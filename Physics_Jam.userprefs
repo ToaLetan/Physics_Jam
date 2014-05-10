@@ -1,11 +1,11 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\PlayerScript.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\InputManager.cs">
     <Files>
-      <File FileName="Assets\Scripts\InputManager.cs" Line="32" Column="4" />
-      <File FileName="Assets\Scripts\XboxController.cs" Line="27" Column="3" />
-      <File FileName="Assets\Scripts\PlayerScript.cs" Line="17" Column="3" />
-      <File FileName="..\..\Semester 6\Colour Craze WORKSPACE\trunk\GradshowProject\Assets\Scripts\Turrets\TurretController.cs" Line="18" Column="3" />
+      <File FileName="Assets\Scripts\PlayerScript.cs" Line="16" Column="35" />
+      <File FileName="Assets\Scripts\InputManager.cs" Line="37" Column="28" />
+      <File FileName="..\..\Semester 6\Colour Craze WORKSPACE\trunk\GradshowProject\Assets\Scripts\General\GamepadInput.cs" Line="208" Column="21" />
+      <File FileName="..\..\Game Jams\GGJ2014\Assets\Scripts\InputManager.cs" Line="15" Column="46" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

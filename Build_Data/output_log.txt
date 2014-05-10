@@ -9,7 +9,7 @@ Direct3D:
 Begin MonoManager ReloadAssembly
 Platform assembly: E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\UnityEngine.dll (this message is harmless)
 Loading E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\UnityEngine.dll into Unity Child Domain
-- Completed reload, in  0.055 seconds
+- Completed reload, in  0.270 seconds
 desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.

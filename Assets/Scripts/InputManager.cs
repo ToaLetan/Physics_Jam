@@ -1,11 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
+using XInputDotNetPure;
 
 public class InputManager
 {
+	public delegate void ControllerButtonEvent(ButtonState buttonState);
+
 	private static InputManager instance = null;
 
-	public XboxController[] ControllerArray = new XboxController[4];
+	public GamePadState[] GamePadStateArray = new GamePadState[4];
+	public GamePadState[] PrevGamePadStateArray = new GamePadState[4];
 
 	public static InputManager Instance
 	{
@@ -20,15 +24,35 @@ public class InputManager
 	// Use this for initialization
 	private InputManager()
 	{
-		ControllerArray [0] = new XboxController (0);
+		for (int i = 0; i < GamePadStateArray.Length; i++) 
+		{
+			GamePadStateArray[i] = GamePad.GetState((PlayerIndex) i);
+			Debug.Log( "Controller " + (i+1) + " connected: " + GamePadStateArray[i].IsConnected);
+		}
 	}
 	
 	// Update is called once per frame
 	public void Update () 
 	{
-		if(ControllerArray[0].GetButtonDown(ControllerArray[0].buttonA) )
+		UpdateControllerStates();
+	}
+
+	private void UpdateControllerStates()
+	{
+		//Check if each controller is connected, set the previous state to the current state and update the current state.
+		for (int i = 0; i < GamePadStateArray.Length; i++) 
 		{
-			Debug.Log("A PRESSED");
+			if(GamePad.GetState((PlayerIndex) i).IsConnected)
+			{
+				PrevGamePadStateArray[i] = GamePadStateArray[i];
+				GamePadStateArray[i] = GamePad.GetState((PlayerIndex) i);
+			}
+			//If the controller is disconnected, maybe pause the game and prompt a reconnect?
 		}
+	}
+
+	private void UpdateButtonInput()
+	{
+
 	}
 }
