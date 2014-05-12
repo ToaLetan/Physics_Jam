@@ -46,14 +46,10 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\GameManager.cs" />
      <Compile Include="Assets\Scripts\InputManager.cs" />
      <Compile Include="Assets\Scripts\PlayerScript.cs" />
      <Compile Include="Assets\Scripts\XboxController.cs" />
-     <Compile Include="Assets\XInputDotNet\Examples\XInputTestCS.cs" />
-     <None Include="Assets\XInputDotNet\MITLicense.txt" />
- <Reference Include="XInputDotNetPure">
- <HintPath>Assets\Plugins\x86\XInputDotNetPure.dll</HintPath>
- </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
