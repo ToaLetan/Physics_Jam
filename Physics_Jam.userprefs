@@ -1,11 +1,11 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\PlayerScript.cs">
     <Files>
-      <File FileName="Assets\Scripts\InputManager.cs" Line="22" Column="38" />
-      <File FileName="Assets\Scripts\PlayerScript.cs" Line="22" Column="2" />
-      <File FileName="Assets\Scripts\GameManager.cs" Line="16" Column="34" />
+      <File FileName="Assets\Scripts\PlayerScript.cs" Line="101" Column="2" />
+      <File FileName="Assets\Scripts\GameManager.cs" Line="11" Column="3" />
       <File FileName="..\..\Game Jams\GGJ2014\Assets\Scripts\PlayerScript.cs" Line="28" Column="34" />
+      <File FileName="C:\Users\Tyler\Documents\GitHub\Unity_Platformer\Assets\Scripts\PlatformerCollision.cs" Line="56" Column="4" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
