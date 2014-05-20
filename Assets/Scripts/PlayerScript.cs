@@ -9,18 +9,21 @@ public class PlayerScript : MonoBehaviour
 
 	private const float MAXVELOCITY = 1.5f;
 
-	private float currentVelocityX = 0;
-	private float currentVelocityY = 0;
+	public float currentVelocityX = 0;
+	public float currentVelocityY = 0;
 
-	private float acceleration = 2.5f;
-	private float deceleration = 2.5f;
-	
+	public float acceleration = 2.5f;
+	public float deceleration = 2.5f;
+
+	private KeyCode previouslyHeldKey;
 
 	// Use this for initialization
 	void Start () 
 	{
 		inputManager.Key_Pressed += PlayerInput;
-		//inputManager.Key_Released += ApplyDeceleration;
+		inputManager.Key_Released += ApplyDeceleration;
+
+		AttachBeam ();
 	}
 	
 	// Update is called once per frame
@@ -62,6 +65,8 @@ public class PlayerScript : MonoBehaviour
 		newPosition.x += currentVelocityX * horizontalDirectionModifier * Time.deltaTime;
 		newPosition.y += currentVelocityY * verticalDirectionModifier * Time.deltaTime;
 		gameObject.transform.position = newPosition;
+
+		previouslyHeldKey = key;
 	}
 
 	private void ApplyDeceleration(int playerNum, KeyCode key)
@@ -72,28 +77,31 @@ public class PlayerScript : MonoBehaviour
 		
 		if (playerNum == PlayerNumber) 
 		{
-			if (key == inputManager.PlayerKeybindArray [playerNum].UpKey || key == inputManager.PlayerKeybindArray [playerNum].DownKey)
+			if (key == previouslyHeldKey) //If the player let go of the key they were holding, decelerate
 			{
 				if(key == inputManager.PlayerKeybindArray [playerNum].UpKey)
 					verticalDirectionModifier = 1;
-				else
+				if (key == inputManager.PlayerKeybindArray [playerNum].DownKey)
 					verticalDirectionModifier = -1;
+
+				if(key == inputManager.PlayerKeybindArray [playerNum].LeftKey)
+					horizontalDirectionModifier = -1;
+				if(key == inputManager.PlayerKeybindArray [playerNum].RightKey)
+					horizontalDirectionModifier = 1;
 				
 				if (currentVelocityY > 0)
 					currentVelocityY -= deceleration * Time.deltaTime;
-			}
-			if (key == inputManager.PlayerKeybindArray [playerNum].LeftKey || key == inputManager.PlayerKeybindArray [playerNum].RightKey)
-			{
-				if(key == inputManager.PlayerKeybindArray [playerNum].LeftKey)
-					horizontalDirectionModifier = -1;
-				else
-					horizontalDirectionModifier = 1;
 				
 				if (currentVelocityX > 0)
 					currentVelocityX -= deceleration * Time.deltaTime;
 			}
 		}
-		
+
+		if (currentVelocityX < 0)
+			currentVelocityX = 0;
+		if (currentVelocityY < 0)
+			currentVelocityY = 0;
+
 		newPosition.x += currentVelocityX * horizontalDirectionModifier * Time.deltaTime;
 		newPosition.y += currentVelocityY * verticalDirectionModifier * Time.deltaTime;
 		gameObject.transform.position = newPosition;
@@ -104,11 +112,24 @@ public class PlayerScript : MonoBehaviour
 		//Replace with a list of collision objects that the player is unable to pass.
 		switch (coll.gameObject.name) 
 		{
+		case "Player":
 		case "Tile_Rock":
 		case "Tile_RockCorner":
 			currentVelocityX = 0;
 			currentVelocityY = 0;
 			break;
 		}
+	}
+
+	void AttachBeam()
+	{
+		GameObject beam = GameObject.Instantiate (Resources.Load ("Prefabs/LineSegment")) as GameObject;
+		beam.transform.position = gameObject.transform.position;
+		beam.transform.localScale = new Vector2 (20, 1);
+		beam.transform.parent = gameObject.transform;
+
+		//Set beam colour
+		SpriteRenderer beamRenderer = beam.transform.GetComponent<SpriteRenderer> ();
+		beamRenderer.material.color = new Color (Random.value, Random.value, Random.value, 0.7f);
 	}
 }
