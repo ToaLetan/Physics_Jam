@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public struct Keybinds
 {
@@ -13,8 +14,8 @@ public struct Keybinds
 
 public class InputManager
 {
-	public delegate void KeyHeldEvent(int playerNum, KeyCode key);
-	public delegate void KeyReleasedEvent(int playerNum, KeyCode key);
+	public delegate void KeyHeldEvent(int playerNum, List<KeyCode> heldKeys);
+	public delegate void KeyReleasedEvent(int playerNum, List<KeyCode> releasedKeys);
 
 	public event KeyHeldEvent Key_Pressed;
 	public event KeyReleasedEvent Key_Released;
@@ -64,67 +65,47 @@ public class InputManager
 		for (int i = 0; i < PlayerKeybindArray.Length; i++) 
 		{
 			//Check all keys being held.
+			List<KeyCode> allHeldKeys = new List<KeyCode>();
+
 			if(Input.GetKey(PlayerKeybindArray [i].UpKey))
-			{
-				if(Key_Pressed != null)
-					Key_Pressed(i, PlayerKeybindArray [i].UpKey);
-			}
+				allHeldKeys.Add(PlayerKeybindArray [i].UpKey);
 			if(Input.GetKey(PlayerKeybindArray [i].DownKey))
-			{
-				if(Key_Pressed != null)
-					Key_Pressed(i, PlayerKeybindArray [i].DownKey);
-			}
+				allHeldKeys.Add(PlayerKeybindArray [i].DownKey);
 			if(Input.GetKey(PlayerKeybindArray [i].LeftKey))
-			{
-				if(Key_Pressed != null)
-					Key_Pressed(i, PlayerKeybindArray [i].LeftKey);
-			}
+				allHeldKeys.Add(PlayerKeybindArray [i].LeftKey);
 			if(Input.GetKey(PlayerKeybindArray [i].RightKey))
-			{
-				if(Key_Pressed != null)
-					Key_Pressed(i, PlayerKeybindArray [i].RightKey);
-			}
+				allHeldKeys.Add(PlayerKeybindArray [i].RightKey);
 			if(Input.GetKey(PlayerKeybindArray [i].LTurnKey))
-			{
-				if(Key_Pressed != null)
-					Key_Pressed(i, PlayerKeybindArray [i].LTurnKey);
-			}
+				allHeldKeys.Add(PlayerKeybindArray [i].LTurnKey);
 			if(Input.GetKey(PlayerKeybindArray [i].RTurnKey))
+				allHeldKeys.Add(PlayerKeybindArray [i].RTurnKey);
+
+			if(allHeldKeys.Count > 0)
 			{
 				if(Key_Pressed != null)
-					Key_Pressed(i, PlayerKeybindArray [i].RTurnKey);
+					Key_Pressed(i, allHeldKeys);
 			}
 
 			//Check all keys being released.
+			List<KeyCode> allReleasedKeys = new List<KeyCode>();
+			
 			if(!Input.GetKey(PlayerKeybindArray [i].UpKey))
-			{
-				if(Key_Released != null)
-					Key_Released(i, PlayerKeybindArray [i].UpKey);
-			}
+				allReleasedKeys.Add(PlayerKeybindArray [i].UpKey);
 			if(!Input.GetKey(PlayerKeybindArray [i].DownKey))
-			{
-				if(Key_Released != null)
-					Key_Released(i, PlayerKeybindArray [i].DownKey);
-			}
+				allReleasedKeys.Add(PlayerKeybindArray [i].DownKey);
 			if(!Input.GetKey(PlayerKeybindArray [i].LeftKey))
-			{
-				if(Key_Released != null)
-					Key_Released(i, PlayerKeybindArray [i].LeftKey);
-			}
+				allReleasedKeys.Add(PlayerKeybindArray [i].LeftKey);
 			if(!Input.GetKey(PlayerKeybindArray [i].RightKey))
-			{
-				if(Key_Released != null)
-					Key_Released(i, PlayerKeybindArray [i].RightKey);
-			}
+				allReleasedKeys.Add(PlayerKeybindArray [i].RightKey);
 			if(!Input.GetKey(PlayerKeybindArray [i].LTurnKey))
-			{
-				if(Key_Released != null)
-					Key_Released(i, PlayerKeybindArray [i].LTurnKey);
-			}
+				allReleasedKeys.Add(PlayerKeybindArray [i].LTurnKey);
 			if(!Input.GetKey(PlayerKeybindArray [i].RTurnKey))
+				allReleasedKeys.Add(PlayerKeybindArray [i].RTurnKey);
+			
+			if(allReleasedKeys.Count > 0)
 			{
 				if(Key_Released != null)
-					Key_Released(i, PlayerKeybindArray [i].RTurnKey);
+					Key_Released(i, allReleasedKeys);
 			}
 
 		}
