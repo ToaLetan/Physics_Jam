@@ -14,8 +14,8 @@ public class CameraEffectsScript : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-		RotateToAngle (275, moveSpeed);
-		ZoomLevel (0.8f, moveSpeed);
+		//RotateToAngle (275, moveSpeed);
+		//ZoomLevel (0.8f, moveSpeed);
 	}
 
 	public void RotateToAngle(float angleInDegrees, float rotateSpeed) //Rotate camera towards a specified angle on the Z-axis
