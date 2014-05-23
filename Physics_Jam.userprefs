@@ -1,9 +1,9 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\PlayerScript.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\CameraEffectsScript.cs">
     <Files>
-      <File FileName="Assets\Scripts\InputManager.cs" Line="84" Column="5" />
-      <File FileName="Assets\Scripts\PlayerScript.cs" Line="65" Column="4" />
+      <File FileName="Assets\Scripts\CameraEffectsScript.cs" Line="22" Column="3" />
+      <File FileName="C:\Users\Tyler\Documents\GitHub\Unity_EnemyShips\Assets\Scripts\EnemyShipScript.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
