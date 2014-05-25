@@ -8,13 +8,16 @@ public class PlayerScript : MonoBehaviour
 
 	InputManager inputManager = InputManager.Instance;
 
-	private const float MAXVELOCITY = 1.5f;
+	private const float MAXVELOCITY = 0.75f;
 
 	public float currentVelocityX = 0;
 	public float currentVelocityY = 0;
 
-	public float acceleration = 2.5f;
-	public float deceleration = 2.5f;
+	private float acceleration = 1.5f;
+	private float deceleration = 4.0f;
+
+	private int currentDirectionX = 0;
+	private int currentDirectionY = 0;
 
 	private KeyCode previouslyHeldKey;
 
@@ -36,17 +39,15 @@ public class PlayerScript : MonoBehaviour
 	private void PlayerInput(int playerNum, List<KeyCode> keysHeld)
 	{
 		Vector3 newPosition = gameObject.transform.position;
-		int horizontalDirectionModifier = 0;
-		int verticalDirectionModifier = 0;
 
 		if (playerNum == PlayerNumber) 
 		{
 			if(keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].UpKey) || keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].DownKey) )
 			{
 				if(keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].UpKey) )
-					verticalDirectionModifier = 1;
+					currentDirectionY = 1;
 				else
-					verticalDirectionModifier = -1;
+					currentDirectionY = -1;
 				
 				if (currentVelocityY < MAXVELOCITY)
 					currentVelocityY += acceleration * Time.deltaTime;
@@ -55,43 +56,37 @@ public class PlayerScript : MonoBehaviour
 			if(keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].LeftKey) || keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].RightKey) )
 			{
 				if(keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].LeftKey) )
-					horizontalDirectionModifier = -1;
+					currentDirectionX = -1;
 				else
-					horizontalDirectionModifier = 1;
+					currentDirectionX = 1;
 
 				if (currentVelocityX < MAXVELOCITY)
 					currentVelocityX += acceleration * Time.deltaTime;
 			}
 		}
 
-		newPosition.x += currentVelocityX * horizontalDirectionModifier * Time.deltaTime;
-		newPosition.y += currentVelocityY * verticalDirectionModifier * Time.deltaTime;
+		newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
+		newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
 		gameObject.transform.position = newPosition;
 	}
 
 	private void ApplyDeceleration(int playerNum, List<KeyCode> keysReleased)
 	{
 		Vector3 newPosition = gameObject.transform.position;
-		int horizontalDirectionModifier = 0;
-		int verticalDirectionModifier = 0;
 		
 		if (playerNum == PlayerNumber) 
 		{
-			if(keysReleased.Contains(inputManager.PlayerKeybindArray [playerNum].UpKey) )
-				verticalDirectionModifier = 1;
-			if(keysReleased.Contains(inputManager.PlayerKeybindArray [playerNum].DownKey) )
-				verticalDirectionModifier = -1;
-
-			if(keysReleased.Contains(inputManager.PlayerKeybindArray [playerNum].LeftKey) )
-				horizontalDirectionModifier = -1;
-			if(keysReleased.Contains(inputManager.PlayerKeybindArray [playerNum].RightKey) )
-				horizontalDirectionModifier = 1;
-				
+			if(keysReleased.Contains(inputManager.PlayerKeybindArray [playerNum].UpKey) && keysReleased.Contains(inputManager.PlayerKeybindArray [playerNum].DownKey) )
+			{
 				if (currentVelocityY > 0)
 					currentVelocityY -= deceleration * Time.deltaTime;
-				
+			}
+
+			if(keysReleased.Contains(inputManager.PlayerKeybindArray [playerNum].LeftKey) && keysReleased.Contains(inputManager.PlayerKeybindArray [playerNum].RightKey) )
+			{
 				if (currentVelocityX > 0)
 					currentVelocityX -= deceleration * Time.deltaTime;
+			}
 		}
 
 		if (currentVelocityX < 0)
@@ -99,8 +94,8 @@ public class PlayerScript : MonoBehaviour
 		if (currentVelocityY < 0)
 			currentVelocityY = 0;
 
-		newPosition.x += currentVelocityX * horizontalDirectionModifier * Time.deltaTime;
-		newPosition.y += currentVelocityY * verticalDirectionModifier * Time.deltaTime;
+		newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
+		newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
 		gameObject.transform.position = newPosition;
 	}
 

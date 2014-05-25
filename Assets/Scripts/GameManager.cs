@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
 	void Start () 
 	{
 		SlowMoManager.Instance.GetAllPhysicsObjects ();
-		SlowMoManager.Instance.SlowMoTime (0.25f, 1.0f);
+		//SlowMoManager.Instance.SlowMoTime (0.25f, 2.0f);
 	}
 	
 	// Update is called once per frame

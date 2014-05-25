@@ -22,7 +22,7 @@ public class CameraEffectsScript : MonoBehaviour
 	{
 		Quaternion newRotation = Quaternion.AngleAxis (angleInDegrees, Vector3.forward);
 
-		gameObject.transform.rotation = Quaternion.Slerp(gameObject.transform.rotation, newRotation, rotateSpeed * Time.deltaTime);
+		gameObject.transform.rotation = Quaternion.Slerp(gameObject.transform.rotation, newRotation, rotateSpeed * Time.deltaTime * SlowMoManager.Instance.SlowMoSpeed);
 	}
 
 	public void ZoomLevel(float zoomScale, float zoomSpeed) //Zoom in/out (positive
@@ -30,8 +30,6 @@ public class CameraEffectsScript : MonoBehaviour
 		Camera theCamera = gameObject.GetComponent<Camera>();
 
 		if (theCamera.orthographicSize != zoomScale)
-			theCamera.orthographicSize += (zoomScale - theCamera.orthographicSize) * Time.deltaTime * zoomSpeed;
-
-		//theCamera.orthographicSize = zoomScale;
+			theCamera.orthographicSize += (zoomScale - theCamera.orthographicSize) * zoomSpeed * Time.deltaTime  * SlowMoManager.Instance.SlowMoSpeed;
 	}
 }
