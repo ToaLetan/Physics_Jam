@@ -4,12 +4,18 @@ using System.Collections.Generic;
 
 public struct Keybinds
 {
+	//Movement Keys
 	public KeyCode UpKey;
 	public KeyCode DownKey;
 	public KeyCode LeftKey;
 	public KeyCode RightKey;
+
+	//Beam keys
 	public KeyCode LTurnKey;
 	public KeyCode RTurnKey;
+
+	//Physics manipulation keys
+	public KeyCode GraborThrowKey;
 }
 
 public class InputManager
@@ -44,6 +50,7 @@ public class InputManager
 		PlayerKeybindArray [0].RightKey = KeyCode.D;
 		PlayerKeybindArray [0].LTurnKey = KeyCode.Q;
 		PlayerKeybindArray [0].RTurnKey = KeyCode.E;
+		PlayerKeybindArray [0].GraborThrowKey = KeyCode.F;
 
 		PlayerKeybindArray [1].UpKey = KeyCode.I;
 		PlayerKeybindArray [1].DownKey = KeyCode.K;
@@ -51,6 +58,7 @@ public class InputManager
 		PlayerKeybindArray [1].RightKey = KeyCode.L;
 		PlayerKeybindArray [1].LTurnKey = KeyCode.U;
 		PlayerKeybindArray [1].RTurnKey = KeyCode.O;
+		PlayerKeybindArray [1].GraborThrowKey = KeyCode.Semicolon;
 	}
 	
 	// Update is called once per frame

@@ -13,13 +13,15 @@ public class PlayerScript : MonoBehaviour
 	public float currentVelocityX = 0;
 	public float currentVelocityY = 0;
 
+	public float turnSpeed = 50.0f;
+
+	private GameObject selectorBeam = null;
+
 	private float acceleration = 1.5f;
 	private float deceleration = 4.0f;
 
 	private int currentDirectionX = 0;
 	private int currentDirectionY = 0;
-
-	private KeyCode previouslyHeldKey;
 
 	// Use this for initialization
 	void Start () 
@@ -44,8 +46,12 @@ public class PlayerScript : MonoBehaviour
 		{
 			if(keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].UpKey) || keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].DownKey) )
 			{
+				//================================================ MOVEMENT ================================================
+				//Clean this mess up later, make a MovePlayer() function
 				if(keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].UpKey) )
+				{
 					currentDirectionY = 1;
+				}
 				else
 					currentDirectionY = -1;
 				
@@ -63,6 +69,17 @@ public class PlayerScript : MonoBehaviour
 				if (currentVelocityX < MAXVELOCITY)
 					currentVelocityX += acceleration * Time.deltaTime;
 			}
+			//=================================================================================================================
+
+			//================================================ BEAM ROTATION ================================================
+			if(keysHeld.Contains(inputManager.PlayerKeybindArray[playerNum].LTurnKey) || keysHeld.Contains(inputManager.PlayerKeybindArray[playerNum].RTurnKey) )
+			{
+				if(keysHeld.Contains(inputManager.PlayerKeybindArray[playerNum].LTurnKey) )
+					RotateBeam(1);
+				else
+					RotateBeam(-1);
+			}
+			//=================================================================================================================
 		}
 
 		newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
@@ -99,10 +116,10 @@ public class PlayerScript : MonoBehaviour
 		gameObject.transform.position = newPosition;
 	}
 
-	void OnCollisionEnter2D(Collision2D coll)
+	void OnCollisionEnter2D(Collision2D collisionObj)
 	{
 		//Replace with a list of collision objects that the player is unable to pass.
-		switch (coll.gameObject.name) 
+		switch (collisionObj.gameObject.name) 
 		{
 		case "Player":
 		case "Tile_Rock":
@@ -115,13 +132,31 @@ public class PlayerScript : MonoBehaviour
 
 	void AttachBeam()
 	{
-		GameObject beam = GameObject.Instantiate (Resources.Load ("Prefabs/LineSegment")) as GameObject;
-		beam.transform.position = gameObject.transform.position;
-		beam.transform.localScale = new Vector2 (20, 1);
-		beam.transform.parent = gameObject.transform;
+		selectorBeam = GameObject.Instantiate (Resources.Load ("Prefabs/LineSegment")) as GameObject;
+		selectorBeam.transform.position = gameObject.transform.position;
+		selectorBeam.transform.localScale = new Vector2 (20, 1);
+		selectorBeam.transform.parent = gameObject.transform;
 
 		//Set beam colour
-		SpriteRenderer beamRenderer = beam.transform.GetComponent<SpriteRenderer> ();
+		SpriteRenderer beamRenderer = selectorBeam.transform.GetComponent<SpriteRenderer> ();
 		beamRenderer.material.color = new Color (Random.value, Random.value, Random.value, 0.7f);
+	}
+
+	void RotateBeam(int direction)
+	{
+		float newAngle = selectorBeam.transform.rotation.eulerAngles.z + turnSpeed * direction * Time.deltaTime;
+		Quaternion newRotation = Quaternion.AngleAxis (newAngle, Vector3.forward);
+
+		selectorBeam.transform.rotation = newRotation;
+	}
+
+	void GrabObject()
+	{
+
+	}
+
+	void ThrowObject()
+	{
+
 	}
 }

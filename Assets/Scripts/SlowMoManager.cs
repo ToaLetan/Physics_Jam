@@ -39,11 +39,6 @@ public class SlowMoManager
 	public void GetAllPhysicsObjects()
 	{
 		physicsObjects = GameObject.FindGameObjectsWithTag ("PhysicsObj");
-
-		for(int i = 0; i < physicsObjects.Length; i++)
-		{
-			Debug.Log(physicsObjects[i].name);
-		}
 	}
 
 	public void SlowMoTime(float timeSpeed, float duration) //Change the game speed for a specified length of time.

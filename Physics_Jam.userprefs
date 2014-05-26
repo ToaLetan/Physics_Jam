@@ -1,11 +1,9 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\PlayerScript.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\BeamScript.cs">
     <Files>
-      <File FileName="Assets\Scripts\GameManager.cs" Line="11" Column="5" />
-      <File FileName="Assets\Scripts\CameraEffectsScript.cs" Line="18" Column="5" />
-      <File FileName="Assets\Scripts\InputManager.cs" Line="32" Column="35" />
-      <File FileName="Assets\Scripts\PlayerScript.cs" Line="16" Column="36" />
+      <File FileName="Assets\Scripts\PlayerScript.cs" Line="138" Column="56" />
+      <File FileName="Assets\Scripts\BeamScript.cs" Line="17" Column="3" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
