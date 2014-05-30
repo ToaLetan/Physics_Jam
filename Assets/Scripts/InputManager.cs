@@ -87,6 +87,8 @@ public class InputManager
 				allHeldKeys.Add(PlayerKeybindArray [i].LTurnKey);
 			if(Input.GetKey(PlayerKeybindArray [i].RTurnKey))
 				allHeldKeys.Add(PlayerKeybindArray [i].RTurnKey);
+			if(Input.GetKey(PlayerKeybindArray [i].GraborThrowKey))
+				allHeldKeys.Add(PlayerKeybindArray [i].GraborThrowKey);
 
 			if(allHeldKeys.Count > 0)
 			{
@@ -109,6 +111,8 @@ public class InputManager
 				allReleasedKeys.Add(PlayerKeybindArray [i].LTurnKey);
 			if(!Input.GetKey(PlayerKeybindArray [i].RTurnKey))
 				allReleasedKeys.Add(PlayerKeybindArray [i].RTurnKey);
+			if(!Input.GetKey(PlayerKeybindArray [i].GraborThrowKey))
+				allReleasedKeys.Add(PlayerKeybindArray [i].GraborThrowKey);
 			
 			if(allReleasedKeys.Count > 0)
 			{

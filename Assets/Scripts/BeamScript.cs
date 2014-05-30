@@ -24,14 +24,14 @@ public class BeamScript : MonoBehaviour
 
 	// TOO FRAMEY, FIND A BETTER SOLUTION.
 
-	/*void OnTriggerEnter2D(Collider2D collisionObj)
+	void OnTriggerEnter2D(Collider2D collisionObj)
 	{
 		switch (collisionObj.gameObject.tag) 
 		{
 			case "PhysicsObj":
 				currentObjectSelected = collisionObj.gameObject;
-				Debug.Log(currentObjectSelected.name);
+				Debug.Log(currentObjectSelected.transform.localScale);
 				break;
 		}
-	}*/
+	}
 }

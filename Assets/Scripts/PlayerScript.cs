@@ -79,6 +79,11 @@ public class PlayerScript : MonoBehaviour
 				else
 					RotateBeam(-1);
 			}
+
+			if(keysHeld.Contains(inputManager.PlayerKeybindArray[playerNum].GraborThrowKey) )
+			{
+				GrabObject();
+			}
 			//=================================================================================================================
 		}
 
@@ -152,7 +157,20 @@ public class PlayerScript : MonoBehaviour
 
 	void GrabObject()
 	{
+		BeamScript playerBeam = selectorBeam.GetComponent<BeamScript> ();
+		if (playerBeam.CurrentObjectSelected != null) 
+		{
+			playerBeam.CurrentObjectSelected.GetComponent<Rigidbody2D>().gravityScale = 0;
+			playerBeam.CurrentObjectSelected.GetComponent<Rigidbody2D>().angularVelocity = 0;
+			playerBeam.CurrentObjectSelected.GetComponent<BoxCollider2D>().enabled = false;
 
+			//playerBeam.CurrentObjectSelected.transform.position = Vector3.zero;
+			playerBeam.CurrentObjectSelected.transform.parent = selectorBeam.transform;
+
+			//MAKE SURE TO SET THE OBJECT'S SCALE, AS IT INHERITS THE PARENT OBJECT'S SCALE FOR SOME STUPID REASON.
+			playerBeam.CurrentObjectSelected.transform.localScale = new Vector2(1/playerBeam.transform.localScale.x, 1/playerBeam.transform.localScale.y);
+			playerBeam.CurrentObjectSelected.transform.rotation = playerBeam.transform.rotation;
+		}
 	}
 
 	void ThrowObject()
