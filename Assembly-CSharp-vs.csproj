@@ -46,13 +46,14 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\BeamScript.cs" />
-     <Compile Include="Assets\Scripts\CameraEffectsScript.cs" />
-     <Compile Include="Assets\Scripts\GameManager.cs" />
-     <Compile Include="Assets\Scripts\InputManager.cs" />
-     <Compile Include="Assets\Scripts\PlayerScript.cs" />
-     <Compile Include="Assets\Scripts\SlowMoManager.cs" />
-     <Compile Include="Assets\Scripts\XboxController.cs" />
+     <Compile Include="Assets\Scripts\General Scripts\CameraEffectsScript.cs" />
+     <Compile Include="Assets\Scripts\General Scripts\SpeculativeContactsScript.cs" />
+     <Compile Include="Assets\Scripts\Input Scripts\InputManager.cs" />
+     <Compile Include="Assets\Scripts\Input Scripts\XboxController.cs" />
+     <Compile Include="Assets\Scripts\Management Scripts\GameManager.cs" />
+     <Compile Include="Assets\Scripts\Management Scripts\SlowMoManager.cs" />
+     <Compile Include="Assets\Scripts\Player Scripts\BeamScript.cs" />
+     <Compile Include="Assets\Scripts\Player Scripts\PlayerScript.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -16,12 +16,16 @@ public class PlayerScript : MonoBehaviour
 	public float turnSpeed = 50.0f;
 
 	private GameObject selectorBeam = null;
+    private GameObject imminentCollisionObj = null;
 
 	private float acceleration = 1.5f;
 	private float deceleration = 4.0f;
 
 	private int currentDirectionX = 0;
 	private int currentDirectionY = 0;
+
+    private float width;
+    private float height;
 
 	// Use this for initialization
 	void Start () 
@@ -30,6 +34,9 @@ public class PlayerScript : MonoBehaviour
 		inputManager.Key_Released += ApplyDeceleration;
 
 		AttachBeam ();
+
+        width = gameObject.GetComponent<SpriteRenderer>().sprite.bounds.max.x;
+        height = gameObject.GetComponent<SpriteRenderer>().sprite.bounds.max.y;
 	}
 	
 	// Update is called once per frame
@@ -55,8 +62,14 @@ public class PlayerScript : MonoBehaviour
 				else
 					currentDirectionY = -1;
 				
-				if (currentVelocityY < MAXVELOCITY)
-					currentVelocityY += acceleration * Time.deltaTime;
+				if (currentVelocityY < MAXVELOCITY) //As long as the player isn't at top speed, increase velocity.
+                {
+                    //Check if the player is going to collide with an object.
+                    if(SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.up * currentDirectionY, height * 1.5f) == true)
+                        currentVelocityY = 0;
+                    else
+					    currentVelocityY += acceleration * Time.deltaTime;
+                }
 			}
 
 			if(keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].LeftKey) || keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].RightKey) )
@@ -67,7 +80,12 @@ public class PlayerScript : MonoBehaviour
 					currentDirectionX = 1;
 
 				if (currentVelocityX < MAXVELOCITY)
-					currentVelocityX += acceleration * Time.deltaTime;
+                {
+                    if(SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.right * currentDirectionX, width * 1.5f) == true)
+                        currentVelocityX = 0;
+                    else
+					    currentVelocityX += acceleration * Time.deltaTime;
+                }
 			}
 			//=================================================================================================================
 
@@ -101,13 +119,23 @@ public class PlayerScript : MonoBehaviour
 			if(keysReleased.Contains(inputManager.PlayerKeybindArray [playerNum].UpKey) && keysReleased.Contains(inputManager.PlayerKeybindArray [playerNum].DownKey) )
 			{
 				if (currentVelocityY > 0)
-					currentVelocityY -= deceleration * Time.deltaTime;
+                {
+                    if(SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.up * currentDirectionY, height * 1.5f) == true)
+                        currentVelocityY = 0;
+                    else
+					    currentVelocityY -= deceleration * Time.deltaTime;
+                }
 			}
 
 			if(keysReleased.Contains(inputManager.PlayerKeybindArray [playerNum].LeftKey) && keysReleased.Contains(inputManager.PlayerKeybindArray [playerNum].RightKey) )
 			{
 				if (currentVelocityX > 0)
-					currentVelocityX -= deceleration * Time.deltaTime;
+                {
+                    if(SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.right * currentDirectionX, width * 1.5f) == true)
+                        currentVelocityX = 0;
+                    else
+					    currentVelocityX -= deceleration * Time.deltaTime;
+                }
 			}
 		}
 
@@ -128,9 +156,11 @@ public class PlayerScript : MonoBehaviour
 		{
 		case "Player":
 		case "Tile_Rock":
-		case "Tile_RockCorner":
-			currentVelocityX = 0;
-			currentVelocityY = 0;
+		case "Tile_RockCorner":                       
+            if(currentVelocityX > 0)
+			    currentVelocityX = 0;
+            if(currentVelocityY > 0)
+			    currentVelocityY = 0;
 			break;
 		}
 	}

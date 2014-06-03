@@ -4,6 +4,7 @@ using System.Collections;
 public class BeamScript : MonoBehaviour 
 {
 	private GameObject currentObjectSelected = null;
+	private bool isHoldingObject = false;
 
 	public GameObject CurrentObjectSelected
 	{
@@ -22,16 +23,26 @@ public class BeamScript : MonoBehaviour
 
 	}
 
-	// TOO FRAMEY, FIND A BETTER SOLUTION.
-
 	void OnTriggerEnter2D(Collider2D collisionObj)
 	{
 		switch (collisionObj.gameObject.tag) 
 		{
 			case "PhysicsObj":
-				currentObjectSelected = collisionObj.gameObject;
-				Debug.Log(currentObjectSelected.transform.localScale);
+				if(!isHoldingObject)
+				{
+					currentObjectSelected = collisionObj.gameObject;
+					isHoldingObject = true;
+				}
 				break;
+		}
+	}
+
+	void OnTriggerExit2D(Collider2D collisionObj)
+	{
+		if (currentObjectSelected != null) 
+		{
+			if(collisionObj.gameObject == currentObjectSelected)
+				currentObjectSelected = null;
 		}
 	}
 }
