@@ -48,6 +48,7 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\General Scripts\CameraEffectsScript.cs" />
      <Compile Include="Assets\Scripts\General Scripts\SpeculativeContactsScript.cs" />
+     <Compile Include="Assets\Scripts\General Scripts\Timer.cs" />
      <Compile Include="Assets\Scripts\Input Scripts\InputManager.cs" />
      <Compile Include="Assets\Scripts\Input Scripts\XboxController.cs" />
      <Compile Include="Assets\Scripts\Management Scripts\GameManager.cs" />

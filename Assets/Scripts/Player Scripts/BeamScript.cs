@@ -4,12 +4,23 @@ using System.Collections;
 public class BeamScript : MonoBehaviour 
 {
 	private GameObject currentObjectSelected = null;
+    private GameObject currentObjectHeld = null;
 	private bool isHoldingObject = false;
 
 	public GameObject CurrentObjectSelected
 	{
 		get { return currentObjectSelected; }
 	}
+
+    public GameObject CurrentObjectHeld
+    {
+        get { return currentObjectHeld; }
+    }
+
+    public bool IsHoldingObject
+    {
+        get { return isHoldingObject; }
+    }
 
 	// Use this for initialization
 	void Start () 
@@ -31,7 +42,6 @@ public class BeamScript : MonoBehaviour
 				if(!isHoldingObject)
 				{
 					currentObjectSelected = collisionObj.gameObject;
-					isHoldingObject = true;
 				}
 				break;
 		}
@@ -45,4 +55,16 @@ public class BeamScript : MonoBehaviour
 				currentObjectSelected = null;
 		}
 	}
+
+    public void GrabObject()
+    {
+        isHoldingObject = true;
+        currentObjectHeld = currentObjectSelected;
+    }
+
+    public void ReleaseObject()
+    {
+        isHoldingObject = false;
+        currentObjectHeld = null;
+    }
 }

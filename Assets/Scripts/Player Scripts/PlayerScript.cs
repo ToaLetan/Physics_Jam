@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 public class PlayerScript : MonoBehaviour 
 {
+    private const float SELECTIONTIME = 0.5f;
+    private const float THROWVELOCITY = 250.0f;
+
 	public int PlayerNumber = 0;
 
 	InputManager inputManager = InputManager.Instance;
@@ -18,6 +21,8 @@ public class PlayerScript : MonoBehaviour
 	private GameObject selectorBeam = null;
     private GameObject imminentCollisionObj = null;
 
+    private Timer selectionTimer = new Timer(SELECTIONTIME);
+
 	private float acceleration = 1.5f;
 	private float deceleration = 4.0f;
 
@@ -27,11 +32,15 @@ public class PlayerScript : MonoBehaviour
     private float width;
     private float height;
 
+    private bool canPerformAction = true;
+
 	// Use this for initialization
 	void Start () 
 	{
 		inputManager.Key_Pressed += PlayerInput;
 		inputManager.Key_Released += ApplyDeceleration;
+
+        selectionTimer.OnTimerComplete += SetAction;
 
 		AttachBeam ();
 
@@ -42,7 +51,7 @@ public class PlayerScript : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-
+        selectionTimer.Update();
 	}
 
 	private void PlayerInput(int playerNum, List<KeyCode> keysHeld)
@@ -100,7 +109,13 @@ public class PlayerScript : MonoBehaviour
 
 			if(keysHeld.Contains(inputManager.PlayerKeybindArray[playerNum].GraborThrowKey) )
 			{
-				GrabObject();
+                if(canPerformAction == true)
+                {
+                    if(selectorBeam.GetComponent<BeamScript> ().IsHoldingObject == false )
+                        GrabObject();
+                    else
+                        ThrowObject();
+                }
 			}
 			//=================================================================================================================
 		}
@@ -190,8 +205,10 @@ public class PlayerScript : MonoBehaviour
 		BeamScript playerBeam = selectorBeam.GetComponent<BeamScript> ();
 		if (playerBeam.CurrentObjectSelected != null) 
 		{
+            playerBeam.GrabObject();
+
 			playerBeam.CurrentObjectSelected.GetComponent<Rigidbody2D>().gravityScale = 0;
-			playerBeam.CurrentObjectSelected.GetComponent<Rigidbody2D>().angularVelocity = 0;
+			playerBeam.CurrentObjectSelected.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
 			playerBeam.CurrentObjectSelected.GetComponent<BoxCollider2D>().enabled = false;
 
 			//playerBeam.CurrentObjectSelected.transform.position = Vector3.zero;
@@ -200,11 +217,32 @@ public class PlayerScript : MonoBehaviour
 			//MAKE SURE TO SET THE OBJECT'S SCALE, AS IT INHERITS THE PARENT OBJECT'S SCALE FOR SOME STUPID REASON.
 			playerBeam.CurrentObjectSelected.transform.localScale = new Vector2(1/playerBeam.transform.localScale.x, 1/playerBeam.transform.localScale.y);
 			playerBeam.CurrentObjectSelected.transform.rotation = playerBeam.transform.rotation;
+
+            selectionTimer.ResetTimer(true);
+            canPerformAction = false;
 		}
 	}
 
 	void ThrowObject()
 	{
+        BeamScript playerBeam = selectorBeam.GetComponent<BeamScript> ();
 
+        if (playerBeam.CurrentObjectHeld != null)
+        {
+            playerBeam.CurrentObjectHeld.GetComponent<Rigidbody2D>().AddForce(playerBeam.CurrentObjectHeld.transform.right * THROWVELOCITY);
+
+            playerBeam.CurrentObjectHeld.GetComponent<BoxCollider2D>().enabled = true;
+
+            playerBeam.CurrentObjectHeld.transform.parent = null;
+            playerBeam.ReleaseObject();
+
+            selectionTimer.ResetTimer(true);
+            canPerformAction = false;
+        }
 	}
+
+    void SetAction()
+    {
+        canPerformAction = true;
+    }
 }
