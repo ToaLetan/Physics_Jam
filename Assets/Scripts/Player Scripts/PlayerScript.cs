@@ -4,24 +4,26 @@ using System.Collections.Generic;
 
 public class PlayerScript : MonoBehaviour 
 {
+    private const float MAXVELOCITY = 0.75f;
     private const float SELECTIONTIME = 0.5f;
     private const float THROWVELOCITY = 250.0f;
+    private const float BEAMOFFSET = -0.03f;
 
 	public int PlayerNumber = 0;
 
-	InputManager inputManager = InputManager.Instance;
+    InputManager inputManager = InputManager.Instance;
 
-	private const float MAXVELOCITY = 0.75f;
-
-	public float currentVelocityX = 0;
-	public float currentVelocityY = 0;
-
-	public float turnSpeed = 50.0f;
-
-	private GameObject selectorBeam = null;
+    private GameObject selectorBeam = null;
     private GameObject imminentCollisionObj = null;
-
+    
     private Timer selectionTimer = new Timer(SELECTIONTIME);
+
+    private Color playerColour = Color.white;
+
+	private float currentVelocityX = 0;
+	private float currentVelocityY = 0;
+
+	private float turnSpeed = 100.0f;
 
 	private float acceleration = 1.5f;
 	private float deceleration = 4.0f;
@@ -42,6 +44,7 @@ public class PlayerScript : MonoBehaviour
 
         selectionTimer.OnTimerComplete += SetAction;
 
+        SetPlayerColour();
 		AttachBeam ();
 
         width = gameObject.GetComponent<SpriteRenderer>().sprite.bounds.max.x;
@@ -53,6 +56,16 @@ public class PlayerScript : MonoBehaviour
 	{
         selectionTimer.Update();
 	}
+
+    private void SetPlayerColour()
+    {
+        if (gameObject.transform.FindChild("PlayerGlowLayerV1") != null)
+        {
+            SpriteRenderer glowLayerRenderer = gameObject.transform.FindChild("PlayerGlowLayerV1").GetComponent<SpriteRenderer> ();
+            playerColour = new Color (Random.value, Random.value, Random.value, 0.7f);
+            glowLayerRenderer.material.color = playerColour;
+        }
+    }
 
 	private void PlayerInput(int playerNum, List<KeyCode> keysHeld)
 	{
@@ -164,7 +177,7 @@ public class PlayerScript : MonoBehaviour
 		gameObject.transform.position = newPosition;
 	}
 
-	void OnCollisionEnter2D(Collision2D collisionObj)
+	private void OnCollisionEnter2D(Collision2D collisionObj)
 	{
 		//Replace with a list of collision objects that the player is unable to pass.
 		switch (collisionObj.gameObject.name) 
@@ -180,27 +193,47 @@ public class PlayerScript : MonoBehaviour
 		}
 	}
 
-	void AttachBeam()
+	private void AttachBeam()
 	{
 		selectorBeam = GameObject.Instantiate (Resources.Load ("Prefabs/LineSegment")) as GameObject;
-		selectorBeam.transform.position = gameObject.transform.position;
+
+        if (gameObject.transform.FindChild("PlayerArmV1") != null)
+        {
+            //Get the position of the player arm and its length, attach the beam to the end of the arm where the hand is.
+            Vector3 playerArmPos = gameObject.transform.FindChild("PlayerArmV1").position;
+            float playerArmLength = gameObject.transform.FindChild("PlayerArmV1").GetComponent<SpriteRenderer>().sprite.bounds.max.x;
+
+            playerArmPos.x += playerArmLength + BEAMOFFSET;
+
+            selectorBeam.transform.position = playerArmPos;
+            selectorBeam.transform.parent = gameObject.transform.FindChild("PlayerArmV1");
+        } 
+        else
+        {
+            selectorBeam.transform.position = gameObject.transform.position;
+            selectorBeam.transform.parent = gameObject.transform;
+        }
+
 		selectorBeam.transform.localScale = new Vector2 (20, 1);
-		selectorBeam.transform.parent = gameObject.transform;
+		
 
 		//Set beam colour
 		SpriteRenderer beamRenderer = selectorBeam.transform.GetComponent<SpriteRenderer> ();
-		beamRenderer.material.color = new Color (Random.value, Random.value, Random.value, 0.7f);
+        beamRenderer.material.color = playerColour;
 	}
 
-	void RotateBeam(int direction)
+	private void RotateBeam(int direction)
 	{
 		float newAngle = selectorBeam.transform.rotation.eulerAngles.z + turnSpeed * direction * Time.deltaTime;
 		Quaternion newRotation = Quaternion.AngleAxis (newAngle, Vector3.forward);
 
+        if (gameObject.transform.FindChild("PlayerArmV1") != null)
+            gameObject.transform.FindChild("PlayerArmV1").rotation = newRotation;
+
 		selectorBeam.transform.rotation = newRotation;
 	}
 
-	void GrabObject()
+	private void GrabObject()
 	{
 		BeamScript playerBeam = selectorBeam.GetComponent<BeamScript> ();
 		if (playerBeam.CurrentObjectSelected != null) 
@@ -223,7 +256,7 @@ public class PlayerScript : MonoBehaviour
 		}
 	}
 
-	void ThrowObject()
+	private void ThrowObject()
 	{
         BeamScript playerBeam = selectorBeam.GetComponent<BeamScript> ();
 
@@ -241,7 +274,7 @@ public class PlayerScript : MonoBehaviour
         }
 	}
 
-    void SetAction()
+    private void SetAction()
     {
         canPerformAction = true;
     }
