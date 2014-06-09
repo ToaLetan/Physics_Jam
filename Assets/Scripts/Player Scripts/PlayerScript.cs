@@ -8,6 +8,7 @@ public class PlayerScript : MonoBehaviour
     private const float SELECTIONTIME = 0.5f;
     private const float THROWVELOCITY = 250.0f;
     private const float BEAMOFFSET = -0.03f;
+    private const float BEAMALPHA = 0.7f;
 
 	public int PlayerNumber = 0;
 
@@ -62,7 +63,7 @@ public class PlayerScript : MonoBehaviour
         if (gameObject.transform.FindChild("PlayerGlowLayerV1") != null)
         {
             SpriteRenderer glowLayerRenderer = gameObject.transform.FindChild("PlayerGlowLayerV1").GetComponent<SpriteRenderer> ();
-            playerColour = new Color (Random.value, Random.value, Random.value, 0.7f);
+            playerColour = new Color (Random.value, Random.value, Random.value, 1.0f);
             glowLayerRenderer.material.color = playerColour;
         }
     }
@@ -219,7 +220,9 @@ public class PlayerScript : MonoBehaviour
 
 		//Set beam colour
 		SpriteRenderer beamRenderer = selectorBeam.transform.GetComponent<SpriteRenderer> ();
-        beamRenderer.material.color = playerColour;
+        Color beamColour = playerColour;
+        beamColour.a = BEAMALPHA;
+        beamRenderer.material.color = beamColour;
 	}
 
 	private void RotateBeam(int direction)
