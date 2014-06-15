@@ -53,6 +53,7 @@
      <Compile Include="Assets\Scripts\Input Scripts\XboxController.cs" />
      <Compile Include="Assets\Scripts\Management Scripts\GameManager.cs" />
      <Compile Include="Assets\Scripts\Management Scripts\SlowMoManager.cs" />
+     <Compile Include="Assets\Scripts\Management Scripts\UIManager.cs" />
      <Compile Include="Assets\Scripts\Player Scripts\BeamScript.cs" />
      <Compile Include="Assets\Scripts\Player Scripts\PlayerScript.cs" />
   </ItemGroup>

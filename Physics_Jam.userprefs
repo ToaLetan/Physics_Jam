@@ -1,8 +1,10 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Player Scripts\PlayerScript.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Management Scripts\UIManager.cs">
     <Files>
-      <File FileName="Assets\Scripts\Player Scripts\PlayerScript.cs" Line="267" Column="10" />
+      <File FileName="Assets\Scripts\Management Scripts\UIManager.cs" Line="35" Column="32" />
+      <File FileName="Assets\Scripts\Management Scripts\GameManager.cs" Line="23" Column="1" />
+      <File FileName="Assets\Scripts\Player Scripts\PlayerScript.cs" Line="75" Column="61" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

@@ -1,0 +1,129 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+public class UIManager
+{
+    private GameObject[] playerArray = new GameObject[4];
+    private GameObject[] playerNamesArray = new GameObject[4];
+    private List<GameObject> playerLivesList = new List<GameObject>();
+
+    private Camera camera;
+
+    private static UIManager instance = null;
+
+    public static UIManager Instance
+    {
+        get
+        {
+            if(instance == null)
+                instance = new UIManager();
+            return instance;
+        }
+    }
+
+	// Use this for initialization
+	private UIManager() 
+    {
+        GameObject[] activePlayers = GameObject.FindGameObjectsWithTag("Player");
+
+        //Arrange the player array to match the player numbers.
+        //THIS IS REALLY GHETTO. FIX IT LATER WHEN NOT TIRED.
+        for (int i = 0; i < activePlayers.Length; i++)
+        {
+            if(activePlayers[i].transform.GetComponent<PlayerScript>().PlayerNumber == 0)
+                playerArray[0] = activePlayers[i];
+            if(activePlayers[i].transform.GetComponent<PlayerScript>().PlayerNumber == 1)
+                playerArray[1] = activePlayers[i];
+            if(activePlayers[i].transform.GetComponent<PlayerScript>().PlayerNumber == 2)
+                playerArray[2] = activePlayers[i];
+            if(activePlayers[i].transform.GetComponent<PlayerScript>().PlayerNumber == 3)
+                playerArray[3] = activePlayers[i];
+        }
+
+        ConstructHUD();
+	}
+	
+	// Update is called once per frame
+	public void Update () 
+    {
+
+	}
+
+    public void ConstructHUD() //Instantiate the HUD, consists of 2-4 Player sectors + info/score/etc., game time remaining.
+    {
+        camera = GameObject.FindGameObjectWithTag("MainCamera").transform.GetComponent<Camera>();
+
+        for (int i = 0; i < playerArray.Length; i++)
+        {
+            playerNamesArray[i] = GameObject.Instantiate(Resources.Load("Prefabs/GUI/Text_Player" + (i+1) ) ) as GameObject;
+            playerNamesArray[i].transform.parent = camera.gameObject.transform;
+
+            PositionHUDElements(playerNamesArray[i].name);
+
+            GenerateLifeIcons(5, i);
+        }
+
+        MatchPlayerColours();
+    }
+
+    private void PositionHUDElements(string elementName)
+    {
+        //Positions HUD objects based on camera size. Offset added to leave room for other GUI objects, spacing, etc.
+        //z = 1 required for some reason. It's weird.
+
+        float UIOffset = 0.1f;
+
+        elementName = elementName.Remove(elementName.IndexOf("(Clone)") );
+
+        switch (elementName)
+        {
+            case "Text_Player1":
+                playerNamesArray[0].transform.localPosition = new Vector3(-camera.orthographicSize - UIOffset, camera.orthographicSize - UIOffset, 1);
+                break;
+            case "Text_Player2":
+                playerNamesArray[1].transform.localPosition = new Vector3(camera.orthographicSize - UIOffset * 2.6f, camera.orthographicSize - UIOffset, 1);
+                break;
+            case "Text_Player3":
+                playerNamesArray[2].transform.localPosition = new Vector3(-camera.orthographicSize - UIOffset, -camera.orthographicSize + (UIOffset * 2), 1);
+                break;
+            case "Text_Player4":
+                playerNamesArray[3].transform.localPosition = new Vector3(camera.orthographicSize - UIOffset * 2.6f, -camera.orthographicSize + (UIOffset * 2), 1);
+                break;
+        }
+    }
+
+    private void GenerateLifeIcons(int numOfLives, int ownerNumber)
+    {
+        float UIOffset = 0.1f;
+
+        for (int i = 0; i < numOfLives; i++)
+        {
+            GameObject newLifeIcon = GameObject.Instantiate(Resources.Load("Prefabs/GUI/Life_Icon") ) as GameObject;
+
+            float lifeIconWidth = newLifeIcon.transform.GetComponent<SpriteRenderer>().bounds.max.x;
+            float lifeIconHeight = newLifeIcon.transform.GetComponent<SpriteRenderer>().bounds.max.y;
+
+            newLifeIcon.transform.parent = playerNamesArray[ownerNumber].transform;
+            newLifeIcon.transform.localPosition = new Vector3(-UIOffset * 2 + (UIOffset * i * 2), -UIOffset * 1.5f, 0);
+
+            playerLivesList.Add(newLifeIcon);
+        }
+    }
+
+    private void MatchPlayerColours() //Colour all player text and icons to match their player colour.
+    {
+        for(int i = 0; i < playerArray.Length; i++)
+        {
+            //Set the player name text to the player colour.
+            playerNamesArray[i].transform.GetComponent<SpriteRenderer>().material.color = playerArray[i].transform.GetComponent<PlayerScript>().PlayerColour;
+
+            //Set all life icons to match that player's colour.
+            for(int j = 0; j < playerNamesArray[i].transform.childCount; j++)
+            {
+                playerNamesArray[i].transform.GetChild(j).GetComponent<SpriteRenderer>().material.color = playerArray[i].transform.GetComponent<PlayerScript>().PlayerColour;
+            }
+        }
+    }
+
+}

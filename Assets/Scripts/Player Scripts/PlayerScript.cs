@@ -10,6 +10,9 @@ public class PlayerScript : MonoBehaviour
     private const float BEAMOFFSET = -0.03f;
     private const float BEAMALPHA = 0.7f;
 
+    public delegate void PlayerEvent();
+    public event PlayerEvent Player_Death;
+
 	public int PlayerNumber = 0;
 
     InputManager inputManager = InputManager.Instance;
@@ -36,6 +39,11 @@ public class PlayerScript : MonoBehaviour
     private float height;
 
     private bool canPerformAction = true;
+
+    public Color PlayerColour
+    {
+        get { return playerColour; }
+    }
 
 	// Use this for initialization
 	void Start () 
@@ -196,7 +204,7 @@ public class PlayerScript : MonoBehaviour
 
 	private void AttachBeam()
 	{
-		selectorBeam = GameObject.Instantiate (Resources.Load ("Prefabs/LineSegment")) as GameObject;
+		selectorBeam = GameObject.Instantiate (Resources.Load ("Prefabs/PlayerObjects/LineSegment")) as GameObject;
 
         if (gameObject.transform.FindChild("PlayerArmV1") != null)
         {

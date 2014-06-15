@@ -3,11 +3,10 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour 
 {
-
 	// Use this for initialization
 	void Start () 
 	{
-		SlowMoManager.Instance.GetAllPhysicsObjects ();
+		SlowMoManager.Instance.GetAllPhysicsObjects();
 		//SlowMoManager.Instance.SlowMoTime (0.25f, 2.0f);
 	}
 	
@@ -15,7 +14,9 @@ public class GameManager : MonoBehaviour
 	void Update () 
 	{
 		//Update any management systems
-		InputManager.Instance.Update ();
-		SlowMoManager.Instance.Update ();
+		InputManager.Instance.Update();
+		SlowMoManager.Instance.Update();
+        UIManager.Instance.Update();
 	}
+
 }
