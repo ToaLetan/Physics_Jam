@@ -10,7 +10,7 @@ public class PlayerScript : MonoBehaviour
     private const float BEAMOFFSET = -0.03f;
     private const float BEAMALPHA = 0.7f;
 
-    public delegate void PlayerEvent();
+    public delegate void PlayerEvent(int playerNum);
     public event PlayerEvent Player_Death;
 
 	public int PlayerNumber = 0;
@@ -18,7 +18,6 @@ public class PlayerScript : MonoBehaviour
     InputManager inputManager = InputManager.Instance;
 
     private GameObject selectorBeam = null;
-    private GameObject imminentCollisionObj = null;
     
     private Timer selectionTimer = new Timer(SELECTIONTIME);
 
@@ -201,6 +200,21 @@ public class PlayerScript : MonoBehaviour
 			break;
 		}
 	}
+
+    private void OnTriggerEnter2D(Collider2D collisionObj)
+    {
+        if (collisionObj.gameObject.tag == "KillBox")
+        {
+            if(Player_Death != null)
+                Player_Death(PlayerNumber);
+
+            //Change the player's pose, hide the arm and selector beam.
+            AnimationPlayer.ChangeSprite(gameObject, "Sprites/Player/Player_Fall");
+            AnimationPlayer.ChangeSprite(gameObject.transform.FindChild("PlayerGlowLayerV1").gameObject, "Sprites/Player/Player_GlowLayer_Fall");
+            selectorBeam.transform.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
+            gameObject.transform.FindChild("PlayerArmV1").transform.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
+        }
+    }
 
 	private void AttachBeam()
 	{

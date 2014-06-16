@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public static class SpeculativeContactsScript
 {
@@ -16,8 +17,11 @@ public static class SpeculativeContactsScript
         if(raycast)
         {
             //collisionResult = true;
-            imminentCollisionObj = raycast.collider.gameObject;
-            Debug.DrawRay(startPos, vecOrientation);
+            if(raycast.collider.gameObject.tag != "KillBox")
+            {
+                imminentCollisionObj = raycast.collider.gameObject;
+                Debug.DrawRay(startPos, vecOrientation);
+            }
         }
         
         return imminentCollisionObj;

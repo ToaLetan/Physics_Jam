@@ -56,12 +56,15 @@ public class UIManager
 
         for (int i = 0; i < playerArray.Length; i++)
         {
-            playerNamesArray[i] = GameObject.Instantiate(Resources.Load("Prefabs/GUI/Text_Player" + (i+1) ) ) as GameObject;
-            playerNamesArray[i].transform.parent = camera.gameObject.transform;
+            if(playerArray[i] != null)
+            {
+                playerNamesArray[i] = GameObject.Instantiate(Resources.Load("Prefabs/GUI/Text_Player" + (i+1) ) ) as GameObject;
+                playerNamesArray[i].transform.parent = camera.gameObject.transform;
 
-            PositionHUDElements(playerNamesArray[i].name);
+                PositionHUDElements(playerNamesArray[i].name);
 
-            GenerateLifeIcons(5, i);
+                GenerateLifeIcons(5, i);
+            }
         }
 
         MatchPlayerColours();
@@ -115,15 +118,23 @@ public class UIManager
     {
         for(int i = 0; i < playerArray.Length; i++)
         {
-            //Set the player name text to the player colour.
-            playerNamesArray[i].transform.GetComponent<SpriteRenderer>().material.color = playerArray[i].transform.GetComponent<PlayerScript>().PlayerColour;
-
-            //Set all life icons to match that player's colour.
-            for(int j = 0; j < playerNamesArray[i].transform.childCount; j++)
+            if(playerArray[i] != null)
             {
-                playerNamesArray[i].transform.GetChild(j).GetComponent<SpriteRenderer>().material.color = playerArray[i].transform.GetComponent<PlayerScript>().PlayerColour;
+                //Set the player name text to the player colour.
+                playerNamesArray[i].transform.GetComponent<SpriteRenderer>().material.color = playerArray[i].transform.GetComponent<PlayerScript>().PlayerColour;
+
+                //Set all life icons to match that player's colour.
+                for(int j = 0; j < playerNamesArray[i].transform.childCount; j++)
+                {
+                    playerNamesArray[i].transform.GetChild(j).GetComponent<SpriteRenderer>().material.color = playerArray[i].transform.GetComponent<PlayerScript>().PlayerColour;
+                }
             }
         }
     }
 
+    public void RemoveLife(int playerNum)
+    {
+        if(playerNamesArray[playerNum].transform.childCount > 0)
+            GameObject.Destroy(playerNamesArray[playerNum].transform.GetChild(playerNamesArray [playerNum].transform.childCount - 1).gameObject );
+    }
 }

@@ -8,6 +8,11 @@ public class GameManager : MonoBehaviour
 	{
 		SlowMoManager.Instance.GetAllPhysicsObjects();
 		//SlowMoManager.Instance.SlowMoTime (0.25f, 2.0f);
+
+        for (int i = 0; i < GameObject.FindGameObjectsWithTag("Player").Length; i++)
+        {
+            GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<PlayerScript>().Player_Death += OnPlayerDeath;
+        }
 	}
 	
 	// Update is called once per frame
@@ -19,4 +24,9 @@ public class GameManager : MonoBehaviour
         UIManager.Instance.Update();
 	}
 
+    private void OnPlayerDeath(int playerNum)
+    {
+        Debug.Log("Player" + (playerNum + 1) + " KOd");
+        UIManager.Instance.RemoveLife(playerNum);
+    }
 }
