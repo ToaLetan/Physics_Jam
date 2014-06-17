@@ -47,11 +47,7 @@ public class SlowMoManager
 		SlowMoSpeed = timeSpeed;
 		isSlowMoRunning = true;
 
-		for(int i = 0; i < physicsObjects.Length; i++)
-		{
-			physicsObjects[i].GetComponent<Rigidbody2D>().drag = 10/SlowMoSpeed;
-			physicsObjects[i].GetComponent<Rigidbody2D>().angularDrag = 10/SlowMoSpeed;
-		}
+        ApplySlowMotion(false);
 	}
 
 	private void UpdateSlowMo()
@@ -64,14 +60,30 @@ public class SlowMoManager
 			{
 				isSlowMoRunning = false;
 				slowMoTimer = 0;
-				SlowMoSpeed = 1.0f;
+                //SlowMoSpeed = 1.0f;
 
-				for(int i = 0; i < physicsObjects.Length; i++)
-				{
-					physicsObjects[i].GetComponent<Rigidbody2D>().drag = 0;
-					physicsObjects[i].GetComponent<Rigidbody2D>().angularDrag = 0;
-				}
+                ApplySlowMotion(true);
 			}
 		}
 	}
+
+    private void ApplySlowMotion(bool returnToNormalSpeed)
+    {
+        if (returnToNormalSpeed == false)
+        {
+            Time.timeScale = Time.timeScale * SlowMoSpeed;  
+            Time.fixedDeltaTime = Time.fixedDeltaTime * SlowMoSpeed;  
+            Time.maximumDeltaTime = Time.maximumDeltaTime * SlowMoSpeed;
+        } 
+        else
+        {
+            Time.timeScale = Time.timeScale / SlowMoSpeed;  
+            Time.fixedDeltaTime = Time.fixedDeltaTime / SlowMoSpeed;  
+            Time.maximumDeltaTime = Time.maximumDeltaTime / SlowMoSpeed;
+
+            SlowMoSpeed = 1.0f;
+        }
+
+        Debug.Log(Time.timeScale);
+    }
 }

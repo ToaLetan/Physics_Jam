@@ -27,12 +27,12 @@ public static class SpeculativeContactsScript
         return imminentCollisionObj;
     }
     
-    private static float GetDistance(float point1, float point2)
+    public static float GetDistance(float point1, float point2)
     {
         return Mathf.Sqrt( (point1 - point2) * (point1 - point2) );
     }
     
-    private static float GetDistance(Vector2 point1, Vector2 point2)
+    public static float GetDistance(Vector2 point1, Vector2 point2)
     {
         return Mathf.Sqrt( (point1.x - point2.x) * (point1.x - point2.x) + (point1.y - point2.y) * (point1.y - point2.y) );
     }

@@ -47,7 +47,7 @@ public class UIManager
 	// Update is called once per frame
 	public void Update () 
     {
-
+        
 	}
 
     public void ConstructHUD() //Instantiate the HUD, consists of 2-4 Player sectors + info/score/etc., game time remaining.

@@ -151,7 +151,7 @@ public class PlayerScript : MonoBehaviour
 		}
 
 		newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
-		newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
+        newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
 		gameObject.transform.position = newPosition;
 	}
 
@@ -189,8 +189,8 @@ public class PlayerScript : MonoBehaviour
 		if (currentVelocityY < 0)
 			currentVelocityY = 0;
 
-		newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
-		newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
+        newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
+        newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
 		gameObject.transform.position = newPosition;
 	}
 
@@ -251,7 +251,7 @@ public class PlayerScript : MonoBehaviour
 
 	private void RotateBeam(int direction)
 	{
-		float newAngle = selectorBeam.transform.rotation.eulerAngles.z + turnSpeed * direction * Time.deltaTime;
+        float newAngle = selectorBeam.transform.rotation.eulerAngles.z + turnSpeed * direction * Time.deltaTime;
 		Quaternion newRotation = Quaternion.AngleAxis (newAngle, Vector3.forward);
 
         if (gameObject.transform.FindChild("PlayerArmV1") != null)
@@ -312,13 +312,16 @@ public class PlayerScript : MonoBehaviour
             Player_Death(PlayerNumber);
         
         //Change the player's pose, hide the arm and selector beam.
+        /*
         AnimationPlayer.PlayAnimation(gameObject, "Player_Fall");
         AnimationPlayer.ChangeSprite(gameObject.transform.FindChild("PlayerGlowLayerV1").gameObject, "Sprites/Player/Player_GlowLayer_Fall");
         selectorBeam.transform.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
         gameObject.transform.FindChild("PlayerArmV1").transform.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
+        */
 
         //Reset the player's position after the death animation has finished.
         gameObject.transform.position = startPosition;
+        gameObject.transform.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
 
         GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SpawnAnimation"), gameObject.transform.position, gameObject.transform.rotation);
     }
