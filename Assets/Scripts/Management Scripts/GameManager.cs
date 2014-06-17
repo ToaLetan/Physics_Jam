@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
 
     private void OnPlayerDeath(int playerNum)
     {
-        Debug.Log("Player" + (playerNum + 1) + " KOd");
+        //Remove 1 life from the player.
         UIManager.Instance.RemoveLife(playerNum);
     }
 }

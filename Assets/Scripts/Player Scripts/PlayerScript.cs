@@ -23,6 +23,8 @@ public class PlayerScript : MonoBehaviour
 
     private Color playerColour = Color.white;
 
+    private Vector3 startPosition = Vector3.zero;
+
 	private float currentVelocityX = 0;
 	private float currentVelocityY = 0;
 
@@ -44,6 +46,11 @@ public class PlayerScript : MonoBehaviour
         get { return playerColour; }
     }
 
+    public Vector3 StartPosition
+    {
+        get { return startPosition; }
+    }
+
 	// Use this for initialization
 	void Start () 
 	{
@@ -57,6 +64,8 @@ public class PlayerScript : MonoBehaviour
 
         width = gameObject.GetComponent<SpriteRenderer>().sprite.bounds.max.x;
         height = gameObject.GetComponent<SpriteRenderer>().sprite.bounds.max.y;
+
+        startPosition = gameObject.transform.position;
 	}
 	
 	// Update is called once per frame
@@ -205,14 +214,7 @@ public class PlayerScript : MonoBehaviour
     {
         if (collisionObj.gameObject.tag == "KillBox")
         {
-            if(Player_Death != null)
-                Player_Death(PlayerNumber);
-
-            //Change the player's pose, hide the arm and selector beam.
-            AnimationPlayer.ChangeSprite(gameObject, "Sprites/Player/Player_Fall");
-            AnimationPlayer.ChangeSprite(gameObject.transform.FindChild("PlayerGlowLayerV1").gameObject, "Sprites/Player/Player_GlowLayer_Fall");
-            selectorBeam.transform.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
-            gameObject.transform.FindChild("PlayerArmV1").transform.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
+            Death();
         }
     }
 
@@ -302,5 +304,22 @@ public class PlayerScript : MonoBehaviour
     private void SetAction()
     {
         canPerformAction = true;
+    }
+
+    private void Death()
+    {
+        if(Player_Death != null)
+            Player_Death(PlayerNumber);
+        
+        //Change the player's pose, hide the arm and selector beam.
+        AnimationPlayer.PlayAnimation(gameObject, "Player_Fall");
+        AnimationPlayer.ChangeSprite(gameObject.transform.FindChild("PlayerGlowLayerV1").gameObject, "Sprites/Player/Player_GlowLayer_Fall");
+        selectorBeam.transform.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
+        gameObject.transform.FindChild("PlayerArmV1").transform.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
+
+        //Reset the player's position after the death animation has finished.
+        gameObject.transform.position = startPosition;
+
+        GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SpawnAnimation"), gameObject.transform.position, gameObject.transform.rotation);
     }
 }

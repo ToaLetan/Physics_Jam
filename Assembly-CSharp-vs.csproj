@@ -46,12 +46,13 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\General Scripts\AnimationObject.cs" />
+     <Compile Include="Assets\Scripts\General Scripts\AnimationPlayer.cs" />
      <Compile Include="Assets\Scripts\General Scripts\CameraEffectsScript.cs" />
      <Compile Include="Assets\Scripts\General Scripts\SpeculativeContactsScript.cs" />
      <Compile Include="Assets\Scripts\General Scripts\Timer.cs" />
      <Compile Include="Assets\Scripts\Input Scripts\InputManager.cs" />
      <Compile Include="Assets\Scripts\Input Scripts\XboxController.cs" />
-     <Compile Include="Assets\Scripts\Management Scripts\AnimationPlayer.cs" />
      <Compile Include="Assets\Scripts\Management Scripts\GameManager.cs" />
      <Compile Include="Assets\Scripts\Management Scripts\SlowMoManager.cs" />
      <Compile Include="Assets\Scripts\Management Scripts\UIManager.cs" />
