@@ -21,7 +21,8 @@ public class CameraEffectsScript : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-        KeepPlayersInView();
+        if(playerList.Count > 0)
+            KeepPlayersInView();
 	}
 
 	public void RotateToAngle(float angleInDegrees, float rotateSpeed) //Rotate camera towards a specified angle on the Z-axis

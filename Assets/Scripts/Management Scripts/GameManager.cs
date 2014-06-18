@@ -14,6 +14,13 @@ public class GameManager : MonoBehaviour
         {
             PlayerList.Add(GameObject.FindGameObjectsWithTag("Player") [i]);
             GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<PlayerScript>().Player_Death += OnPlayerDeath;
+
+
+            //EXTREMELY TEMPORARY
+            if(i == 0)
+                GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<PlayerScript>().SetPlayerColour(GameInfoManager.Instance.ColourPlayer1);
+            else
+                GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<PlayerScript>().SetPlayerColour(GameInfoManager.Instance.ColourPlayer2);
         }
 	}
 	

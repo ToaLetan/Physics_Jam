@@ -16,6 +16,9 @@ public struct Keybinds
 
 	//Physics manipulation keys
 	public KeyCode GraborThrowKey;
+
+    //Menu Keys
+    public KeyCode SelectKey;
 }
 
 public class InputManager
@@ -59,6 +62,8 @@ public class InputManager
 		PlayerKeybindArray [1].LTurnKey = KeyCode.U;
 		PlayerKeybindArray [1].RTurnKey = KeyCode.O;
 		PlayerKeybindArray [1].GraborThrowKey = KeyCode.Semicolon;
+
+        PlayerKeybindArray [0].SelectKey = KeyCode.Return;
 	}
 	
 	// Update is called once per frame
@@ -89,6 +94,9 @@ public class InputManager
 				allHeldKeys.Add(PlayerKeybindArray [i].RTurnKey);
 			if(Input.GetKey(PlayerKeybindArray [i].GraborThrowKey))
 				allHeldKeys.Add(PlayerKeybindArray [i].GraborThrowKey);
+
+            if(Input.GetKey(PlayerKeybindArray [i].SelectKey))
+                allHeldKeys.Add(PlayerKeybindArray [i].SelectKey);
 
 			if(allHeldKeys.Count > 0)
 			{

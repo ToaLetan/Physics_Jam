@@ -68,8 +68,7 @@ public class PlayerScript : MonoBehaviour
         selectionTimer.OnTimerComplete += SetAction;
         respawnTimer.OnTimerComplete += EnableMove;
 
-        SetPlayerColour();
-		AttachBeam ();
+        //SetPlayerColour(); //Old, used for randomized colour initially.
 
         width = gameObject.GetComponent<SpriteRenderer>().sprite.bounds.max.x;
         height = gameObject.GetComponent<SpriteRenderer>().sprite.bounds.max.y;
@@ -84,14 +83,16 @@ public class PlayerScript : MonoBehaviour
         respawnTimer.Update();
 	}
 
-    private void SetPlayerColour()
+    public void SetPlayerColour(Color newColour)
     {
         if (gameObject.transform.FindChild("PlayerGlowLayerV1") != null)
         {
             SpriteRenderer glowLayerRenderer = gameObject.transform.FindChild("PlayerGlowLayerV1").GetComponent<SpriteRenderer> ();
-            playerColour = new Color (Random.value, Random.value, Random.value, 1.0f);
+            playerColour = newColour;
             glowLayerRenderer.material.color = playerColour;
         }
+
+        AttachBeam ();
     }
 
 	private void PlayerInput(int playerNum, List<KeyCode> keysHeld)
