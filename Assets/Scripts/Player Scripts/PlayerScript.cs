@@ -13,6 +13,7 @@ public class PlayerScript : MonoBehaviour
 
     public delegate void PlayerEvent(int playerNum);
     public event PlayerEvent Player_Death;
+    public event PlayerEvent Player_Lose;
 
 	public int PlayerNumber = 0;
 
@@ -38,6 +39,8 @@ public class PlayerScript : MonoBehaviour
 	private int currentDirectionX = 0;
 	private int currentDirectionY = 0;
 
+    private int numLives = 1;
+
     private float width;
     private float height;
 
@@ -54,9 +57,16 @@ public class PlayerScript : MonoBehaviour
         get { return startPosition; }
     }
 
+    public int NumLives
+    {
+        get { return numLives; }
+        set { numLives = value; }
+    }
+
     public bool CanMove
     {
         get { return canMove; }
+        set { canMove = value; }
     }
 
 	// Use this for initialization
@@ -95,7 +105,7 @@ public class PlayerScript : MonoBehaviour
         AttachBeam ();
     }
 
-	private void PlayerInput(int playerNum, List<KeyCode> keysHeld)
+	public void PlayerInput(int playerNum, List<KeyCode> keysHeld)
 	{
 		Vector3 newPosition = gameObject.transform.position;
 
@@ -169,9 +179,9 @@ public class PlayerScript : MonoBehaviour
         }
 	}
 
-	private void ApplyDeceleration(int playerNum, List<KeyCode> keysReleased)
+	public void ApplyDeceleration(int playerNum, List<KeyCode> keysReleased)
 	{
-		Vector3 newPosition = gameObject.transform.position;
+        Vector3 newPosition = gameObject.transform.position;
 		
 		if (playerNum == PlayerNumber && canMove == true) 
 		{
@@ -327,6 +337,19 @@ public class PlayerScript : MonoBehaviour
     {
         if(Player_Death != null)
             Player_Death(PlayerNumber);
+
+        numLives -= 1;
+
+        if (numLives == 0)
+        {
+            if (Player_Lose != null)
+                Player_Lose(PlayerNumber);
+
+            Respawn(false);
+        }
+        else
+            //Reset the player's position after the death animation has finished.
+            Respawn();
         
         //Change the player's pose, hide the arm and selector beam.
         /*
@@ -336,11 +359,9 @@ public class PlayerScript : MonoBehaviour
         gameObject.transform.FindChild("PlayerArmV1").transform.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
         */
 
-        //Reset the player's position after the death animation has finished.
-        Respawn();
     }
 
-    private void Respawn()
+    private void Respawn(bool useSpawnTimer = true)
     {
         gameObject.transform.position = startPosition;
         gameObject.transform.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
@@ -348,7 +369,9 @@ public class PlayerScript : MonoBehaviour
         GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SpawnAnimation"), gameObject.transform.position, gameObject.transform.rotation);
 
         canMove = false;
-        respawnTimer.StartTimer();
+
+        if(useSpawnTimer == true)
+            respawnTimer.StartTimer();
 
         //Disable physics on the player as an invulnerability period.
         gameObject.GetComponent<Rigidbody2D>().isKinematic = true;

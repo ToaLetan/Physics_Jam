@@ -19,6 +19,7 @@ public struct Keybinds
 
     //Menu Keys
     public KeyCode SelectKey;
+    public KeyCode ExitKey;
 }
 
 public class InputManager
@@ -64,6 +65,7 @@ public class InputManager
 		PlayerKeybindArray [1].GraborThrowKey = KeyCode.Semicolon;
 
         PlayerKeybindArray [0].SelectKey = KeyCode.Return;
+        PlayerKeybindArray [0].ExitKey = KeyCode.Escape;
 	}
 	
 	// Update is called once per frame
@@ -127,7 +129,6 @@ public class InputManager
 				if(Key_Released != null)
 					Key_Released(i, allReleasedKeys);
 			}
-
 		}
 	}
 }

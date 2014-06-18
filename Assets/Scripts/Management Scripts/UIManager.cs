@@ -11,6 +11,8 @@ public class UIManager
     private Camera camera;
 
     private GameObject combinedUI;
+    private GameObject winnerText;
+    private GameObject endPromptText;
 
     private static UIManager instance = null;
 
@@ -32,6 +34,12 @@ public class UIManager
         combinedUI = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/CombinedUIHolder"), camera.gameObject.transform.position, camera.gameObject.transform.rotation) as GameObject;
         combinedUI.transform.parent = camera.gameObject.transform;
 
+        winnerText = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/GUI/WinText") ) as GameObject;
+        winnerText.transform.parent = combinedUI.transform;
+
+        endPromptText = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/GUI/EndingPrompt") ) as GameObject;
+        endPromptText.transform.parent = combinedUI.transform;
+
         GameObject[] activePlayers = GameObject.FindGameObjectsWithTag("Player");
 
         //Arrange the player array to match the player numbers.
@@ -49,18 +57,22 @@ public class UIManager
         }
 
         ConstructHUD();
+        HideEnding();
 	}
 	
 	// Update is called once per frame
 	public void Update () 
     {
-        //Testing UI repositioning.
-        combinedUI.transform.localScale = camera.gameObject.transform.localScale * 0.75f;
-        playerNamesArray[0].transform.localPosition = new Vector3(-camera.orthographicSize, camera.orthographicSize, 1);
-        camera.WorldToViewportPoint(playerNamesArray [0].transform.localPosition);
+        if (camera != null)
+        {
+            //Testing UI repositioning.
+            combinedUI.transform.localScale = camera.gameObject.transform.localScale * 0.75f;
+            playerNamesArray [0].transform.localPosition = new Vector3(-camera.orthographicSize, camera.orthographicSize, 1);
+            camera.WorldToViewportPoint(playerNamesArray [0].transform.localPosition);
 
-        playerNamesArray[1].transform.localPosition = new Vector3(camera.orthographicSize, camera.orthographicSize, 1);
-        camera.WorldToViewportPoint(playerNamesArray [1].transform.localPosition);
+            playerNamesArray [1].transform.localPosition = new Vector3(camera.orthographicSize, camera.orthographicSize, 1);
+            camera.WorldToViewportPoint(playerNamesArray [1].transform.localPosition);
+        }
 	}
 
     public void ConstructHUD() //Instantiate the HUD, consists of 2-4 Player sectors + info/score/etc., game time remaining.
@@ -74,7 +86,7 @@ public class UIManager
 
                 PositionHUDElements(playerNamesArray[i].name);
 
-                GenerateLifeIcons(5, i);
+                GenerateLifeIcons(playerArray[i].GetComponent<PlayerScript>().NumLives, i);
             }
         }
 
@@ -147,5 +159,36 @@ public class UIManager
     {
         if(playerNamesArray[playerNum].transform.childCount > 0)
             GameObject.Destroy(playerNamesArray[playerNum].transform.GetChild(playerNamesArray [playerNum].transform.childCount - 1).gameObject );
+    }
+
+    //IMPROVE THIS AT A LATER DATE
+    public void HideEnding()
+    {
+        Color objectColour = winnerText.GetComponent<SpriteRenderer>().color;
+        objectColour.a = 0;
+        winnerText.GetComponent<SpriteRenderer>().color = objectColour;
+        
+        objectColour = endPromptText.GetComponent<SpriteRenderer>().color;
+        objectColour.a = 0;
+        endPromptText.GetComponent<SpriteRenderer>().color = objectColour;
+    }
+
+    public void ShowEnding(int winnerNum)
+    {
+        Color objectColour = winnerText.GetComponent<SpriteRenderer>().color;
+        objectColour.a = 1;
+        winnerText.GetComponent<SpriteRenderer>().color = objectColour;
+
+        /*
+        objectColour = endPromptText.GetComponent<SpriteRenderer>().color;
+        objectColour.a = 1;
+        endPromptText.GetComponent<SpriteRenderer>().color = objectColour;
+        */
+
+        //Position the text.
+        winnerText.transform.parent = playerNamesArray [winnerNum].transform;
+        winnerText.transform.localPosition = new Vector3(0.4f, 0, 0);
+       
+        endPromptText.transform.localPosition = new Vector3(0, 0, 1);
     }
 }

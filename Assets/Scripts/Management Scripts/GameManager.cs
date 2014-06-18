@@ -14,6 +14,9 @@ public class GameManager : MonoBehaviour
         {
             PlayerList.Add(GameObject.FindGameObjectsWithTag("Player") [i]);
             GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<PlayerScript>().Player_Death += OnPlayerDeath;
+            GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<PlayerScript>().Player_Lose += OnPlayerLose;
+
+            //InputManager.Instance.Key_Pressed += HandleInput;
 
 
             //EXTREMELY TEMPORARY
@@ -37,5 +40,36 @@ public class GameManager : MonoBehaviour
     {
         //Remove 1 life from the player.
         UIManager.Instance.RemoveLife(playerNum);
+    }
+
+    private void OnPlayerLose(int playerNum)
+    {
+        //Show the winner, and the prompt for what to do next.
+        //THIS IS REALLY CHEAP, IMPROVE IT WHENEVER.
+        if(playerNum == 0)
+            UIManager.Instance.ShowEnding(1);
+        else
+            UIManager.Instance.ShowEnding(0);
+
+        for (int i = 0; i < PlayerList.Count; i++)
+        {
+            PlayerList[i].GetComponent<PlayerScript>().CanMove = false;
+        }
+    }
+
+    private void HandleInput(int playerNum, List<KeyCode> keysHeld)
+    {
+        /*if(keysHeld.Contains(InputManager.Instance.PlayerKeybindArray [0].SelectKey) ) //GO back to the main menu after unsubbing.
+        {
+            //All players must unsub from InputManager first
+            for(int i = 0; i < PlayerList.Count; i++)
+            {
+                InputManager.Instance.Key_Pressed -= PlayerList[i].GetComponent<PlayerScript>().PlayerInput;
+                InputManager.Instance.Key_Released -= PlayerList[i].GetComponent<PlayerScript>().ApplyDeceleration;
+            }
+
+            InputManager.Instance.Key_Pressed -= HandleInput;
+            Application.LoadLevel("Menu");
+        }*/
     }
 }

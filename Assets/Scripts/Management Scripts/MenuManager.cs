@@ -7,7 +7,6 @@ public class MenuManager : MonoBehaviour
     private const int NUMOFCOLOURS = 8;
 
     private List<GameObject> previewPlayers = new List<GameObject>();
-    private List<GameObject> previewBars = new List<GameObject>();
 
     private Color[] colourArray = new Color[NUMOFCOLOURS];
 
@@ -28,14 +27,9 @@ public class MenuManager : MonoBehaviour
 
         PopulateColours();
 
-        for (int i = 0; i < GameObject.FindGameObjectsWithTag("PreviewPlayer").Length; i++)
+        for (int i = 0; i < GameObject.FindGameObjectsWithTag("PlayerSelect").Length; i++)
         {
-            previewPlayers.Add(GameObject.FindGameObjectsWithTag("PreviewPlayer")[i]);
-        }
-
-        for (int j = 0; j < GameObject.FindGameObjectsWithTag("PreviewBar").Length; j++)
-        {
-            previewBars.Add(GameObject.FindGameObjectsWithTag("PreviewBar")[j]);
+            previewPlayers.Add(GameObject.FindGameObjectsWithTag("PlayerSelect")[i]);
         }
 
         //Set players to start as red.
@@ -81,12 +75,14 @@ public class MenuManager : MonoBehaviour
 
             newColour = colourArray [currentColourPlayer1];
 
-            previewPlayers[playerNum].transform.GetChild(0).GetComponent<SpriteRenderer>().color = newColour;
-            previewBars[playerNum].GetComponent<SpriteRenderer>().color = newColour;
-
             GameInfoManager.Instance.ColourPlayer1 = newColour;
 
             canChangeColourPlayer1 = false;
+
+            //Apply the colour to the player
+            previewPlayers[playerNum].transform.FindChild("PreviewPlayer").GetChild(0).GetComponent<SpriteRenderer>().color = newColour;
+            previewPlayers[playerNum].transform.FindChild("ColourPreview").GetComponent<SpriteRenderer>().color = newColour;
+            previewPlayers[playerNum].transform.FindChild("Text_Player" + (playerNum+1) ).GetComponent<SpriteRenderer>().color = newColour;
         } 
         if (playerNum == 1 && canChangeColourPlayer2 == true)
         {
@@ -99,12 +95,16 @@ public class MenuManager : MonoBehaviour
 
             newColour = colourArray [currentColourPlayer2];
 
-            previewPlayers[playerNum].transform.GetChild(0).GetComponent<SpriteRenderer>().color = newColour;
-            previewBars[playerNum].GetComponent<SpriteRenderer>().color = newColour;
+
 
             GameInfoManager.Instance.ColourPlayer2 = newColour;
 
             canChangeColourPlayer2 = false;
+
+            //Apply the colour to the player
+            previewPlayers[playerNum].transform.FindChild("PreviewPlayer").GetChild(0).GetComponent<SpriteRenderer>().color = newColour;
+            previewPlayers[playerNum].transform.FindChild("ColourPreview").GetComponent<SpriteRenderer>().color = newColour;
+            previewPlayers[playerNum].transform.FindChild("Text_Player" + (playerNum+1) ).GetComponent<SpriteRenderer>().color = newColour;
         }
     }
 
