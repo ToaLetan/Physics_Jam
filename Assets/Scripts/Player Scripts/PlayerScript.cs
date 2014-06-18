@@ -6,6 +6,7 @@ public class PlayerScript : MonoBehaviour
 {
     private const float MAXVELOCITY = 0.75f;
     private const float SELECTIONTIME = 0.5f;
+    private const float RESPAWNTIME = 0.8f;
     private const float THROWVELOCITY = 250.0f;
     private const float BEAMOFFSET = -0.03f;
     private const float BEAMALPHA = 0.7f;
@@ -20,6 +21,7 @@ public class PlayerScript : MonoBehaviour
     private GameObject selectorBeam = null;
     
     private Timer selectionTimer = new Timer(SELECTIONTIME);
+    private Timer respawnTimer = new Timer(RESPAWNTIME);
 
     private Color playerColour = Color.white;
 
@@ -40,6 +42,7 @@ public class PlayerScript : MonoBehaviour
     private float height;
 
     private bool canPerformAction = true;
+    private bool canMove = true; //Prevents instantly moving upon respawn.
 
     public Color PlayerColour
     {
@@ -51,6 +54,11 @@ public class PlayerScript : MonoBehaviour
         get { return startPosition; }
     }
 
+    public bool CanMove
+    {
+        get { return canMove; }
+    }
+
 	// Use this for initialization
 	void Start () 
 	{
@@ -58,6 +66,7 @@ public class PlayerScript : MonoBehaviour
 		inputManager.Key_Released += ApplyDeceleration;
 
         selectionTimer.OnTimerComplete += SetAction;
+        respawnTimer.OnTimerComplete += EnableMove;
 
         SetPlayerColour();
 		AttachBeam ();
@@ -72,6 +81,7 @@ public class PlayerScript : MonoBehaviour
 	void Update () 
 	{
         selectionTimer.Update();
+        respawnTimer.Update();
 	}
 
     private void SetPlayerColour()
@@ -88,7 +98,7 @@ public class PlayerScript : MonoBehaviour
 	{
 		Vector3 newPosition = gameObject.transform.position;
 
-		if (playerNum == PlayerNumber) 
+		if (playerNum == PlayerNumber && canMove == true) 
 		{
 			if(keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].UpKey) || keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].DownKey) )
 			{
@@ -150,16 +160,19 @@ public class PlayerScript : MonoBehaviour
 			//=================================================================================================================
 		}
 
-		newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
-        newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
-		gameObject.transform.position = newPosition;
+        if (canMove == true) //TEMPORARY, ORGANIZE THIS BETTER ANOTHER TIME
+        {
+            newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
+            newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
+            gameObject.transform.position = newPosition;
+        }
 	}
 
 	private void ApplyDeceleration(int playerNum, List<KeyCode> keysReleased)
 	{
 		Vector3 newPosition = gameObject.transform.position;
 		
-		if (playerNum == PlayerNumber) 
+		if (playerNum == PlayerNumber && canMove == true) 
 		{
 			if(keysReleased.Contains(inputManager.PlayerKeybindArray [playerNum].UpKey) && keysReleased.Contains(inputManager.PlayerKeybindArray [playerNum].DownKey) )
 			{
@@ -189,9 +202,12 @@ public class PlayerScript : MonoBehaviour
 		if (currentVelocityY < 0)
 			currentVelocityY = 0;
 
-        newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
-        newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
-		gameObject.transform.position = newPosition;
+        if (canMove == true) //TEMPORARY, ORGANIZE THIS BETTER ANOTHER TIME
+        {
+            newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
+            newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
+            gameObject.transform.position = newPosition;
+        }
 	}
 
 	private void OnCollisionEnter2D(Collision2D collisionObj)
@@ -320,9 +336,30 @@ public class PlayerScript : MonoBehaviour
         */
 
         //Reset the player's position after the death animation has finished.
+        Respawn();
+    }
+
+    private void Respawn()
+    {
         gameObject.transform.position = startPosition;
         gameObject.transform.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-
+        
         GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SpawnAnimation"), gameObject.transform.position, gameObject.transform.rotation);
+
+        canMove = false;
+        respawnTimer.StartTimer();
+
+        //Disable physics on the player as an invulnerability period.
+        gameObject.GetComponent<Rigidbody2D>().isKinematic = true;
+        gameObject.GetComponent<BoxCollider2D>().enabled = false;
+    }
+
+    private void EnableMove()
+    {
+        canMove = true;
+        respawnTimer.ResetTimer();
+
+        gameObject.GetComponent<Rigidbody2D>().isKinematic = false;
+        gameObject.GetComponent<BoxCollider2D>().enabled = true;
     }
 }

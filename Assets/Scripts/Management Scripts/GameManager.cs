@@ -9,8 +9,6 @@ public class GameManager : MonoBehaviour
 	// Use this for initialization
 	void Start () 
 	{
-		SlowMoManager.Instance.GetAllPhysicsObjects();
-
         //Get all players, add them to the exposed PlayerList and subscribe to their Player_Death events.
         for (int i = 0; i < GameObject.FindGameObjectsWithTag("Player").Length; i++)
         {

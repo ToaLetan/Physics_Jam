@@ -10,8 +10,6 @@ public class SlowMoManager
 	private float currentSlowMoDuration = 0.0f;
 	private bool isSlowMoRunning = false;
 
-	private GameObject[] physicsObjects;
-
 	private static SlowMoManager instance = null;
 
 	public static SlowMoManager Instance
@@ -34,11 +32,6 @@ public class SlowMoManager
 	public void Update () 
 	{
 		UpdateSlowMo ();
-	}
-
-	public void GetAllPhysicsObjects()
-	{
-		physicsObjects = GameObject.FindGameObjectsWithTag ("PhysicsObj");
 	}
 
 	public void SlowMoTime(float timeSpeed, float duration) //Change the game speed for a specified length of time.
@@ -83,7 +76,5 @@ public class SlowMoManager
 
             SlowMoSpeed = 1.0f;
         }
-
-        Debug.Log(Time.timeScale);
     }
 }

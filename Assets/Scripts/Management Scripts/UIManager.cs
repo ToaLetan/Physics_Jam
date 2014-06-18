@@ -10,6 +10,8 @@ public class UIManager
 
     private Camera camera;
 
+    private GameObject combinedUI;
+
     private static UIManager instance = null;
 
     public static UIManager Instance
@@ -25,6 +27,11 @@ public class UIManager
 	// Use this for initialization
 	private UIManager() 
     {
+        camera = GameObject.FindGameObjectWithTag("MainCamera").transform.GetComponent<Camera>();
+
+        combinedUI = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/CombinedUIHolder"), camera.gameObject.transform.position, camera.gameObject.transform.rotation) as GameObject;
+        combinedUI.transform.parent = camera.gameObject.transform;
+
         GameObject[] activePlayers = GameObject.FindGameObjectsWithTag("Player");
 
         //Arrange the player array to match the player numbers.
@@ -47,19 +54,23 @@ public class UIManager
 	// Update is called once per frame
 	public void Update () 
     {
-        
+        //Testing UI repositioning.
+        combinedUI.transform.localScale = camera.gameObject.transform.localScale * 0.75f;
+        playerNamesArray[0].transform.localPosition = new Vector3(-camera.orthographicSize, camera.orthographicSize, 1);
+        camera.WorldToViewportPoint(playerNamesArray [0].transform.localPosition);
+
+        playerNamesArray[1].transform.localPosition = new Vector3(camera.orthographicSize, camera.orthographicSize, 1);
+        camera.WorldToViewportPoint(playerNamesArray [1].transform.localPosition);
 	}
 
     public void ConstructHUD() //Instantiate the HUD, consists of 2-4 Player sectors + info/score/etc., game time remaining.
     {
-        camera = GameObject.FindGameObjectWithTag("MainCamera").transform.GetComponent<Camera>();
-
         for (int i = 0; i < playerArray.Length; i++)
         {
             if(playerArray[i] != null)
             {
                 playerNamesArray[i] = GameObject.Instantiate(Resources.Load("Prefabs/GUI/Text_Player" + (i+1) ) ) as GameObject;
-                playerNamesArray[i].transform.parent = camera.gameObject.transform;
+                playerNamesArray[i].transform.parent = combinedUI.transform;
 
                 PositionHUDElements(playerNamesArray[i].name);
 
