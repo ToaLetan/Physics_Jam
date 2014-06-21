@@ -1,0 +1,23 @@
+Initialize engine version: 4.5.0f6 (fd4616464986)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 9.0c [aticfx32.dll 8.17.10.1247]
+    Renderer: AMD Radeon HD 5800 Series
+    Vendor:   ATI
+    VRAM:     1009 MB (via DXGI)
+    Caps:     Shader=30 DepthRT=1 NativeDepth=1 NativeShadow=1 DF16=1 INTZ=1 RAWZ=0 NULL=1 RESZ=1 SlowINTZ=1
+Begin MonoManager ReloadAssembly
+Platform assembly: E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+- Completed reload, in  0.056 seconds
+desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
+<RI> Initializing input.
+<RI> Input initialized.
+UnloadTime: 1.075918 ms
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 14 unused Assets to reduce memory usage. Loaded Objects now: 697.
+Total: 2.466376 ms (FindLiveObjects: 0.113715 ms CreateObjectMapping: 0.044465 ms MarkObjects: 0.321828 ms  DeleteObjects: 0.062689 ms)
+

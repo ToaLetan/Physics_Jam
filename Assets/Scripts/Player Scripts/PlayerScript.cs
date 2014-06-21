@@ -39,7 +39,7 @@ public class PlayerScript : MonoBehaviour
 	private int currentDirectionX = 0;
 	private int currentDirectionY = 0;
 
-    private int numLives = 1;
+    private int numLives = 5;
 
     private float width;
     private float height;
