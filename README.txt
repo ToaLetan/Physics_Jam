@@ -18,6 +18,7 @@ Q/E - Rotate beam left/right
 F - Pick Up/Throw Object
 
 PLAYER 2
+
 I/J/K/L - Up/Left/Down/Right
 U/O - Rotate beam left/right
 ; - Pick Up/Throw Object
