@@ -75,7 +75,7 @@ public class MenuManager : MonoBehaviour
 
             newColour = colourArray [currentColourPlayer1];
 
-            GameInfoManager.Instance.ColourPlayer1 = newColour;
+            GameInfoManager.Instance.PlayerColours[0] = newColour;
 
             canChangeColourPlayer1 = false;
 
@@ -97,7 +97,7 @@ public class MenuManager : MonoBehaviour
 
 
 
-            GameInfoManager.Instance.ColourPlayer2 = newColour;
+            GameInfoManager.Instance.PlayerColours[1] = newColour;
 
             canChangeColourPlayer2 = false;
 

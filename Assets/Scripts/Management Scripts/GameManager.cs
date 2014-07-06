@@ -6,6 +6,16 @@ public class GameManager : MonoBehaviour
 {
     public List<GameObject> PlayerList = new List<GameObject>();
 
+    private GameObject pauseMenu = null;
+
+    private bool isGamePaused = false;
+
+    public bool IsGamePaused
+    {
+        get { return isGamePaused; }
+        set { isGamePaused = value; }
+    }
+
 	// Use this for initialization
 	void Start () 
 	{
@@ -16,14 +26,9 @@ public class GameManager : MonoBehaviour
             GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<PlayerScript>().Player_Death += OnPlayerDeath;
             GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<PlayerScript>().Player_Lose += OnPlayerLose;
 
-            //InputManager.Instance.Key_Pressed += HandleInput;
+            InputManager.Instance.Key_Pressed += HandleInput;
 
-
-            //EXTREMELY TEMPORARY
-            if(i == 0)
-                GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<PlayerScript>().SetPlayerColour(GameInfoManager.Instance.ColourPlayer1);
-            else
-                GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<PlayerScript>().SetPlayerColour(GameInfoManager.Instance.ColourPlayer2);
+            GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<PlayerScript>().SetPlayerColour(GameInfoManager.Instance.PlayerColours[i]);
         }
 	}
 	
@@ -71,5 +76,24 @@ public class GameManager : MonoBehaviour
             InputManager.Instance.Key_Pressed -= HandleInput;
             Application.LoadLevel("Menu");
         }*/
+
+        if (keysHeld.Contains(InputManager.Instance.PlayerKeybindArray [0].SelectKey)) //Bring up the pause menu
+        {
+            if(isGamePaused == false)
+                ShowPauseMenu();
+        }
+    }
+
+    private void ShowPauseMenu()
+    {
+        isGamePaused = true;
+
+        //Instantiate the pause menu if it doesn't exist, attach it to the camera and center it.
+        if (pauseMenu == null)
+        {
+            pauseMenu = GameObject.Instantiate(Resources.Load("Prefabs/GUI/PauseMenu") ) as GameObject;
+            pauseMenu.transform.parent = GameObject.FindGameObjectWithTag("MainCamera").transform;
+            pauseMenu.transform.localPosition = new Vector3(0, 0, 1);
+        }
     }
 }

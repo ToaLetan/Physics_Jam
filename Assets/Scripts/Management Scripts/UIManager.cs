@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 public class UIManager
 {
+    private const float LEFTPLAYERSX = -1.16f;
+    private const float RIGHTPLAYERSX = 0.95f;
+    private const float TOPPLAYERSY = 0.95f;
+
     private GameObject[] playerArray = new GameObject[4];
     private GameObject[] playerNamesArray = new GameObject[4];
     private List<GameObject> playerLivesList = new List<GameObject>();
@@ -31,7 +35,7 @@ public class UIManager
     {
         camera = GameObject.FindGameObjectWithTag("MainCamera").transform.GetComponent<Camera>();
 
-        combinedUI = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/CombinedUIHolder"), camera.gameObject.transform.position, camera.gameObject.transform.rotation) as GameObject;
+        combinedUI = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/GUI/CombinedUIHolder"), camera.gameObject.transform.position, camera.gameObject.transform.rotation) as GameObject;
         combinedUI.transform.parent = camera.gameObject.transform;
 
         winnerText = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/GUI/WinText") ) as GameObject;
@@ -43,17 +47,10 @@ public class UIManager
         GameObject[] activePlayers = GameObject.FindGameObjectsWithTag("Player");
 
         //Arrange the player array to match the player numbers.
-        //THIS IS REALLY GHETTO. FIX IT LATER WHEN NOT TIRED.
         for (int i = 0; i < activePlayers.Length; i++)
         {
-            if(activePlayers[i].transform.GetComponent<PlayerScript>().PlayerNumber == 0)
-                playerArray[0] = activePlayers[i];
-            if(activePlayers[i].transform.GetComponent<PlayerScript>().PlayerNumber == 1)
-                playerArray[1] = activePlayers[i];
-            if(activePlayers[i].transform.GetComponent<PlayerScript>().PlayerNumber == 2)
-                playerArray[2] = activePlayers[i];
-            if(activePlayers[i].transform.GetComponent<PlayerScript>().PlayerNumber == 3)
-                playerArray[3] = activePlayers[i];
+            if(activePlayers[i].transform.GetComponent<PlayerScript>().PlayerNumber == i)
+                playerArray[i] = activePlayers[i];
         }
 
         ConstructHUD();
@@ -63,16 +60,7 @@ public class UIManager
 	// Update is called once per frame
 	public void Update () 
     {
-        if (camera != null)
-        {
-            //Testing UI repositioning.
-            combinedUI.transform.localScale = camera.gameObject.transform.localScale * 0.75f;
-            playerNamesArray [0].transform.localPosition = new Vector3(-camera.orthographicSize, camera.orthographicSize, 1);
-            camera.WorldToViewportPoint(playerNamesArray [0].transform.localPosition);
 
-            playerNamesArray [1].transform.localPosition = new Vector3(camera.orthographicSize, camera.orthographicSize, 1);
-            camera.WorldToViewportPoint(playerNamesArray [1].transform.localPosition);
-        }
 	}
 
     public void ConstructHUD() //Instantiate the HUD, consists of 2-4 Player sectors + info/score/etc., game time remaining.
@@ -105,16 +93,16 @@ public class UIManager
         switch (elementName)
         {
             case "Text_Player1":
-                playerNamesArray[0].transform.localPosition = new Vector3(-camera.orthographicSize - UIOffset, camera.orthographicSize - UIOffset, 1);
+                playerNamesArray[0].transform.localPosition = new Vector3(LEFTPLAYERSX, TOPPLAYERSY, 1);
                 break;
             case "Text_Player2":
-                playerNamesArray[1].transform.localPosition = new Vector3(camera.orthographicSize - UIOffset * 2.6f, camera.orthographicSize - UIOffset, 1);
+                playerNamesArray[1].transform.localPosition = new Vector3(RIGHTPLAYERSX, TOPPLAYERSY, 1);
                 break;
             case "Text_Player3":
-                playerNamesArray[2].transform.localPosition = new Vector3(-camera.orthographicSize - UIOffset, -camera.orthographicSize + (UIOffset * 2), 1);
+                playerNamesArray[2].transform.localPosition = new Vector3(LEFTPLAYERSX, -camera.orthographicSize + (UIOffset * 2), 1);
                 break;
             case "Text_Player4":
-                playerNamesArray[3].transform.localPosition = new Vector3(camera.orthographicSize - UIOffset * 2.6f, -camera.orthographicSize + (UIOffset * 2), 1);
+                playerNamesArray[3].transform.localPosition = new Vector3(RIGHTPLAYERSX, -camera.orthographicSize + (UIOffset * 2), 1);
                 break;
         }
     }
