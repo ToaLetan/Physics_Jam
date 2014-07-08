@@ -8,7 +8,9 @@ public class SlowMoManager
 
 	private float slowMoTimer = 0.0f;
 	private float currentSlowMoDuration = 0.0f;
+
 	private bool isSlowMoRunning = false;
+    private bool isReturningToTimerOnResume = false;
 
 	private static SlowMoManager instance = null;
 
@@ -25,7 +27,8 @@ public class SlowMoManager
 	// Use this for initialization
 	private SlowMoManager()
 	{
-
+        GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>().GamePaused += OnGamePaused;
+        GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>().GameResumed += OnGameResumed;
 	}
 	
 	// Update is called once per frame
@@ -45,7 +48,7 @@ public class SlowMoManager
 
 	private void UpdateSlowMo()
 	{
-		if (isSlowMoRunning) 
+        if (isSlowMoRunning) 
 		{
 			slowMoTimer += Time.deltaTime;
 
@@ -75,6 +78,28 @@ public class SlowMoManager
             Time.maximumDeltaTime = Time.maximumDeltaTime / SlowMoSpeed;
 
             SlowMoSpeed = 1.0f;
+        }
+    }
+
+    private void OnGamePaused()
+    {
+        if (isSlowMoRunning) //Reset time values to allow menu input to run at normal speed.
+        {
+            isSlowMoRunning = false;
+            isReturningToTimerOnResume = true;
+
+            ApplySlowMotion(true);
+        }
+    }
+
+    private void OnGameResumed()
+    {
+        if (isReturningToTimerOnResume)
+        {
+            isSlowMoRunning = true;
+            isReturningToTimerOnResume = false;
+            
+            ApplySlowMotion(false);
         }
     }
 }

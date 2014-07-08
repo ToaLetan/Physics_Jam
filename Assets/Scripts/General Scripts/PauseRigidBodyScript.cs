@@ -30,6 +30,7 @@ public class PauseRigidBodyScript : MonoBehaviour
     {
         //gameObject.transform.GetComponent<Rigidbody2D>().AddForce(pausedVelocity * 50); //THIS IS REALLY CHEATY. LIKE USING A GAMESHARK TO COMPLETE YOUR POKEDEX LEVEL OF CHEATY.
         gameObject.transform.GetComponent<Rigidbody2D>().AddForce(pausedVelocity, ForceMode2D.Impulse);
+        gameObject.transform.GetComponent<Rigidbody2D>().AddTorque(pausedAngularVelocity);
         gameObject.transform.GetComponent<Rigidbody2D>().WakeUp();
     }
 }
