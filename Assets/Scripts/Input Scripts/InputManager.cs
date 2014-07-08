@@ -25,9 +25,11 @@ public struct Keybinds
 public class InputManager
 {
 	public delegate void KeyHeldEvent(int playerNum, List<KeyCode> heldKeys);
+    public delegate void KeyPressedEvent(int playerNum, List<KeyCode> pressedKeys);
 	public delegate void KeyReleasedEvent(int playerNum, List<KeyCode> releasedKeys);
 
-	public event KeyHeldEvent Key_Pressed;
+	public event KeyHeldEvent Key_Held;
+    public event KeyPressedEvent Key_Pressed;
 	public event KeyReleasedEvent Key_Released;
 
 	public Keybinds[] PlayerKeybindArray = new Keybinds[2];
@@ -102,9 +104,36 @@ public class InputManager
 
 			if(allHeldKeys.Count > 0)
 			{
-				if(Key_Pressed != null)
-					Key_Pressed(i, allHeldKeys);
+                if(Key_Held != null)
+                    Key_Held(i, allHeldKeys);
 			}
+
+            //Check all keys being pressed.
+            List<KeyCode> allPressedKeys = new List<KeyCode>();
+
+            if(Input.GetKeyDown(PlayerKeybindArray [i].UpKey))
+                allPressedKeys.Add(PlayerKeybindArray [i].UpKey);
+            if(Input.GetKeyDown(PlayerKeybindArray [i].DownKey))
+                allPressedKeys.Add(PlayerKeybindArray [i].DownKey);
+            if(Input.GetKeyDown(PlayerKeybindArray [i].LeftKey))
+                allPressedKeys.Add(PlayerKeybindArray [i].LeftKey);
+            if(Input.GetKeyDown(PlayerKeybindArray [i].RightKey))
+                allPressedKeys.Add(PlayerKeybindArray [i].RightKey);
+            if(Input.GetKeyDown(PlayerKeybindArray [i].LTurnKey))
+                allPressedKeys.Add(PlayerKeybindArray [i].LTurnKey);
+            if(Input.GetKeyDown(PlayerKeybindArray [i].RTurnKey))
+                allPressedKeys.Add(PlayerKeybindArray [i].RTurnKey);
+            if(Input.GetKeyDown(PlayerKeybindArray [i].GraborThrowKey))
+                allPressedKeys.Add(PlayerKeybindArray [i].GraborThrowKey);
+            
+            if(Input.GetKeyDown(PlayerKeybindArray [i].SelectKey))
+                allPressedKeys.Add(PlayerKeybindArray [i].SelectKey);
+
+            if(allPressedKeys.Count > 0)
+            {
+                if(Key_Pressed != null)
+                    Key_Pressed(i, allPressedKeys);
+            }
 
 			//Check all keys being released.
 			List<KeyCode> allReleasedKeys = new List<KeyCode>();

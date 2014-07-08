@@ -50,6 +50,7 @@
      <Compile Include="Assets\Scripts\General Scripts\AnimationPlayer.cs" />
      <Compile Include="Assets\Scripts\General Scripts\CameraEffectsScript.cs" />
      <Compile Include="Assets\Scripts\General Scripts\IgnoreCameraScalingScript.cs" />
+     <Compile Include="Assets\Scripts\General Scripts\PauseRigidBodyScript.cs" />
      <Compile Include="Assets\Scripts\General Scripts\PhysicsObjectScript.cs" />
      <Compile Include="Assets\Scripts\General Scripts\SpeculativeContactsScript.cs" />
      <Compile Include="Assets\Scripts\General Scripts\Timer.cs" />

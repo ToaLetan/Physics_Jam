@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour 
 {
+    public delegate void GameEvent();
+    public GameEvent GamePaused;
+    public GameEvent GameResumed;
+
     public List<GameObject> PlayerList = new List<GameObject>();
 
     private GameObject pauseMenu = null;
@@ -62,7 +66,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void HandleInput(int playerNum, List<KeyCode> keysHeld)
+    private void HandleInput(int playerNum, List<KeyCode> keysPressed)
     {
         /*if(keysHeld.Contains(InputManager.Instance.PlayerKeybindArray [0].SelectKey) ) //GO back to the main menu after unsubbing.
         {
@@ -77,16 +81,25 @@ public class GameManager : MonoBehaviour
             Application.LoadLevel("Menu");
         }*/
 
-        if (keysHeld.Contains(InputManager.Instance.PlayerKeybindArray [0].SelectKey)) //Bring up the pause menu
+        if (keysPressed.Contains(InputManager.Instance.PlayerKeybindArray [0].SelectKey)) //Bring up the pause menu
         {
             if(isGamePaused == false)
                 ShowPauseMenu();
+            //if(isGamePaused == true)
+                //HidePauseMenu();
+        }
+
+        if (keysPressed.Contains(InputManager.Instance.PlayerKeybindArray [0].GraborThrowKey))
+        {
+            if(isGamePaused == true)
+                HidePauseMenu();
         }
     }
 
     private void ShowPauseMenu()
     {
-        isGamePaused = true;
+        if (GamePaused != null)
+            GamePaused();
 
         //Instantiate the pause menu if it doesn't exist, attach it to the camera and center it.
         if (pauseMenu == null)
@@ -95,5 +108,18 @@ public class GameManager : MonoBehaviour
             pauseMenu.transform.parent = GameObject.FindGameObjectWithTag("MainCamera").transform;
             pauseMenu.transform.localPosition = new Vector3(0, 0, 1);
         }
+
+        isGamePaused = true;
+    }
+
+    private void HidePauseMenu()
+    {
+        if (GameResumed != null)
+            GameResumed();
+
+        if (pauseMenu != null)
+           GameObject.Destroy(pauseMenu);
+
+        isGamePaused = false;
     }
 }
