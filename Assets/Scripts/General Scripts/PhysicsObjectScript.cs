@@ -3,7 +3,7 @@ using System.Collections;
 
 public class PhysicsObjectScript : MonoBehaviour 
 {
-    public const float MIN_SLOWMO_TRIGGER_SPEED = 0.5f;
+    public const float MIN_SLOWMO_TRIGGER_SPEED = 0.25f;
 
     private Vector3 startPosition;
     private Quaternion startRotation;
@@ -29,7 +29,7 @@ public class PhysicsObjectScript : MonoBehaviour
                (gameObject.transform.GetComponent<Rigidbody2D>().velocity.x > MIN_SLOWMO_TRIGGER_SPEED ||
                 gameObject.transform.GetComponent<Rigidbody2D>().velocity.y > MIN_SLOWMO_TRIGGER_SPEED) )
             {
-                if(SlowMoManager.Instance.SlowMoSpeed == 1.0f)
+                if(SlowMoManager.Instance.IsSlowMoRunning == false)
                     SlowMoManager.Instance.SlowMoTime(0.25f, 0.5f);
             }
         }
@@ -39,7 +39,10 @@ public class PhysicsObjectScript : MonoBehaviour
     {
         if (collisionObj.gameObject.tag == "KillBox")
         {
-            Respawn();
+            if(gameObject.name.Contains("(Clone)") )
+               Destroy(gameObject);
+            else
+                Respawn();
         }
     }
 

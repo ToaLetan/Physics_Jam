@@ -324,12 +324,7 @@ public class PlayerScript : MonoBehaviour
 
         if (playerBeam.CurrentObjectHeld != null)
         {
-            playerBeam.CurrentObjectHeld.GetComponent<Rigidbody2D>().AddForce(playerBeam.CurrentObjectHeld.transform.right * THROWVELOCITY);
-
-            playerBeam.CurrentObjectHeld.GetComponent<BoxCollider2D>().enabled = true;
-
-            playerBeam.CurrentObjectHeld.transform.parent = null;
-            playerBeam.ReleaseObject();
+            ActionTypes.Throw_Spread(playerBeam);
 
             selectionTimer.ResetTimer(true);
             canPerformAction = false;

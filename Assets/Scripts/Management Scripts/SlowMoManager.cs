@@ -24,6 +24,12 @@ public class SlowMoManager
 		}
 	}
 
+    public bool IsSlowMoRunning
+    {
+        get { return isSlowMoRunning; }
+        set { isSlowMoRunning = value; }
+    }
+
 	// Use this for initialization
 	private SlowMoManager()
 	{
@@ -77,7 +83,7 @@ public class SlowMoManager
             Time.fixedDeltaTime = Time.fixedDeltaTime / SlowMoSpeed;  
             Time.maximumDeltaTime = Time.maximumDeltaTime / SlowMoSpeed;
 
-            SlowMoSpeed = 1.0f;
+            //SlowMoSpeed = 1.0f;
         }
     }
 
@@ -94,7 +100,7 @@ public class SlowMoManager
 
     private void OnGameResumed()
     {
-        if (isReturningToTimerOnResume)
+        if (isReturningToTimerOnResume == true)
         {
             isSlowMoRunning = true;
             isReturningToTimerOnResume = false;
