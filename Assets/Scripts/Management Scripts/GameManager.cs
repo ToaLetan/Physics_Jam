@@ -23,17 +23,7 @@ public class GameManager : MonoBehaviour
 	// Use this for initialization
 	void Start () 
 	{
-        //Get all players, add them to the exposed PlayerList and subscribe to their Player_Death events.
-        for (int i = 0; i < GameObject.FindGameObjectsWithTag("Player").Length; i++)
-        {
-            PlayerList.Add(GameObject.FindGameObjectsWithTag("Player") [i]);
-            GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<PlayerScript>().Player_Death += OnPlayerDeath;
-            GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<PlayerScript>().Player_Lose += OnPlayerLose;
-
-            InputManager.Instance.Key_Pressed += HandleInput;
-
-            GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<PlayerScript>().SetPlayerColour(GameInfoManager.Instance.PlayerColours[i]);
-        }
+        InitializeGame();
 	}
 	
 	// Update is called once per frame
@@ -44,6 +34,23 @@ public class GameManager : MonoBehaviour
 		SlowMoManager.Instance.Update();
         UIManager.Instance.Update();
 	}
+
+    private void InitializeGame()
+    {
+        //Get all players, add them to the exposed PlayerList and subscribe to their Player_Death events.
+        for (int i = 0; i < GameObject.FindGameObjectsWithTag("Player").Length; i++)
+        {
+            PlayerList.Add(GameObject.FindGameObjectsWithTag("Player") [i]);
+            GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<PlayerScript>().Player_Death += OnPlayerDeath;
+            GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<PlayerScript>().Player_Lose += OnPlayerLose;
+            
+            InputManager.Instance.Key_Pressed += HandleInput;
+            
+            GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<PlayerScript>().SetPlayerColour(GameInfoManager.Instance.PlayerColours[i]);
+
+            UIManager.Instance.ResetUI();
+        }
+    }
 
     private void OnPlayerDeath(int playerNum)
     {
@@ -85,8 +92,6 @@ public class GameManager : MonoBehaviour
         {
             if(isGamePaused == false)
                 ShowPauseMenu();
-            //if(isGamePaused == true)
-                //HidePauseMenu();
         }
     }
 
@@ -115,5 +120,10 @@ public class GameManager : MonoBehaviour
            GameObject.Destroy(pauseMenu);
 
         isGamePaused = false;
+    }
+
+    public void RestartGame() //Go back to the Main Menu, make sure to unsubscribe to events, prevent all null errors, etc.
+    {
+        Application.LoadLevel("Menu");
     }
 }

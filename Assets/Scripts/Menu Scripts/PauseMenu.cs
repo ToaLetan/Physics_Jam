@@ -68,8 +68,11 @@ public class PauseMenu : MonoBehaviour
                     }
                     break;
                 case "Text_Restart":
+                    inputManager.Key_Pressed -= ProcessSelection;
+                    gameManager.RestartGame();
                     break;
                 case "Text_Quit":
+                        Application.Quit();
                     break;
                 default:
                     if(gameManager.IsGamePaused == true)

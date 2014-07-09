@@ -33,28 +33,7 @@ public class UIManager
 	// Use this for initialization
 	private UIManager() 
     {
-        camera = GameObject.FindGameObjectWithTag("MainCamera").transform.GetComponent<Camera>();
 
-        combinedUI = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/GUI/CombinedUIHolder"), camera.gameObject.transform.position, camera.gameObject.transform.rotation) as GameObject;
-        combinedUI.transform.parent = camera.gameObject.transform;
-
-        winnerText = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/GUI/WinText") ) as GameObject;
-        winnerText.transform.parent = combinedUI.transform;
-
-        endPromptText = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/GUI/EndingPrompt") ) as GameObject;
-        endPromptText.transform.parent = combinedUI.transform;
-
-        GameObject[] activePlayers = GameObject.FindGameObjectsWithTag("Player");
-
-        //Arrange the player array to match the player numbers.
-        for (int i = 0; i < activePlayers.Length; i++)
-        {
-            if(activePlayers[i].transform.GetComponent<PlayerScript>().PlayerNumber == i)
-                playerArray[i] = activePlayers[i];
-        }
-
-        ConstructHUD();
-        HideEnding();
 	}
 	
 	// Update is called once per frame
@@ -67,7 +46,7 @@ public class UIManager
     {
         for (int i = 0; i < playerArray.Length; i++)
         {
-            if(playerArray[i] != null)
+            if(playerArray[i] != null && playerNamesArray[i] == null)
             {
                 playerNamesArray[i] = GameObject.Instantiate(Resources.Load("Prefabs/GUI/Text_Player" + (i+1) ) ) as GameObject;
                 playerNamesArray[i].transform.parent = combinedUI.transform;
@@ -178,5 +157,40 @@ public class UIManager
         winnerText.transform.localPosition = new Vector3(0.4f, 0, 0);
        
         endPromptText.transform.localPosition = new Vector3(0, 0, 1);
+    }
+
+    public void ResetUI()
+    {
+        camera = GameObject.FindGameObjectWithTag("MainCamera").transform.GetComponent<Camera>();
+
+        if (combinedUI == null)
+        {
+            combinedUI = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/GUI/CombinedUIHolder"), camera.gameObject.transform.position, camera.gameObject.transform.rotation) as GameObject;
+            combinedUI.transform.parent = camera.gameObject.transform;
+        }
+
+        if (winnerText == null)
+        {
+            winnerText = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/GUI/WinText")) as GameObject;
+            winnerText.transform.parent = combinedUI.transform;
+        }
+
+        if (endPromptText == null)
+        {
+            endPromptText = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/GUI/EndingPrompt")) as GameObject;
+            endPromptText.transform.parent = combinedUI.transform;
+        }
+        
+        GameObject[] activePlayers = GameObject.FindGameObjectsWithTag("Player");
+        
+        //Arrange the player array to match the player numbers.
+        for (int i = 0; i < activePlayers.Length; i++)
+        {
+            if(activePlayers[i].transform.GetComponent<PlayerScript>().PlayerNumber == i)
+                playerArray[i] = activePlayers[i];
+        }
+        
+        ConstructHUD();
+        HideEnding();
     }
 }
