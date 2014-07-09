@@ -3,6 +3,8 @@ using System.Collections;
 
 public class PhysicsObjectScript : MonoBehaviour 
 {
+    public const float MIN_SLOWMO_TRIGGER_SPEED = 0.5f;
+
     private Vector3 startPosition;
     private Quaternion startRotation;
 
@@ -23,7 +25,9 @@ public class PhysicsObjectScript : MonoBehaviour
     {
         if (collisionObj.gameObject.tag == "Player")
         {
-            if(collisionObj.gameObject.GetComponent<PlayerScript>().CanMove == true)
+            if(collisionObj.gameObject.GetComponent<PlayerScript>().CanMove == true && 
+               (gameObject.transform.GetComponent<Rigidbody2D>().velocity.x > MIN_SLOWMO_TRIGGER_SPEED ||
+                gameObject.transform.GetComponent<Rigidbody2D>().velocity.y > MIN_SLOWMO_TRIGGER_SPEED) )
             {
                 if(SlowMoManager.Instance.SlowMoSpeed == 1.0f)
                     SlowMoManager.Instance.SlowMoTime(0.25f, 0.5f);

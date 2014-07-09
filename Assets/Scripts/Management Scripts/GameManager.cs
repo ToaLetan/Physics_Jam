@@ -88,12 +88,6 @@ public class GameManager : MonoBehaviour
             //if(isGamePaused == true)
                 //HidePauseMenu();
         }
-
-        if (keysPressed.Contains(InputManager.Instance.PlayerKeybindArray [0].GraborThrowKey))
-        {
-            if(isGamePaused == true)
-                HidePauseMenu();
-        }
     }
 
     private void ShowPauseMenu()
@@ -112,7 +106,7 @@ public class GameManager : MonoBehaviour
         isGamePaused = true;
     }
 
-    private void HidePauseMenu()
+    public void HidePauseMenu()
     {
         if (GameResumed != null)
             GameResumed();
