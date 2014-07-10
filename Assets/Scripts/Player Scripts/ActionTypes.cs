@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public static class ActionTypes //All actions players can perform. Everyone starts with Basic, can gain others through pick-ups.
 {
@@ -101,13 +102,29 @@ public static class ActionTypes //All actions players can perform. Everyone star
             playerBeam.CurrentObjectHeld.GetComponent<Rigidbody2D>().AddForce(playerBeam.CurrentObjectHeld.transform.right * THROWVELOCITY/2);
             
             //Get the opponent's location and home in on them with an offset.
+            GameObject[] playerArray = GameObject.FindGameObjectsWithTag("Player");
+            List<GameObject> potentialTargetList = new List<GameObject>();
+
+            int ownerNumber = playerBeam.transform.parent.parent.GetComponent<PlayerScript>().PlayerNumber;
+
+            for(int i = 0; i < playerArray.Length; i++)
+            {
+                if(playerArray[i].GetComponent<PlayerScript>().PlayerNumber != ownerNumber)
+                {
+                    potentialTargetList.Add(playerArray[i]);
+                }
+            }
+
+            //Randomize a target from the list of available targets.
             Vector3 opponentLocation = Vector3.zero;
 
-
+            int randPlayer = Random.Range(0, potentialTargetList.Count);
+            //opponentLocation = potentialTargetList[randPlayer].transform.position;
 
             playerBeam.CurrentObjectHeld.AddComponent<ProjectileAttributeScript>();
-            playerBeam.CurrentObjectHeld.GetComponent<ProjectileAttributeScript>().CurrentProjectileType = ProjectileAttributeScript.ProjectileType.Boomerang;
-            playerBeam.CurrentObjectHeld.GetComponent<ProjectileAttributeScript>().TargetPoint = playerBeam.transform.position;
+            playerBeam.CurrentObjectHeld.GetComponent<ProjectileAttributeScript>().CurrentProjectileType = ProjectileAttributeScript.ProjectileType.Homing;
+            //playerBeam.CurrentObjectHeld.GetComponent<ProjectileAttributeScript>().TargetPoint = opponentLocation;
+            playerBeam.CurrentObjectHeld.GetComponent<ProjectileAttributeScript>().TargetPlayer = potentialTargetList[randPlayer];
             
             playerBeam.CurrentObjectHeld.GetComponent<BoxCollider2D>().enabled = true;
             

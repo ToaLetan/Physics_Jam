@@ -55,6 +55,11 @@ public class PhysicsObjectScript : MonoBehaviour
         gameObject.transform.rotation = startRotation;
         gameObject.transform.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
         gameObject.transform.GetComponent<Rigidbody2D>().angularVelocity = 0;
+
+        if (gameObject.GetComponent<ProjectileAttributeScript>() != null)
+        {
+            Destroy(gameObject.GetComponent<ProjectileAttributeScript>() );
+        }
         
         GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SpawnAnimation"), gameObject.transform.position, gameObject.transform.rotation);
     }

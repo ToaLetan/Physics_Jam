@@ -94,8 +94,8 @@ public class UIManager
         {
             GameObject newLifeIcon = GameObject.Instantiate(Resources.Load("Prefabs/GUI/Life_Icon") ) as GameObject;
 
-            float lifeIconWidth = newLifeIcon.transform.GetComponent<SpriteRenderer>().bounds.max.x;
-            float lifeIconHeight = newLifeIcon.transform.GetComponent<SpriteRenderer>().bounds.max.y;
+            //float lifeIconWidth = newLifeIcon.transform.GetComponent<SpriteRenderer>().bounds.max.x;
+            //float lifeIconHeight = newLifeIcon.transform.GetComponent<SpriteRenderer>().bounds.max.y;
 
             newLifeIcon.transform.parent = playerNamesArray[ownerNumber].transform;
             newLifeIcon.transform.localPosition = new Vector3(-UIOffset * 2 + (UIOffset * i * 2), -UIOffset * 1.5f, 0);
