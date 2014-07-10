@@ -3,15 +3,17 @@ using System.Collections;
 
 public class PhysicsObjectScript : MonoBehaviour 
 {
-    public const float MIN_SLOWMO_TRIGGER_SPEED = 0.25f;
+    public const float MIN_SLOWMO_TRIGGER_SPEED = 0.5f;
 
     private Vector3 startPosition;
+    private Vector3 startScale;
     private Quaternion startRotation;
 
 	// Use this for initialization
 	void Start () 
     {
         startPosition = gameObject.transform.position;
+        startScale = gameObject.transform.localScale;
         startRotation = gameObject.transform.rotation;
 	}
 	
@@ -49,6 +51,7 @@ public class PhysicsObjectScript : MonoBehaviour
     private void Respawn()
     {
         gameObject.transform.position = startPosition;
+        gameObject.transform.localScale = startScale;
         gameObject.transform.rotation = startRotation;
         gameObject.transform.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
         gameObject.transform.GetComponent<Rigidbody2D>().angularVelocity = 0;

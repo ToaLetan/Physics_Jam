@@ -53,6 +53,8 @@
      <Compile Include="Assets\Scripts\General Scripts\IgnoreCameraScalingScript.cs" />
      <Compile Include="Assets\Scripts\General Scripts\PauseRigidBodyScript.cs" />
      <Compile Include="Assets\Scripts\General Scripts\PhysicsObjectScript.cs" />
+     <Compile Include="Assets\Scripts\General Scripts\PickupScript.cs" />
+     <Compile Include="Assets\Scripts\General Scripts\ProjectileAttributeScript.cs" />
      <Compile Include="Assets\Scripts\General Scripts\SpeculativeContactsScript.cs" />
      <Compile Include="Assets\Scripts\General Scripts\Timer.cs" />
      <Compile Include="Assets\Scripts\Input Scripts\InputManager.cs" />

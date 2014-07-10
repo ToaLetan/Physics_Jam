@@ -15,6 +15,10 @@ public class PlayerScript : MonoBehaviour
     public event PlayerEvent Player_Death;
     public event PlayerEvent Player_Lose;
 
+    public enum PlayerAction { Throw_Basic, Throw_Spread, Throw_Boomerang, Throw_Enlarge, Throw_Homing  }
+    private PlayerAction currentAction = PlayerAction.Throw_Basic;
+
+
 	public int PlayerNumber = 0;
 
     InputManager inputManager = InputManager.Instance;
@@ -324,7 +328,28 @@ public class PlayerScript : MonoBehaviour
 
         if (playerBeam.CurrentObjectHeld != null)
         {
-            ActionTypes.Throw_Spread(playerBeam);
+            switch(currentAction)
+            {
+                case PlayerAction.Throw_Basic:
+                    ActionTypes.Throw_Basic(playerBeam);
+                    break;
+                case PlayerAction.Throw_Spread:
+                    ActionTypes.Throw_Spread(playerBeam);
+                    break;
+                case PlayerAction.Throw_Boomerang:
+                    ActionTypes.Throw_Boomerang(playerBeam);
+                    break;
+                case PlayerAction.Throw_Enlarge:
+                    ActionTypes.Throw_Enlarge(playerBeam);
+                    break;
+                case PlayerAction.Throw_Homing:
+                    ActionTypes.Throw_Homing(playerBeam);
+                    break;
+                default:
+                    ActionTypes.Throw_Basic(playerBeam);
+                    break;
+            }
+
 
             selectionTimer.ResetTimer(true);
             canPerformAction = false;
