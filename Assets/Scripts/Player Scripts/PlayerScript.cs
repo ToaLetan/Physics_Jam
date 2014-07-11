@@ -254,10 +254,10 @@ public class PlayerScript : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collisionObj)
     {
-        if (collisionObj.gameObject.tag == "KillBox")
-            Death();
-        if (collisionObj.gameObject.tag == "Pickup")
-            GainPickup(collisionObj.gameObject.GetComponent<PickupScript>());
+            if (collisionObj.gameObject.tag == "KillBox")
+                Death();
+            if (collisionObj.gameObject.tag == "Pickup")
+                GainPickup(collisionObj.gameObject.GetComponent<PickupScript>());
     }
 
 	private void AttachBeam()
