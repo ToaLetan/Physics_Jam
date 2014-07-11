@@ -22,10 +22,10 @@ public class PickupSpawner : MonoBehaviour
     private void RandomizeSpawnTime()
     {
         if (pickupSpawnTime == null)
-            pickupSpawnTime = new Timer(Random.Range(2.0f, 6.0f), true);
+            pickupSpawnTime = new Timer(Random.Range(5.0f, 10.0f), true);
         else
         {
-            pickupSpawnTime.TargetTime = Random.Range(2.0f, 6.0f);
+            pickupSpawnTime.TargetTime = Random.Range(5.0f, 10.0f);
             pickupSpawnTime.ResetTimer(true);
         }
     }

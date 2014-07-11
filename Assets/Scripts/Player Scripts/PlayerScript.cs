@@ -438,6 +438,11 @@ public class PlayerScript : MonoBehaviour
                 currentAction = PlayerAction.Throw_Homing;
                 break;
         }
+        //Spawn the pickup text
+        GameObject pickupText = GameObject.Instantiate(Resources.Load("Prefabs/GUI/PickupAlert"), pickupInfo.gameObject.transform.position, 
+                                                       pickupInfo.gameObject.transform.rotation) as GameObject;
+        pickupText.GetComponent<PickupAlertScript>().PickupText(pickupInfo.CurrentPickupType.ToString() );
+
         Destroy(pickupInfo.gameObject);
     }
 }

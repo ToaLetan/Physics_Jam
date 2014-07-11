@@ -11,13 +11,14 @@ Platform assembly: E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\UnityEng
 Loading E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\UnityEngine.dll into Unity Child Domain
 Platform assembly: E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\Assembly-CSharp.dll (this message is harmless)
 Loading E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
-- Completed reload, in  0.059 seconds
+- Completed reload, in  0.061 seconds
 desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.
-UnloadTime: 0.926121 ms
+UnloadTime: 0.547804 ms
 Unloading 3 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
 
-Unloading 14 unused Assets to reduce memory usage. Loaded Objects now: 704.
-Total: 2.248422 ms (FindLiveObjects: 0.092211 ms CreateObjectMapping: 0.043736 ms MarkObjects: 0.312716 ms  DeleteObjects: 0.062689 ms)
+Unloading 14 unused Assets to reduce memory usage. Loaded Objects now: 713.
+Total: 1.378804 ms (FindLiveObjects: 0.051390 ms CreateObjectMapping: 0.024419 ms MarkObjects: 0.174582 ms  DeleteObjects: 0.036447 ms)
 
+Platform assembly: E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\System.dll (this message is harmless)

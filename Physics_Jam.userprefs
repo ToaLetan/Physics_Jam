@@ -1,9 +1,10 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Management Scripts\PickupSpawner.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\General Scripts\RainbowScript.cs">
     <Files>
-      <File FileName="Assets\Scripts\Management Scripts\PickupSpawner.cs" Line="33" Column="31" />
-      <File FileName="Assets\Scripts\General Scripts\Timer.cs" Line="27" Column="6" />
+      <File FileName="Assets\Scripts\General Scripts\PickupAlertScript.cs" Line="10" Column="5" />
+      <File FileName="Assets\Scripts\Management Scripts\PickupSpawner.cs" Line="25" Column="43" />
+      <File FileName="Assets\Scripts\General Scripts\RainbowScript.cs" Line="35" Column="6" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
