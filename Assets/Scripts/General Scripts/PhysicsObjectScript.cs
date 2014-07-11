@@ -42,7 +42,12 @@ public class PhysicsObjectScript : MonoBehaviour
         if (collisionObj.gameObject.tag == "KillBox")
         {
             if(gameObject.name.Contains("(Clone)") )
-               Destroy(gameObject);
+            {
+                //Unscribe to any events and destroy the object.
+                if(gameObject.GetComponent<PauseRigidBodyScript>() != null)
+                    gameObject.GetComponent<PauseRigidBodyScript>().UnsubscribeFromEvents();
+                Destroy(gameObject);
+            }
             else
                 Respawn();
         }

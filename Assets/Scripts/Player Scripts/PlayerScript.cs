@@ -255,9 +255,9 @@ public class PlayerScript : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collisionObj)
     {
         if (collisionObj.gameObject.tag == "KillBox")
-        {
             Death();
-        }
+        if (collisionObj.gameObject.tag == "Pickup")
+            GainPickup(collisionObj.gameObject.GetComponent<PickupScript>());
     }
 
 	private void AttachBeam()
@@ -353,7 +353,9 @@ public class PlayerScript : MonoBehaviour
                     ActionTypes.Throw_Basic(playerBeam);
                     break;
             }
-
+            //If the player gained an action through a pickup, reset them back to the basic action.
+            if(currentAction != PlayerAction.Throw_Basic)
+                currentAction = PlayerAction.Throw_Basic;
 
             selectionTimer.ResetTimer(true);
             canPerformAction = false;
@@ -417,5 +419,25 @@ public class PlayerScript : MonoBehaviour
 
         gameObject.GetComponent<Rigidbody2D>().isKinematic = false;
         gameObject.GetComponent<BoxCollider2D>().enabled = true;
+    }
+
+    private void GainPickup(PickupScript pickupInfo)
+    {
+        switch (pickupInfo.CurrentPickupType)
+        {
+            case PickupScript.PickupType.Spread:
+                currentAction = PlayerAction.Throw_Spread;
+                break;
+            case PickupScript.PickupType.Boomerang:
+                currentAction = PlayerAction.Throw_Boomerang;
+                break;
+            case PickupScript.PickupType.Enlarge:
+                currentAction = PlayerAction.Throw_Enlarge;
+                break;
+            case PickupScript.PickupType.Homing:
+                currentAction = PlayerAction.Throw_Homing;
+                break;
+        }
+        Destroy(pickupInfo.gameObject);
     }
 }

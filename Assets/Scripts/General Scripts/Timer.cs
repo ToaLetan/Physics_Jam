@@ -20,6 +20,7 @@ public class Timer
     public float TargetTime
     {
         get { return targetTime; }
+        set { targetTime = value; }
     }
 
     public bool IsTimerRunning

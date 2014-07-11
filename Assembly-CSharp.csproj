@@ -61,6 +61,7 @@
      <Compile Include="Assets\Scripts\Management Scripts\GameInfoManager.cs" />
      <Compile Include="Assets\Scripts\Management Scripts\GameManager.cs" />
      <Compile Include="Assets\Scripts\Management Scripts\MenuManager.cs" />
+     <Compile Include="Assets\Scripts\Management Scripts\PickupSpawner.cs" />
      <Compile Include="Assets\Scripts\Management Scripts\SlowMoManager.cs" />
      <Compile Include="Assets\Scripts\Management Scripts\UIManager.cs" />
      <Compile Include="Assets\Scripts\Menu Scripts\PauseMenu.cs" />

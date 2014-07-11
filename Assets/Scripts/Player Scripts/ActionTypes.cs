@@ -116,8 +116,6 @@ public static class ActionTypes //All actions players can perform. Everyone star
             }
 
             //Randomize a target from the list of available targets.
-            Vector3 opponentLocation = Vector3.zero;
-
             int randPlayer = Random.Range(0, potentialTargetList.Count);
             //opponentLocation = potentialTargetList[randPlayer].transform.position;
 

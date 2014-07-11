@@ -6,7 +6,13 @@ public class PickupScript : MonoBehaviour
     public enum PickupType
     { Spread, Boomerang, Enlarge, Homing }
 
-    private PickupType pickupType;
+    private PickupType currentPickupType;
+
+    public PickupType CurrentPickupType
+    {
+        get { return currentPickupType; }
+        set { currentPickupType = value; }
+    }
 
 	// Use this for initialization
 	void Start () 
@@ -27,20 +33,20 @@ public class PickupScript : MonoBehaviour
         switch (randIndex)
         {
             case 0:
-                pickupType = PickupType.Spread;
-
+                currentPickupType = PickupType.Spread;
                 break;
             case 1:
-                pickupType = PickupType.Boomerang;
+                currentPickupType = PickupType.Boomerang;
                 break;
             case 2:
-                pickupType = PickupType.Enlarge;
+                currentPickupType = PickupType.Enlarge;
                 break;
             case 3:
-                pickupType = PickupType.Homing;
+                currentPickupType = PickupType.Homing;
                 break;
         }
-        Debug.Log(pickupType.ToString() );
-        gameObject.GetComponent<SpriteRenderer>().sprite = Resources.Load("Sprites/Pickups/Pickup_" + pickupType.ToString() ) as Sprite;
+        string pickupName = "Pickup_" + currentPickupType.ToString();
+
+        gameObject.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Pickups/" + pickupName);
     }
 }

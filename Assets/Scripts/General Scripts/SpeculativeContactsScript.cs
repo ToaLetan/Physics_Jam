@@ -17,7 +17,9 @@ public static class SpeculativeContactsScript
         if(raycast)
         {
             //collisionResult = true;
-            if(raycast.collider.gameObject.tag != "KillBox")
+            if(raycast.collider.gameObject.tag != "KillBox" && 
+               raycast.collider.gameObject.tag != "SpawnZone" &&
+               raycast.collider.gameObject.tag != "Pickup")
             {
                 imminentCollisionObj = raycast.collider.gameObject;
                 Debug.DrawRay(startPos, vecOrientation);
