@@ -68,6 +68,7 @@
      <Compile Include="Assets\Scripts\Management Scripts\UIManager.cs" />
      <Compile Include="Assets\Scripts\Menu Scripts\PauseMenu.cs" />
      <Compile Include="Assets\Scripts\Player Scripts\ActionTypes.cs" />
+     <Compile Include="Assets\Scripts\Player Scripts\AnimatePreviewScript.cs" />
      <Compile Include="Assets\Scripts\Player Scripts\BeamScript.cs" />
      <Compile Include="Assets\Scripts\Player Scripts\PlayerScript.cs" />
   </ItemGroup>

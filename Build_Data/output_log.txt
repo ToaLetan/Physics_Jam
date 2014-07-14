@@ -11,14 +11,25 @@ Platform assembly: E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\UnityEng
 Loading E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\UnityEngine.dll into Unity Child Domain
 Platform assembly: E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\Assembly-CSharp.dll (this message is harmless)
 Loading E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
-- Completed reload, in  0.061 seconds
+- Completed reload, in  0.060 seconds
 desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.
-UnloadTime: 0.547804 ms
+UnloadTime: 0.388527 ms
 Unloading 3 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
 
-Unloading 14 unused Assets to reduce memory usage. Loaded Objects now: 713.
-Total: 1.378804 ms (FindLiveObjects: 0.051390 ms CreateObjectMapping: 0.024419 ms MarkObjects: 0.174582 ms  DeleteObjects: 0.036447 ms)
+Unloading 20 unused Assets to reduce memory usage. Loaded Objects now: 715.
+Total: 0.630901 ms (FindLiveObjects: 0.027699 ms CreateObjectMapping: 0.014214 ms MarkObjects: 0.110435 ms  DeleteObjects: 0.027699 ms)
 
-Platform assembly: E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\System.dll (this message is harmless)
+UnloadTime: 1.048222 ms
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 153 unused Assets to reduce memory usage. Loaded Objects now: 172.
+Total: 0.855052 ms (FindLiveObjects: 0.010569 ms CreateObjectMapping: 0.015672 ms MarkObjects: 0.133396 ms  DeleteObjects: 0.222692 ms)
+
+UnloadTime: 0.354631 ms
+Unloading 1 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 19 unused Assets to reduce memory usage. Loaded Objects now: 715.
+Total: 0.641471 ms (FindLiveObjects: 0.028064 ms CreateObjectMapping: 0.016765 ms MarkObjects: 0.154171 ms  DeleteObjects: 0.026242 ms)
+

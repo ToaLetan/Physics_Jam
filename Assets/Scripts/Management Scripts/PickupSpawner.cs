@@ -15,8 +15,11 @@ public class PickupSpawner : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
     {
-	    if (pickupSpawnTime != null && GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>().IsGamePaused == false)
-            pickupSpawnTime.Update();
+        if (GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>().IsGamePaused == false)
+        {
+            if (pickupSpawnTime != null)
+                pickupSpawnTime.Update();
+        }
 	}
 
     private void RandomizeSpawnTime()

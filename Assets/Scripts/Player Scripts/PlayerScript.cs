@@ -181,7 +181,7 @@ public class PlayerScript : MonoBehaviour
             if (canMove == true) //TEMPORARY, ORGANIZE THIS BETTER ANOTHER TIME
             {
                 //Prevent the player from being dragged with an object long after escaping it.
-                if( Mathf.Sqrt(Mathf.Pow(gameObject.GetComponent<Rigidbody2D>().velocity.x, 2) + Mathf.Pow(gameObject.GetComponent<Rigidbody2D>().velocity.y, 2) ) < 1.0f )
+                if( Mathf.Sqrt(Mathf.Pow(gameObject.GetComponent<Rigidbody2D>().velocity.x, 2) + Mathf.Pow(gameObject.GetComponent<Rigidbody2D>().velocity.y, 2) ) < 0.4f )
                     gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
 
                 newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
