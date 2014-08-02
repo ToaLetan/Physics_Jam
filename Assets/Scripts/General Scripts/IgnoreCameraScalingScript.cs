@@ -9,6 +9,8 @@ public class IgnoreCameraScalingScript : MonoBehaviour
 
     private float prevOrthoSize = 0.0f;
 
+    private float initialCameraSize = 0.0f;
+
 	// Use this for initialization
 	void Start () 
     {
@@ -16,6 +18,7 @@ public class IgnoreCameraScalingScript : MonoBehaviour
         prevOrthoSize = theCamera.orthographicSize;
 
         initialScale = gameObject.transform.localScale;
+        initialCameraSize = theCamera.orthographicSize;
 
         NegateScaling();
 	}
@@ -32,6 +35,19 @@ public class IgnoreCameraScalingScript : MonoBehaviour
 
     private void NegateScaling()
     {
-        gameObject.transform.localScale = new Vector3(theCamera.orthographicSize/initialScale.x, theCamera.orthographicSize/initialScale.y, 1);
+        //OLD CODE WORKS IF INITIALSCALE = 1
+        //gameObject.transform.localScale = new Vector3(theCamera.orthographicSize/initialScale.x, theCamera.orthographicSize/initialScale.y, 1);
+
+        //THE FOLLOWING FORMULA FAVOURS INITIAL SIZES OF 1+
+        //float newScale = theCamera.orthographicSize * initialScale.x;
+
+        float newScale = 0.0f;
+
+        if(initialScale == Vector3.one)
+            newScale = theCamera.orthographicSize;
+        else
+            newScale = theCamera.orthographicSize * (initialScale.x / initialCameraSize);
+
+        gameObject.transform.localScale = new Vector3(newScale, newScale, 1);
     }
 }

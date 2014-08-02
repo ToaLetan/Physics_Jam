@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     private GameObject pauseMenu = null;
 
     private bool isGamePaused = false;
+    private bool isGameOver = false;
 
     public bool IsGamePaused
     {
@@ -71,6 +72,8 @@ public class GameManager : MonoBehaviour
         {
             PlayerList[i].GetComponent<PlayerScript>().CanMove = false;
         }
+
+        isGameOver = true;
     }
 
     private void HandleInput(int playerNum, List<KeyCode> keysPressed)

@@ -43,6 +43,6 @@ public class PickupAlertScript : MonoBehaviour
 
     private void OnLifeTimerComplete()
     {
-        Destroy(this);
+        Destroy(gameObject);
     }
 }

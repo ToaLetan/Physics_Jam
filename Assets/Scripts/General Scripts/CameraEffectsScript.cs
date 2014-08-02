@@ -36,8 +36,8 @@ public class CameraEffectsScript : MonoBehaviour
 	{
 		Camera theCamera = gameObject.GetComponent<Camera>();
 
-		if (theCamera.orthographicSize != zoomScale)
-			theCamera.orthographicSize += (zoomScale - theCamera.orthographicSize) * zoomSpeed * Time.deltaTime;
+        if (theCamera.orthographicSize != zoomScale)
+            theCamera.orthographicSize += (zoomScale - theCamera.orthographicSize) * zoomSpeed * Time.deltaTime;
 	}
 
     public void MoveToLocation(Vector2 location, float moveSpeed) //Gradually translate the camera
