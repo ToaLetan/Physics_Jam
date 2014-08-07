@@ -4,17 +4,23 @@ using System.Collections.Generic;
 
 public class MenuManager : MonoBehaviour 
 {
-    private const int NUMOFCOLOURS = 8;
+    private const int NUM_OF_COLOURS = 8;
+    private const int MAX_NUM_OF_PLAYERS = 4;
 
     private List<GameObject> previewPlayers = new List<GameObject>();
 
-    private Color[] colourArray = new Color[NUMOFCOLOURS];
+    private Color[] colourArray = new Color[NUM_OF_COLOURS];
 
+    //Kinda messy, maybe set up a class for this?
     private int currentColourPlayer1 = -1;
     private int currentColourPlayer2 = -1;
+    private int currentColourPlayer3 = -1;
+    private int currentColourPlayer4 = -1;
 
     private bool canChangeColourPlayer1 = true;
     private bool canChangeColourPlayer2 = true;
+    private bool canChangeColourPlayer3 = true;
+    private bool canChangeColourPlayer4 = true;
 
     private InputManager inputManager;
 
@@ -26,11 +32,8 @@ public class MenuManager : MonoBehaviour
         inputManager.Key_Released += CheckReleasedKeys;
 
         PopulateColours();
-
-        for (int i = 0; i < GameObject.FindGameObjectsWithTag("PlayerSelect").Length; i++)
-        {
-            previewPlayers.Add(GameObject.FindGameObjectsWithTag("PlayerSelect")[i]);
-        }
+        PopulatePreviewPlayers();
+        
 
         //Set players to start as red.
         ApplyColourPreview(1, 0);
@@ -58,12 +61,40 @@ public class MenuManager : MonoBehaviour
         colourArray [7] = Color.cyan;
     }
 
+    private void PopulatePreviewPlayers() //Add the preview player bars in order from top to bottom.
+    {
+        float highestValue = -5;
+        GameObject topmostPlayer = null;
+
+        for (int i = 0; i < MAX_NUM_OF_PLAYERS; i++)
+        {
+            for (int j = 0; j < GameObject.FindGameObjectsWithTag("PlayerSelect").Length; j++)
+            {
+                //If the player's the topmost one and isn't already in the previewPlayers array, consider it the current topmost one.
+                if (GameObject.FindGameObjectsWithTag("PlayerSelect")[j].transform.position.y >= highestValue && previewPlayers.Contains(GameObject.FindGameObjectsWithTag("PlayerSelect")[j]) == false)
+                {
+                    highestValue = GameObject.FindGameObjectsWithTag("PlayerSelect")[j].transform.position.y;
+                    topmostPlayer = GameObject.FindGameObjectsWithTag("PlayerSelect")[j];
+                }
+            }
+            previewPlayers.Add(topmostPlayer);
+            highestValue = -5;
+            
+        }
+    }
+
     private void ApplyColourPreview(int incrementation, int playerNum)
     {
         //THIS IS REALLY GHETTO FOR NOW, IMPROVE IT LATER
 
         Color newColour = Color.white;
 
+        for (int i = 0; i < previewPlayers.Count; i++)
+        {
+
+        }
+
+        /*
         if (playerNum == 0 && canChangeColourPlayer1 == true)
         {
             currentColourPlayer1 += incrementation;
@@ -105,11 +136,14 @@ public class MenuManager : MonoBehaviour
             previewPlayers[playerNum].transform.FindChild("PreviewPlayer").GetChild(0).GetComponent<SpriteRenderer>().color = newColour;
             previewPlayers[playerNum].transform.FindChild("ColourPreview").GetComponent<SpriteRenderer>().color = newColour;
             previewPlayers[playerNum].transform.FindChild("Text_Player" + (playerNum+1) ).GetComponent<SpriteRenderer>().color = newColour;
-        }
+        }*/
     }
 
     private void MenuInput(int playerNum, List<KeyCode> keysHeld)
     {
+
+
+        /*
         for (int i = 0; i < previewPlayers.Count; i++)
         {
             if(keysHeld.Contains(inputManager.PlayerKeybindArray [i].LeftKey) )
@@ -120,7 +154,7 @@ public class MenuManager : MonoBehaviour
             {
                 ApplyColourPreview(1, i);
             }
-        }
+        }*/
 
         if(keysHeld.Contains(inputManager.PlayerKeybindArray [0].SelectKey) ) //Start game once enter has been pressed. Make sure to unsub first.
         {
@@ -131,6 +165,7 @@ public class MenuManager : MonoBehaviour
 
     private void CheckReleasedKeys(int playerNum, List<KeyCode> keysReleased)
     {
+        /*
         for (int i = 0; i < previewPlayers.Count; i++)
         {
             if(keysReleased.Contains(inputManager.PlayerKeybindArray [i].LeftKey) && keysReleased.Contains(inputManager.PlayerKeybindArray [i].RightKey) )
@@ -140,7 +175,7 @@ public class MenuManager : MonoBehaviour
                 else
                     canChangeColourPlayer2 = true;
             }
-        }
+        }*/
     }
 
     private void AnimatePlayers()
@@ -152,5 +187,13 @@ public class MenuManager : MonoBehaviour
                 AnimationPlayer.PlayAnimation(previewPlayers[i], "Player_Fall");
             }
         }
+    }
+
+    private void PlayerJoin()
+    {
+        //When someone presses a Join Button, get the input source and tie it to the current player number.
+        //Ex: if there's no current player 1, tie it to player 1.
+
+
     }
 }

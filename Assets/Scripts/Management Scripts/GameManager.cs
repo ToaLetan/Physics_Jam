@@ -15,6 +15,8 @@ public class GameManager : MonoBehaviour
     private bool isGamePaused = false;
     private bool isGameOver = false;
 
+    private XboxController newController;
+
     public bool IsGamePaused
     {
         get { return isGamePaused; }
@@ -25,6 +27,8 @@ public class GameManager : MonoBehaviour
 	void Start () 
 	{
         InitializeGame();
+
+        newController = new XboxController(1);
 	}
 	
 	// Update is called once per frame
