@@ -25,9 +25,9 @@ public struct Keybinds
 public class InputManager
 {
     //Events for keyboard input
-	public delegate void KeyHeldEvent(int playerNum, List<KeyCode> heldKeys);
-	public delegate void KeyPressedEvent(int playerNum, List<KeyCode> pressedKeys);
-	public delegate void KeyReleasedEvent(int playerNum, List<KeyCode> releasedKeys);
+	public delegate void KeyHeldEvent(int playerNum, List<string> heldKeys);
+	public delegate void KeyPressedEvent(int playerNum, List<string> pressedKeys);
+	public delegate void KeyReleasedEvent(int playerNum, List<string> releasedKeys);
 
 	public event KeyHeldEvent Key_Held;
 	public event KeyPressedEvent Key_Pressed;
@@ -100,25 +100,25 @@ public class InputManager
 		for (int i = 0; i < PlayerKeybindArray.Length; i++) 
 		{
 			//Check all keys being held.
-			List<KeyCode> allHeldKeys = new List<KeyCode>();
+			List<string> allHeldKeys = new List<string>();
 
 			if(Input.GetKey(PlayerKeybindArray [i].UpKey))
-				allHeldKeys.Add(PlayerKeybindArray [i].UpKey);
+				allHeldKeys.Add(PlayerKeybindArray [i].UpKey.ToString() );
 			if(Input.GetKey(PlayerKeybindArray [i].DownKey))
-				allHeldKeys.Add(PlayerKeybindArray [i].DownKey);
+                allHeldKeys.Add(PlayerKeybindArray[i].DownKey.ToString() );
 			if(Input.GetKey(PlayerKeybindArray [i].LeftKey))
-				allHeldKeys.Add(PlayerKeybindArray [i].LeftKey);
+                allHeldKeys.Add(PlayerKeybindArray[i].LeftKey.ToString() );
 			if(Input.GetKey(PlayerKeybindArray [i].RightKey))
-				allHeldKeys.Add(PlayerKeybindArray [i].RightKey);
+                allHeldKeys.Add(PlayerKeybindArray[i].RightKey.ToString() );
 			if(Input.GetKey(PlayerKeybindArray [i].LTurnKey))
-				allHeldKeys.Add(PlayerKeybindArray [i].LTurnKey);
+                allHeldKeys.Add(PlayerKeybindArray[i].LTurnKey.ToString() );
 			if(Input.GetKey(PlayerKeybindArray [i].RTurnKey))
-				allHeldKeys.Add(PlayerKeybindArray [i].RTurnKey);
+                allHeldKeys.Add(PlayerKeybindArray[i].RTurnKey.ToString() );
 			if(Input.GetKey(PlayerKeybindArray [i].GraborThrowKey))
-				allHeldKeys.Add(PlayerKeybindArray [i].GraborThrowKey);
+                allHeldKeys.Add(PlayerKeybindArray[i].GraborThrowKey.ToString() );
 
 			if(Input.GetKey(PlayerKeybindArray [i].SelectKey))
-				allHeldKeys.Add(PlayerKeybindArray [i].SelectKey);
+                allHeldKeys.Add(PlayerKeybindArray[i].SelectKey.ToString() );
 
 			if(allHeldKeys.Count > 0)
 			{
@@ -127,25 +127,25 @@ public class InputManager
 			}
 
 			//Check all keys being pressed.
-			List<KeyCode> allPressedKeys = new List<KeyCode>();
+            List<string> allPressedKeys = new List<string>();
 
 			if(Input.GetKeyDown(PlayerKeybindArray [i].UpKey))
-				allPressedKeys.Add(PlayerKeybindArray [i].UpKey);
+				allPressedKeys.Add(PlayerKeybindArray [i].UpKey.ToString() );
 			if(Input.GetKeyDown(PlayerKeybindArray [i].DownKey))
-				allPressedKeys.Add(PlayerKeybindArray [i].DownKey);
+                allPressedKeys.Add(PlayerKeybindArray[i].DownKey.ToString() );
 			if(Input.GetKeyDown(PlayerKeybindArray [i].LeftKey))
-				allPressedKeys.Add(PlayerKeybindArray [i].LeftKey);
+                allPressedKeys.Add(PlayerKeybindArray[i].LeftKey.ToString() );
 			if(Input.GetKeyDown(PlayerKeybindArray [i].RightKey))
-				allPressedKeys.Add(PlayerKeybindArray [i].RightKey);
+                allPressedKeys.Add(PlayerKeybindArray[i].RightKey.ToString() );
 			if(Input.GetKeyDown(PlayerKeybindArray [i].LTurnKey))
-				allPressedKeys.Add(PlayerKeybindArray [i].LTurnKey);
+                allPressedKeys.Add(PlayerKeybindArray[i].LTurnKey.ToString() );
 			if(Input.GetKeyDown(PlayerKeybindArray [i].RTurnKey))
-				allPressedKeys.Add(PlayerKeybindArray [i].RTurnKey);
+                allPressedKeys.Add(PlayerKeybindArray[i].RTurnKey.ToString() );
 			if(Input.GetKeyDown(PlayerKeybindArray [i].GraborThrowKey))
-				allPressedKeys.Add(PlayerKeybindArray [i].GraborThrowKey);
+                allPressedKeys.Add(PlayerKeybindArray[i].GraborThrowKey.ToString() );
 			
 			if(Input.GetKeyDown(PlayerKeybindArray [i].SelectKey))
-				allPressedKeys.Add(PlayerKeybindArray [i].SelectKey);
+                allPressedKeys.Add(PlayerKeybindArray[i].SelectKey.ToString() );
 
 			if(allPressedKeys.Count > 0)
 			{
@@ -154,22 +154,22 @@ public class InputManager
 			}
 
 			//Check all keys being released.
-			List<KeyCode> allReleasedKeys = new List<KeyCode>();
+			List<string> allReleasedKeys = new List<string>();
 			
 			if(!Input.GetKey(PlayerKeybindArray [i].UpKey))
-				allReleasedKeys.Add(PlayerKeybindArray [i].UpKey);
+                allReleasedKeys.Add(PlayerKeybindArray[i].UpKey.ToString() );
 			if(!Input.GetKey(PlayerKeybindArray [i].DownKey))
-				allReleasedKeys.Add(PlayerKeybindArray [i].DownKey);
+                allReleasedKeys.Add(PlayerKeybindArray[i].DownKey.ToString() );
 			if(!Input.GetKey(PlayerKeybindArray [i].LeftKey))
-				allReleasedKeys.Add(PlayerKeybindArray [i].LeftKey);
+                allReleasedKeys.Add(PlayerKeybindArray[i].LeftKey.ToString() );
 			if(!Input.GetKey(PlayerKeybindArray [i].RightKey))
-				allReleasedKeys.Add(PlayerKeybindArray [i].RightKey);
+                allReleasedKeys.Add(PlayerKeybindArray[i].RightKey.ToString() );
 			if(!Input.GetKey(PlayerKeybindArray [i].LTurnKey))
-				allReleasedKeys.Add(PlayerKeybindArray [i].LTurnKey);
+                allReleasedKeys.Add(PlayerKeybindArray[i].LTurnKey.ToString() );
 			if(!Input.GetKey(PlayerKeybindArray [i].RTurnKey))
-				allReleasedKeys.Add(PlayerKeybindArray [i].RTurnKey);
+                allReleasedKeys.Add(PlayerKeybindArray[i].RTurnKey.ToString() );
 			if(!Input.GetKey(PlayerKeybindArray [i].GraborThrowKey))
-				allReleasedKeys.Add(PlayerKeybindArray [i].GraborThrowKey);
+                allReleasedKeys.Add(PlayerKeybindArray[i].GraborThrowKey.ToString() );
 			
 			if(allReleasedKeys.Count > 0)
 			{

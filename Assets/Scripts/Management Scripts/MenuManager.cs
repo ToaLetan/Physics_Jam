@@ -145,35 +145,39 @@ public class MenuManager : MonoBehaviour
 		}*/
 	}
 
-	private void MenuInput(int playerNum, List<KeyCode> keysHeld)
+	private void MenuInput(int playerNum, List<string> keysHeld)
 	{
         for (int i = 0; i < inputManager.PlayerKeybindArray.Length; i++)
 		{
-            if (keysHeld.Contains(inputManager.PlayerKeybindArray[i].GraborThrowKey))
+            if (keysHeld.Contains(inputManager.PlayerKeybindArray[i].GraborThrowKey.ToString() ) )
             {
-            //If there aren't 4 players and the input source hasn't already been bound to someone, join the new player.
-                if (currentJoinedPlayerIndex < MAX_NUM_OF_PLAYERS - 1 && GameInfoManager.Instance.PlayerInputSources.Contains(inputManager.PlayerKeybindArray[i].ToString() + playerNum) == false)
-                    PlayerJoin(inputManager.PlayerKeybindArray[i].ToString() + playerNum);
+                string inputString = inputManager.PlayerKeybindArray[i].ToString() + " " + playerNum;
+                //If there aren't 4 players and the input source hasn't already been bound to someone, join the new player.
+                if (currentJoinedPlayerIndex < MAX_NUM_OF_PLAYERS - 1 && GameInfoManager.Instance.PlayerInputSources.Contains(inputString) == false)
+                    PlayerJoin(inputString);
             }
 
-			if(keysHeld.Contains(inputManager.PlayerKeybindArray [i].LeftKey) )
+            if (keysHeld.Contains(inputManager.PlayerKeybindArray[i].LeftKey.ToString() ) )
 			{
 				//ApplyColourPreview(-1, i);
 			}
-			if(keysHeld.Contains(inputManager.PlayerKeybindArray [i].RightKey) )
+            if (keysHeld.Contains(inputManager.PlayerKeybindArray[i].RightKey.ToString() ) )
 			{
 				//ApplyColourPreview(1, i);
 			}
 		}
 
-		if(keysHeld.Contains(inputManager.PlayerKeybindArray [0].SelectKey) ) //Start game once enter has been pressed. Make sure to unsub first.
+        if (keysHeld.Contains(inputManager.PlayerKeybindArray[0].SelectKey.ToString() ) ) //Start game once enter has been pressed. Make sure to unsub first.
 		{
-			inputManager.Key_Pressed -= MenuInput;
-			Application.LoadLevel("Main");
+            if (currentJoinedPlayerIndex >= 1) //Prevent a game from starting until there's at least two players.
+            {
+                inputManager.Key_Pressed -= MenuInput;
+                Application.LoadLevel("Main");
+            }
 		}
 	}
 
-	private void CheckReleasedKeys(int playerNum, List<KeyCode> keysReleased)
+	private void CheckReleasedKeys(int playerNum, List<string> keysReleased)
 	{
 		/*
 		for (int i = 0; i < previewPlayers.Count; i++)
@@ -236,9 +240,10 @@ public class MenuManager : MonoBehaviour
     {
             if (buttonsHeld.Contains(inputManager.ControllerArray[playerNum].buttonA))
 			{
+                string inputString = inputManager.ControllerArray[playerNum].ToString() + " " + playerNum;
                 //If there aren't 4 players and the input source hasn't already been bound to someone, join the new player.
-                if (currentJoinedPlayerIndex < MAX_NUM_OF_PLAYERS - 1 && GameInfoManager.Instance.PlayerInputSources.Contains(inputManager.ControllerArray[playerNum].ToString() + playerNum) == false )
-                    PlayerJoin(inputManager.ControllerArray[playerNum].ToString() + playerNum);
+                if (currentJoinedPlayerIndex < MAX_NUM_OF_PLAYERS - 1 && GameInfoManager.Instance.PlayerInputSources.Contains(inputString) == false)
+                    PlayerJoin(inputString);
 			}
     }
 }

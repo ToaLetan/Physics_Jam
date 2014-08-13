@@ -34,9 +34,9 @@ public class PauseMenu : MonoBehaviour
 	
 	}
 
-    private void ProcessSelection(int playerNum, List<KeyCode> keysPressed)
+    private void ProcessSelection(int playerNum, List<string> keysPressed)
     {
-        if(keysPressed.Contains(inputManager.PlayerKeybindArray [0].UpKey) || keysPressed.Contains(inputManager.PlayerKeybindArray [1].UpKey) )
+        if (keysPressed.Contains(inputManager.PlayerKeybindArray[0].UpKey.ToString()) || keysPressed.Contains(inputManager.PlayerKeybindArray[1].UpKey.ToString()))
         {
             if(currentSelectionIndex - 1 < 0)
                 currentSelectionIndex = menuSelections.Length - 1;
@@ -46,7 +46,7 @@ public class PauseMenu : MonoBehaviour
             HighlightSelection();
         }
 
-        if(keysPressed.Contains(inputManager.PlayerKeybindArray [0].DownKey) || keysPressed.Contains(inputManager.PlayerKeybindArray [1].DownKey) )
+        if (keysPressed.Contains(inputManager.PlayerKeybindArray[0].DownKey.ToString()) || keysPressed.Contains(inputManager.PlayerKeybindArray[1].DownKey.ToString()))
         {
             if((currentSelectionIndex + 1) >= menuSelections.Length)
                 currentSelectionIndex = 0;
@@ -56,7 +56,7 @@ public class PauseMenu : MonoBehaviour
             HighlightSelection();
         }
 
-        if(keysPressed.Contains(inputManager.PlayerKeybindArray [0].SelectKey) )
+        if (keysPressed.Contains(inputManager.PlayerKeybindArray[0].SelectKey.ToString()))
         {
             switch(menuSelections[currentSelectionIndex].name)
             {

@@ -80,7 +80,7 @@ public class GameManager : MonoBehaviour
         isGameOver = true;
     }
 
-    private void HandleInput(int playerNum, List<KeyCode> keysPressed)
+    private void HandleInput(int playerNum, List<string> keysPressed)
     {
         /*if(keysHeld.Contains(InputManager.Instance.PlayerKeybindArray [0].SelectKey) ) //GO back to the main menu after unsubbing.
         {
@@ -95,7 +95,7 @@ public class GameManager : MonoBehaviour
             Application.LoadLevel("Menu");
         }*/
 
-        if (keysPressed.Contains(InputManager.Instance.PlayerKeybindArray [0].SelectKey)) //Bring up the pause menu
+        if (keysPressed.Contains(InputManager.Instance.PlayerKeybindArray [0].SelectKey.ToString() ) ) //Bring up the pause menu
         {
             if(isGamePaused == false)
                 ShowPauseMenu();

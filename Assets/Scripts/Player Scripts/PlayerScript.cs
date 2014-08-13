@@ -18,7 +18,6 @@ public class PlayerScript : MonoBehaviour
     public enum PlayerAction { Throw_Basic, Throw_Spread, Throw_Boomerang, Throw_Enlarge, Throw_Homing  }
     private PlayerAction currentAction = PlayerAction.Throw_Basic;
 
-
 	public int PlayerNumber = 0;
 
     InputManager inputManager = InputManager.Instance;
@@ -32,6 +31,9 @@ public class PlayerScript : MonoBehaviour
     private Color playerColour = Color.white;
 
     private Vector3 startPosition = Vector3.zero;
+
+    private string inputSource = "";
+    private int inputSourceIndex = -1;
 
 	private float currentVelocityX = 0;
 	private float currentVelocityY = 0;
@@ -77,8 +79,17 @@ public class PlayerScript : MonoBehaviour
 	// Use this for initialization
 	void Start () 
 	{
-		inputManager.Key_Held += PlayerInput;
-		inputManager.Key_Released += ApplyDeceleration;
+        
+
+        inputSource = GameInfoManager.Instance.PlayerInputSources[PlayerNumber];
+        inputSourceIndex = int.Parse(inputSource.Substring(inputSource.IndexOf(" ") ) ); //Grabs the index number after 
+
+        Debug.Log("PLAYER " + PlayerNumber + " TIED TO INPUT SOURCE: " + inputSource);
+
+        TiePlayerInputSource();
+
+        inputManager.Key_Held += PlayerInput;
+        inputManager.Key_Released += ApplyDeceleration;
 
         selectionTimer.OnTimerComplete += SetAction;
         respawnTimer.OnTimerComplete += EnableMove;
@@ -111,95 +122,95 @@ public class PlayerScript : MonoBehaviour
         AttachBeam ();
     }
 
-	public void PlayerInput(int playerNum, List<KeyCode> keysHeld)
+	public void PlayerInput(int playerNum, List<string> keysHeld)
 	{
         if (gameManager.IsGamePaused == false)
         {
             Vector3 newPosition = gameObject.transform.position;
 
-            if (playerNum == PlayerNumber && canMove == true)
+            if (canMove == true)
             {
-                if (keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].UpKey) || keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].DownKey))
+                if(inputSource.Contains("Keybinds") == true)
                 {
-                    //================================================ MOVEMENT ================================================
-                    //Clean this mess up later, make a MovePlayer() function
-                    if (keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].UpKey))
-                    {
-                        currentDirectionY = 1;
-                    } else
-                        currentDirectionY = -1;
-				
-                    if (currentVelocityY < MAXVELOCITY) //As long as the player isn't at top speed, increase velocity.
-                    {
-                        //Check if the player is going to collide with an object.
-                        if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.up * currentDirectionY, height * 1.5f) == true)
-                            currentVelocityY = 0;
-                        else
-                            currentVelocityY += acceleration * Time.deltaTime;
-                    }
+                    if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].UpKey.ToString()) || keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].DownKey.ToString()))
+                        {
+                            //================================================ MOVEMENT ================================================
+                            //Clean this mess up later, make a MovePlayer() function
+                            if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].UpKey.ToString()))
+                            {
+                                currentDirectionY = 1;
+                            }
+                            else
+                                currentDirectionY = -1;
+
+                            if (currentVelocityY < MAXVELOCITY) //As long as the player isn't at top speed, increase velocity.
+                            {
+                                //Check if the player is going to collide with an object.
+                                if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.up * currentDirectionY, height * 1.5f) == true)
+                                    currentVelocityY = 0;
+                                else
+                                    currentVelocityY += acceleration * Time.deltaTime;
+                            }
+                        }
+
+                    if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LeftKey.ToString()) || keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].RightKey.ToString()))
+                        {
+                            if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LeftKey.ToString()))
+                                currentDirectionX = -1;
+                            else
+                                currentDirectionX = 1;
+
+                            if (currentVelocityX < MAXVELOCITY)
+                            {
+                                if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.right * currentDirectionX, width * 1.5f) == true)
+                                    currentVelocityX = 0;
+                                else
+                                    currentVelocityX += acceleration * Time.deltaTime;
+                            }
+                        }
+                        //=================================================================================================================
+
+                        //================================================ BEAM ROTATION ================================================
+                    if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LTurnKey.ToString()) || keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].RTurnKey.ToString()))
+                        {
+                            if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LTurnKey.ToString()))
+                                RotateBeam(1);
+                            else
+                                RotateBeam(-1);
+                        }
+
+                    if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].GraborThrowKey.ToString()))
+                        {
+                            if (canPerformAction == true)
+                            {
+                                if (selectorBeam.GetComponent<BeamScript>().IsHoldingObject == false)
+                                    GrabObject();
+                                else
+                                    ThrowObject();
+                            }
+                        }
+                        //=================================================================================================================
                 }
-
-                if (keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].LeftKey) || keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].RightKey))
-                {
-                    if (keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].LeftKey))
-                        currentDirectionX = -1;
-                    else
-                        currentDirectionX = 1;
-
-                    if (currentVelocityX < MAXVELOCITY)
-                    {
-                        if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.right * currentDirectionX, width * 1.5f) == true)
-                            currentVelocityX = 0;
-                        else
-                            currentVelocityX += acceleration * Time.deltaTime;
-                    }
-                }
-                //=================================================================================================================
-
-                //================================================ BEAM ROTATION ================================================
-                if (keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].LTurnKey) || keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].RTurnKey))
-                {
-                    if (keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].LTurnKey))
-                        RotateBeam(1);
-                    else
-                        RotateBeam(-1);
-                }
-
-                if (keysHeld.Contains(inputManager.PlayerKeybindArray [playerNum].GraborThrowKey))
-                {
-                    if (canPerformAction == true)
-                    {
-                        if (selectorBeam.GetComponent<BeamScript>().IsHoldingObject == false)
-                            GrabObject();
-                        else
-                            ThrowObject();
-                    }
-                }
-                //=================================================================================================================
-            }
-
-            if (canMove == true) //TEMPORARY, ORGANIZE THIS BETTER ANOTHER TIME
-            {
                 //Prevent the player from being dragged with an object long after escaping it.
-                if( Mathf.Sqrt(Mathf.Pow(gameObject.GetComponent<Rigidbody2D>().velocity.x, 2) + Mathf.Pow(gameObject.GetComponent<Rigidbody2D>().velocity.y, 2) ) < 0.4f )
+                if (Mathf.Sqrt(Mathf.Pow(gameObject.GetComponent<Rigidbody2D>().velocity.x, 2) + Mathf.Pow(gameObject.GetComponent<Rigidbody2D>().velocity.y, 2)) < 0.4f)
                     gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
 
                 newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
                 newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
                 gameObject.transform.position = newPosition;
-            }
+            } 
         }
 	}
 
-	public void ApplyDeceleration(int playerNum, List<KeyCode> keysReleased)
+	public void ApplyDeceleration(int playerNum, List<string> keysReleased)
 	{
         if (gameManager.IsGamePaused == false)
         {
             Vector3 newPosition = gameObject.transform.position;
 		
-            if (playerNum == PlayerNumber && canMove == true)
+            if (canMove == true)
             {
-                if (keysReleased.Contains(inputManager.PlayerKeybindArray [playerNum].UpKey) && keysReleased.Contains(inputManager.PlayerKeybindArray [playerNum].DownKey))
+                if (keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].UpKey.ToString()) && keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].DownKey.ToString()))
                 {
                     if (currentVelocityY > 0)
                     {
@@ -210,7 +221,7 @@ public class PlayerScript : MonoBehaviour
                     }
                 }
 
-                if (keysReleased.Contains(inputManager.PlayerKeybindArray [playerNum].LeftKey) && keysReleased.Contains(inputManager.PlayerKeybindArray [playerNum].RightKey))
+                if (keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LeftKey.ToString()) && keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].RightKey.ToString()))
                 {
                     if (currentVelocityX > 0)
                     {
@@ -220,19 +231,14 @@ public class PlayerScript : MonoBehaviour
                             currentVelocityX -= deceleration * Time.deltaTime;
                     }
                 }
+                    newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
+                    newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
+                    gameObject.transform.position = newPosition;
             }
-
-            if (currentVelocityX < 0)
-                currentVelocityX = 0;
-            if (currentVelocityY < 0)
-                currentVelocityY = 0;
-
-            if (canMove == true) //TEMPORARY, ORGANIZE THIS BETTER ANOTHER TIME
-            {
-                newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
-                newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
-                gameObject.transform.position = newPosition;
-            }
+                if (currentVelocityX < 0)
+                    currentVelocityX = 0;
+                if (currentVelocityY < 0)
+                    currentVelocityY = 0;
         }
 	}
 
@@ -444,5 +450,18 @@ public class PlayerScript : MonoBehaviour
         pickupText.GetComponent<PickupAlertScript>().PickupText(pickupInfo.CurrentPickupType.ToString() );
 
         Destroy(pickupInfo.gameObject);
+    }
+
+    private void TiePlayerInputSource()
+    {
+        if (inputSource.Contains("Controller") == true)
+        {
+            //inputManager.Button_Held += ; //MAKE A NEW INPUT FUNCTION OR SHARE IT?
+            //inputManager.Button_Released += ; //SAME AS ABOVE
+        }
+        else if (inputSource.Contains("Keybinds") == true)
+        {
+            
+        }
     }
 }
