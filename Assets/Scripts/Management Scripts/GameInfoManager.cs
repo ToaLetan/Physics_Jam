@@ -4,9 +4,12 @@ using System.Collections.Generic;
 
 public class GameInfoManager
 {
+    private const int NUM_MAX_PLAYERS = 4;
+
     private static GameInfoManager instance = null;
 
-	public List<Color> PlayerColours = new List<Color> ();
+    public List<Color> PlayerColours = new List<Color>();
+    public List<string> PlayerInputSources = new List<string>(); //Where players are getting their controls from (controller 1-4 or keyboard 1-2) by name.
     
     public static GameInfoManager Instance
     {
@@ -21,14 +24,11 @@ public class GameInfoManager
     // Use this for initialization
     private GameInfoManager()
     {
-        //TEMPORARY
-        PlayerColours.Add(Color.white);
-        PlayerColours.Add(Color.white);
-
         //Default all player colours to white in case something goes wrong.
-		for(int i = 0; i < PlayerColours.Count; i++)
+        for (int i = 0; i < NUM_MAX_PLAYERS; i++)
 		{
-			PlayerColours[i] = Color.white;
+			PlayerColours.Add(Color.white);
+            PlayerInputSources.Add("");
 		}
     }
 	

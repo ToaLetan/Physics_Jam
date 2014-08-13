@@ -17,22 +17,34 @@ public struct Keybinds
 	//Physics manipulation keys
 	public KeyCode GraborThrowKey;
 
-    //Menu Keys
-    public KeyCode SelectKey;
-    public KeyCode ExitKey;
+	//Menu Keys
+	public KeyCode SelectKey;
+	public KeyCode ExitKey;
 }
 
 public class InputManager
 {
+    //Events for keyboard input
 	public delegate void KeyHeldEvent(int playerNum, List<KeyCode> heldKeys);
-    public delegate void KeyPressedEvent(int playerNum, List<KeyCode> pressedKeys);
+	public delegate void KeyPressedEvent(int playerNum, List<KeyCode> pressedKeys);
 	public delegate void KeyReleasedEvent(int playerNum, List<KeyCode> releasedKeys);
 
 	public event KeyHeldEvent Key_Held;
-    public event KeyPressedEvent Key_Pressed;
+	public event KeyPressedEvent Key_Pressed;
 	public event KeyReleasedEvent Key_Released;
 
-	public Keybinds[] PlayerKeybindArray = new Keybinds[2];
+    //Events for controller input
+    public delegate void ButtonHeldEvent(int playerNum, List<string> heldButtons);
+    public delegate void ButtonPressedEvent(int playerNum, List<string> pressedButtons);
+    public delegate void ButtonReleasedEvent(int playerNum, List<string> releasedButtons);
+    public delegate void ThumbstickEvent(int playerNum, Vector2 thumbstickVector);
+
+    public event ButtonHeldEvent Button_Held;
+    public event ButtonPressedEvent Button_Pressed;
+    public event ButtonReleasedEvent Button_Released;
+
+	public Keybinds[] PlayerKeybindArray = new Keybinds[2]; //Keybinds for up to two keyboard-based players.
+	public XboxController[] ControllerArray = new XboxController[4]; //Supporting up to 4 connected controllers.
 	
 	private static InputManager instance = null;
 
@@ -66,8 +78,13 @@ public class InputManager
 		PlayerKeybindArray [1].RTurnKey = KeyCode.O;
 		PlayerKeybindArray [1].GraborThrowKey = KeyCode.Semicolon;
 
-        PlayerKeybindArray [0].SelectKey = KeyCode.Return;
-        PlayerKeybindArray [0].ExitKey = KeyCode.Escape;
+		PlayerKeybindArray [0].SelectKey = KeyCode.Return;
+		PlayerKeybindArray [0].ExitKey = KeyCode.Escape;
+
+		for (int i = 0; i < ControllerArray.Length; i++)
+		{
+			ControllerArray[i] = new XboxController(i);
+		}
 	}
 	
 	// Update is called once per frame
@@ -79,6 +96,7 @@ public class InputManager
 
 	private void UpdateButtonInput()
 	{
+        //================================= KEYBOARD INPUT FOR KEYS HELD/RELEASED ================================= 
 		for (int i = 0; i < PlayerKeybindArray.Length; i++) 
 		{
 			//Check all keys being held.
@@ -99,41 +117,41 @@ public class InputManager
 			if(Input.GetKey(PlayerKeybindArray [i].GraborThrowKey))
 				allHeldKeys.Add(PlayerKeybindArray [i].GraborThrowKey);
 
-            if(Input.GetKey(PlayerKeybindArray [i].SelectKey))
-                allHeldKeys.Add(PlayerKeybindArray [i].SelectKey);
+			if(Input.GetKey(PlayerKeybindArray [i].SelectKey))
+				allHeldKeys.Add(PlayerKeybindArray [i].SelectKey);
 
 			if(allHeldKeys.Count > 0)
 			{
-                if(Key_Held != null)
-                    Key_Held(i, allHeldKeys);
+				if(Key_Held != null)
+					Key_Held(i, allHeldKeys);
 			}
 
-            //Check all keys being pressed.
-            List<KeyCode> allPressedKeys = new List<KeyCode>();
+			//Check all keys being pressed.
+			List<KeyCode> allPressedKeys = new List<KeyCode>();
 
-            if(Input.GetKeyDown(PlayerKeybindArray [i].UpKey))
-                allPressedKeys.Add(PlayerKeybindArray [i].UpKey);
-            if(Input.GetKeyDown(PlayerKeybindArray [i].DownKey))
-                allPressedKeys.Add(PlayerKeybindArray [i].DownKey);
-            if(Input.GetKeyDown(PlayerKeybindArray [i].LeftKey))
-                allPressedKeys.Add(PlayerKeybindArray [i].LeftKey);
-            if(Input.GetKeyDown(PlayerKeybindArray [i].RightKey))
-                allPressedKeys.Add(PlayerKeybindArray [i].RightKey);
-            if(Input.GetKeyDown(PlayerKeybindArray [i].LTurnKey))
-                allPressedKeys.Add(PlayerKeybindArray [i].LTurnKey);
-            if(Input.GetKeyDown(PlayerKeybindArray [i].RTurnKey))
-                allPressedKeys.Add(PlayerKeybindArray [i].RTurnKey);
-            if(Input.GetKeyDown(PlayerKeybindArray [i].GraborThrowKey))
-                allPressedKeys.Add(PlayerKeybindArray [i].GraborThrowKey);
-            
-            if(Input.GetKeyDown(PlayerKeybindArray [i].SelectKey))
-                allPressedKeys.Add(PlayerKeybindArray [i].SelectKey);
+			if(Input.GetKeyDown(PlayerKeybindArray [i].UpKey))
+				allPressedKeys.Add(PlayerKeybindArray [i].UpKey);
+			if(Input.GetKeyDown(PlayerKeybindArray [i].DownKey))
+				allPressedKeys.Add(PlayerKeybindArray [i].DownKey);
+			if(Input.GetKeyDown(PlayerKeybindArray [i].LeftKey))
+				allPressedKeys.Add(PlayerKeybindArray [i].LeftKey);
+			if(Input.GetKeyDown(PlayerKeybindArray [i].RightKey))
+				allPressedKeys.Add(PlayerKeybindArray [i].RightKey);
+			if(Input.GetKeyDown(PlayerKeybindArray [i].LTurnKey))
+				allPressedKeys.Add(PlayerKeybindArray [i].LTurnKey);
+			if(Input.GetKeyDown(PlayerKeybindArray [i].RTurnKey))
+				allPressedKeys.Add(PlayerKeybindArray [i].RTurnKey);
+			if(Input.GetKeyDown(PlayerKeybindArray [i].GraborThrowKey))
+				allPressedKeys.Add(PlayerKeybindArray [i].GraborThrowKey);
+			
+			if(Input.GetKeyDown(PlayerKeybindArray [i].SelectKey))
+				allPressedKeys.Add(PlayerKeybindArray [i].SelectKey);
 
-            if(allPressedKeys.Count > 0)
-            {
-                if(Key_Pressed != null)
-                    Key_Pressed(i, allPressedKeys);
-            }
+			if(allPressedKeys.Count > 0)
+			{
+				if(Key_Pressed != null)
+					Key_Pressed(i, allPressedKeys);
+			}
 
 			//Check all keys being released.
 			List<KeyCode> allReleasedKeys = new List<KeyCode>();
@@ -159,5 +177,68 @@ public class InputManager
 					Key_Released(i, allReleasedKeys);
 			}
 		}
+        //=========================================================================================================== 
+
+        //================================= CONTROLLER INPUT FOR BUTTONS HELD/RELEASED ==============================
+        for (int j = 0; j < ControllerArray.Length; j++)
+        {
+                //Check all buttons being held.
+                List<string> allHeldButtons = new List<string>();
+                if (ControllerArray[j].GetButtonHeld(ControllerArray[j].buttonA))
+                    allHeldButtons.Add(ControllerArray[j].buttonA);
+                if (ControllerArray[j].GetButtonHeld(ControllerArray[j].buttonB))
+                    allHeldButtons.Add(ControllerArray[j].buttonB);
+                if (ControllerArray[j].GetButtonHeld(ControllerArray[j].buttonX))
+                    allHeldButtons.Add(ControllerArray[j].buttonX);
+                if (ControllerArray[j].GetButtonHeld(ControllerArray[j].buttonY))
+                    allHeldButtons.Add(ControllerArray[j].buttonY);
+
+                if (allHeldButtons.Count > 0)
+                {
+                    if (Button_Held != null)
+                        Button_Held(j, allHeldButtons);
+
+                    allHeldButtons.Clear();
+                }
+
+                
+                //Check all buttons being pressed.
+                List<string> allPressedButtons = new List<string>();
+                if (ControllerArray[j].GetButtonDown(ControllerArray[j].buttonA))
+                    allPressedButtons.Add(ControllerArray[j].buttonA);
+                if (ControllerArray[j].GetButtonDown(ControllerArray[j].buttonB))
+                    allPressedButtons.Add(ControllerArray[j].buttonB);
+                if (ControllerArray[j].GetButtonDown(ControllerArray[j].buttonX))
+                    allPressedButtons.Add(ControllerArray[j].buttonX);
+                if (ControllerArray[j].GetButtonDown(ControllerArray[j].buttonY))
+                    allPressedButtons.Add(ControllerArray[j].buttonY);
+
+                if (allPressedButtons.Count > 0)
+                {
+                    if (Button_Pressed != null)
+                        Button_Pressed(j, allPressedButtons);
+
+                    allHeldButtons.Clear();
+                }
+
+                //Check all buttons being released.
+                List<string> allReleasedButtons = new List<string>();
+                if (!ControllerArray[j].GetButtonHeld(ControllerArray[j].buttonA))
+                    allReleasedButtons.Add(ControllerArray[j].buttonA);
+                if (!ControllerArray[j].GetButtonHeld(ControllerArray[j].buttonB))
+                    allReleasedButtons.Add(ControllerArray[j].buttonB);
+                if (!ControllerArray[j].GetButtonHeld(ControllerArray[j].buttonX))
+                    allReleasedButtons.Add(ControllerArray[j].buttonX);
+                if (!ControllerArray[j].GetButtonHeld(ControllerArray[j].buttonY))
+                    allReleasedButtons.Add(ControllerArray[j].buttonY);
+
+                if (allReleasedButtons.Count > 0)
+                {
+                    if (Button_Released != null)
+                        Button_Released(j, allReleasedButtons);
+
+                    allReleasedButtons.Clear();
+                }
+            }
 	}
 }

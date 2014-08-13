@@ -2,11 +2,16 @@
 using System.Collections;
 
 public class XboxController
-{	
-	public string buttonA = "Fire1";
-	public string buttonB = "Fire2";
-	public string buttonX = "Fire3";
-	public string buttonY = "Jump";
+{
+	public string buttonA = "Button A";
+	public string buttonB = "Button B";
+	public string buttonX = "Button X";
+	public string buttonY = "Button Y";
+
+    public string leftThumbstickHorizontal = "Left Stick Horizontal";
+    public string leftThumbstickVertical = "Left Stick Vertical";
+
+    private string controllerIdentifier;
 
 	private int id;
 
@@ -19,6 +24,7 @@ public class XboxController
 	public XboxController(int controllerID) 
 	{
 		id = controllerID;
+        controllerIdentifier = "Controller" + (id+1) + " ";
 	}
 	
 	// Update is called once per frame
@@ -28,19 +34,24 @@ public class XboxController
 	}
 
 	//Input functions
+    public bool GetButtonHeld(string buttonName)
+    {
+        return Input.GetButton(controllerIdentifier + buttonName);
+    }
+
 	public bool GetButtonDown(string buttonName)
 	{
-		return Input.GetButtonDown(buttonName);
+        return Input.GetButtonDown(controllerIdentifier + buttonName);
 	}
 
 	public bool GetButtonUp(string buttonName)
 	{
-		return Input.GetButtonUp(buttonName);
+        return Input.GetButtonUp(controllerIdentifier + buttonName);
 	}
 
-	public float GetAxis(string axisName)
+	public float GetThumbstickAxis(string axisName)
 	{
-		return Input.GetAxis(axisName);
+        return Input.GetAxis(controllerIdentifier + axisName);
 	}
 	
 }
