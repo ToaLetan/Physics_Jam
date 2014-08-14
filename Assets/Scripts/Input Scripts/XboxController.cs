@@ -8,8 +8,21 @@ public class XboxController
 	public string buttonX = "Button X";
 	public string buttonY = "Button Y";
 
+    public string leftBumper = "Left Bumper";
+    public string rightBumper = "Right Bumper";
+    public string leftRightTriggers = "Left/Right Triggers";
+
+    public string startButton = "Start Button";
+    public string backButton = "Back Button";
+
     public string leftThumbstickHorizontal = "Left Stick Horizontal";
     public string leftThumbstickVertical = "Left Stick Vertical";
+
+    public string rightThumbstickHorizontal = "Right Stick Horizontal";
+    public string rightThumbstickVertical = "Right Stick Vertical";
+
+    public string dPadHorizontal = "D-Pad Horizontal";
+    public string dPadVertical = "D-Pad Vertical";
 
     private string controllerIdentifier;
 

@@ -43,8 +43,8 @@ public class PlayerScript : MonoBehaviour
 	private float acceleration = 1.5f;
 	private float deceleration = 4.0f;
 
-	private float currentDirectionX = 0;
-	private float currentDirectionY = 0;
+	private int currentDirectionX = 0;
+	private int currentDirectionY = 0;
 
     private int numLives = 5;
 
@@ -113,6 +113,7 @@ public class PlayerScript : MonoBehaviour
         {
             PlayerInput(PlayerNumber, null);
             ApplyDeceleration(PlayerNumber, null);
+            RotateBeamController();
         }
 	}
 
@@ -138,25 +139,16 @@ public class PlayerScript : MonoBehaviour
             {
                 if(inputSource.Contains("Keybinds") == true)
                 {
+                    //================================================ MOVEMENT ================================================
                     if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].UpKey.ToString()) || keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].DownKey.ToString()))
                         {
-                            //================================================ MOVEMENT ================================================
-                            //Clean this mess up later, make a MovePlayer() function
+
                             if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].UpKey.ToString()))
                             {
                                 currentDirectionY = 1;
                             }
                             else
                                 currentDirectionY = -1;
-
-                            if (currentVelocityY < MAXVELOCITY) //As long as the player isn't at top speed, increase velocity.
-                            {
-                                //Check if the player is going to collide with an object.
-                                if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.up * currentDirectionY, height * 1.5f) == true)
-                                    currentVelocityY = 0;
-                                else
-                                    currentVelocityY += acceleration * Time.deltaTime;
-                            }
                         }
 
                     if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LeftKey.ToString()) || keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].RightKey.ToString()))
@@ -165,14 +157,6 @@ public class PlayerScript : MonoBehaviour
                                 currentDirectionX = -1;
                             else
                                 currentDirectionX = 1;
-
-                            if (currentVelocityX < MAXVELOCITY)
-                            {
-                                if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.right * currentDirectionX, width * 1.5f) == true)
-                                    currentVelocityX = 0;
-                                else
-                                    currentVelocityX += acceleration * Time.deltaTime;
-                            }
                         }
                         //=================================================================================================================
 
@@ -180,9 +164,9 @@ public class PlayerScript : MonoBehaviour
                     if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LTurnKey.ToString()) || keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].RTurnKey.ToString()))
                         {
                             if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LTurnKey.ToString()))
-                                RotateBeam(1);
+                                RotateBeamKeyboard(1);
                             else
-                                RotateBeam(-1);
+                                RotateBeamKeyboard(-1);
                         }
 
                     if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].GraborThrowKey.ToString()))
@@ -200,48 +184,38 @@ public class PlayerScript : MonoBehaviour
 
                 if (inputSource.Contains("Controller") == true)
                 {
-                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis("Left Stick Vertical") != 0)
+                    //================================================ MOVEMENT ================================================
+                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) != 0.1f)
                     {
-                        //================================================ MOVEMENT ================================================
-                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis("Left Stick Vertical") > 0)
-                            currentDirectionY = 1;
-                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis("Left Stick Vertical") < 0)
-                            currentDirectionY = -1;
 
-                        if (currentVelocityY < MAXVELOCITY) //As long as the player isn't at top speed, increase velocity.
-                        {
-                            //Check if the player is going to collide with an object.
-                            if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.up * currentDirectionY, height * 1.5f) == true)
-                                currentVelocityY = 0;
-                            else
-                                currentVelocityY += acceleration * Time.deltaTime;
-                        }
+                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) > 0)
+                            currentDirectionY = 1;
+                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) < 0)
+                            currentDirectionY = -1;
                     }
 
-                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis("Left Stick Horizontal") != 0)
+                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) != 0.1f)
                     {
-                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis("Left Stick Horizontal") > 0)
+                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) > 0)
                             currentDirectionX = 1;
-                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis("Left Stick Horizontal") < 0)
+                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) < 0)
                             currentDirectionX = -1;
+                    }
+                    //=================================================================================================================
 
-                        if (currentVelocityX < MAXVELOCITY)
+                    if (inputManager.ControllerArray[inputSourceIndex].GetButtonDown(inputManager.ControllerArray[inputSourceIndex].rightBumper) )
+                    {
+                        if (canPerformAction == true)
                         {
-                            if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.right * currentDirectionX, width * 1.5f) == true)
-                                currentVelocityX = 0;
+                            if (selectorBeam.GetComponent<BeamScript>().IsHoldingObject == false)
+                                GrabObject();
                             else
-                                currentVelocityX += acceleration * Time.deltaTime;
+                                ThrowObject();
                         }
                     }
                 }
-
-                //Prevent the player from being dragged with an object long after escaping it.
-                if (Mathf.Sqrt(Mathf.Pow(gameObject.GetComponent<Rigidbody2D>().velocity.x, 2) + Mathf.Pow(gameObject.GetComponent<Rigidbody2D>().velocity.y, 2)) < 0.4f)
-                    gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-
-                newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
-                newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
-                gameObject.transform.position = newPosition;
+                PlayerMove(currentDirectionX, currentDirectionY);
+                
             } 
         }
 	}
@@ -281,7 +255,7 @@ public class PlayerScript : MonoBehaviour
 
                 if (inputSource.Contains("Controller") == true)
                 {
-                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis("Left Stick Vertical") == 0)
+                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) == 0)
                     {
                         if (currentVelocityY > 0)
                         {
@@ -292,7 +266,7 @@ public class PlayerScript : MonoBehaviour
                         }
                     }
 
-                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis("Left Stick Horizontal") == 0)
+                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) == 0)
                     {
                         if (currentVelocityX > 0)
                         {
@@ -314,6 +288,36 @@ public class PlayerScript : MonoBehaviour
                     currentVelocityY = 0;
         }
 	}
+
+    private void PlayerMove(int directionX, int directionY)
+    {
+        Vector3 newPosition = gameObject.transform.position;
+
+        if (currentVelocityX < MAXVELOCITY)  //As long as the player isn't at top speed, increase velocity.
+        {
+            //Check if the player is going to collide with an object.
+            if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.right * currentDirectionX, width * 1.5f) == true)
+                currentVelocityX = 0;
+            else
+                currentVelocityX += acceleration * Time.deltaTime;
+        }
+        if (currentVelocityY < MAXVELOCITY) //Now do the same for the Y-axis
+        {
+
+            if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.up * currentDirectionY, height * 1.5f) == true)
+                currentVelocityY = 0;
+            else
+                currentVelocityY += acceleration * Time.deltaTime;
+        }
+
+        //Prevent the player from being dragged with an object long after escaping it.
+        if (Mathf.Sqrt(Mathf.Pow(gameObject.GetComponent<Rigidbody2D>().velocity.x, 2) + Mathf.Pow(gameObject.GetComponent<Rigidbody2D>().velocity.y, 2)) < 0.4f)
+            gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+
+        newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
+        newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
+        gameObject.transform.position = newPosition;
+    }
 
 	private void OnCollisionEnter2D(Collision2D collisionObj)
 	{
@@ -370,7 +374,7 @@ public class PlayerScript : MonoBehaviour
         beamRenderer.material.color = beamColour;
 	}
 
-	private void RotateBeam(int direction)
+	private void RotateBeamKeyboard(int direction)
 	{
         float newAngle = selectorBeam.transform.rotation.eulerAngles.z + turnSpeed * direction * Time.deltaTime;
 		Quaternion newRotation = Quaternion.AngleAxis (newAngle, Vector3.forward);
@@ -380,6 +384,23 @@ public class PlayerScript : MonoBehaviour
 
 		selectorBeam.transform.rotation = newRotation;
 	}
+
+    private void RotateBeamController()
+    {
+        Vector2 rightThumbstickOrientation = new Vector2(inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].rightThumbstickHorizontal),
+            inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].rightThumbstickVertical));
+
+        float newAngle = Mathf.Atan2(rightThumbstickOrientation.y, rightThumbstickOrientation.x) * Mathf.Rad2Deg * -1;
+
+        Quaternion newRotation = Quaternion.AngleAxis(newAngle, Vector3.forward);
+
+        if (gameObject.transform.FindChild("PlayerArmV1") != null)
+            gameObject.transform.FindChild("PlayerArmV1").rotation = newRotation;
+
+        selectorBeam.transform.rotation = newRotation;
+
+        Debug.Log(newAngle);
+    }
 
 	private void GrabObject()
 	{
