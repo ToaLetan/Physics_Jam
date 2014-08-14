@@ -37,7 +37,6 @@ public class InputManager
     public delegate void ButtonHeldEvent(int playerNum, List<string> heldButtons);
     public delegate void ButtonPressedEvent(int playerNum, List<string> pressedButtons);
     public delegate void ButtonReleasedEvent(int playerNum, List<string> releasedButtons);
-    public delegate void ThumbstickEvent(int playerNum, Vector2 thumbstickVector);
 
     public event ButtonHeldEvent Button_Held;
     public event ButtonPressedEvent Button_Pressed;
@@ -182,7 +181,7 @@ public class InputManager
         //================================= CONTROLLER INPUT FOR BUTTONS HELD/RELEASED ==============================
         for (int j = 0; j < ControllerArray.Length; j++)
         {
-                //Check all buttons being held.
+                //Check all buttons being held along with thumbsticks.
                 List<string> allHeldButtons = new List<string>();
                 if (ControllerArray[j].GetButtonHeld(ControllerArray[j].buttonA))
                     allHeldButtons.Add(ControllerArray[j].buttonA);

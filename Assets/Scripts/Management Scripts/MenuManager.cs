@@ -212,8 +212,6 @@ public class MenuManager : MonoBehaviour
 
         GameInfoManager.Instance.PlayerInputSources[currentJoinedPlayerIndex] = inputSource;
 
-        Debug.Log(inputSource);
-
         //Move the player panels on-screen all fancy-like.
         Vector3 panelPosition = Vector3.zero;
 

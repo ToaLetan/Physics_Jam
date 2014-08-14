@@ -24,12 +24,16 @@ public class GameInfoManager
     // Use this for initialization
     private GameInfoManager()
     {
-        //Default all player colours to white in case something goes wrong.
+        //Default all player colours to white.
         for (int i = 0; i < NUM_MAX_PLAYERS; i++)
 		{
 			PlayerColours.Add(Color.white);
             PlayerInputSources.Add("");
 		}
+
+        //Default players 1 and 2 to keyboard if something goes wrong, or if testing through the Main game scene.
+        //PlayerInputSources[0] = "Keybinds 0";
+        //PlayerInputSources[1] = "Keybinds 1";
     }
 	
 	// Update is called once per frame

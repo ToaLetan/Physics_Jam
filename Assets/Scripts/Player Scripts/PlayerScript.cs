@@ -43,8 +43,8 @@ public class PlayerScript : MonoBehaviour
 	private float acceleration = 1.5f;
 	private float deceleration = 4.0f;
 
-	private int currentDirectionX = 0;
-	private int currentDirectionY = 0;
+	private float currentDirectionX = 0;
+	private float currentDirectionY = 0;
 
     private int numLives = 5;
 
@@ -108,6 +108,12 @@ public class PlayerScript : MonoBehaviour
 	{
         selectionTimer.Update();
         respawnTimer.Update();
+
+        if (inputSource.Contains("Controller") == true)
+        {
+            PlayerInput(PlayerNumber, null);
+            ApplyDeceleration(PlayerNumber, null);
+        }
 	}
 
     public void SetPlayerColour(Color newColour)
@@ -191,6 +197,44 @@ public class PlayerScript : MonoBehaviour
                         }
                         //=================================================================================================================
                 }
+
+                if (inputSource.Contains("Controller") == true)
+                {
+                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis("Left Stick Vertical") != 0)
+                    {
+                        //================================================ MOVEMENT ================================================
+                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis("Left Stick Vertical") > 0)
+                            currentDirectionY = 1;
+                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis("Left Stick Vertical") < 0)
+                            currentDirectionY = -1;
+
+                        if (currentVelocityY < MAXVELOCITY) //As long as the player isn't at top speed, increase velocity.
+                        {
+                            //Check if the player is going to collide with an object.
+                            if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.up * currentDirectionY, height * 1.5f) == true)
+                                currentVelocityY = 0;
+                            else
+                                currentVelocityY += acceleration * Time.deltaTime;
+                        }
+                    }
+
+                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis("Left Stick Horizontal") != 0)
+                    {
+                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis("Left Stick Horizontal") > 0)
+                            currentDirectionX = 1;
+                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis("Left Stick Horizontal") < 0)
+                            currentDirectionX = -1;
+
+                        if (currentVelocityX < MAXVELOCITY)
+                        {
+                            if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.right * currentDirectionX, width * 1.5f) == true)
+                                currentVelocityX = 0;
+                            else
+                                currentVelocityX += acceleration * Time.deltaTime;
+                        }
+                    }
+                }
+
                 //Prevent the player from being dragged with an object long after escaping it.
                 if (Mathf.Sqrt(Mathf.Pow(gameObject.GetComponent<Rigidbody2D>().velocity.x, 2) + Mathf.Pow(gameObject.GetComponent<Rigidbody2D>().velocity.y, 2)) < 0.4f)
                     gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
@@ -210,27 +254,56 @@ public class PlayerScript : MonoBehaviour
 		
             if (canMove == true)
             {
-                if (keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].UpKey.ToString()) && keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].DownKey.ToString()))
+                if (inputSource.Contains("Keybinds") == true)
                 {
-                    if (currentVelocityY > 0)
+                    if (keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].UpKey.ToString()) && keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].DownKey.ToString()))
                     {
-                        if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.up * currentDirectionY, height * 1.5f) == true)
-                            currentVelocityY = 0;
-                        else
-                            currentVelocityY -= deceleration * Time.deltaTime;
+                        if (currentVelocityY > 0)
+                        {
+                            if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.up * currentDirectionY, height * 1.5f) == true)
+                                currentVelocityY = 0;
+                            else
+                                currentVelocityY -= deceleration * Time.deltaTime;
+                        }
+                    }
+
+                    if (keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LeftKey.ToString()) && keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].RightKey.ToString()))
+                    {
+                        if (currentVelocityX > 0)
+                        {
+                            if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.right * currentDirectionX, width * 1.5f) == true)
+                                currentVelocityX = 0;
+                            else
+                                currentVelocityX -= deceleration * Time.deltaTime;
+                        }
                     }
                 }
 
-                if (keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LeftKey.ToString()) && keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].RightKey.ToString()))
+                if (inputSource.Contains("Controller") == true)
                 {
-                    if (currentVelocityX > 0)
+                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis("Left Stick Vertical") == 0)
                     {
-                        if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.right * currentDirectionX, width * 1.5f) == true)
-                            currentVelocityX = 0;
-                        else
-                            currentVelocityX -= deceleration * Time.deltaTime;
+                        if (currentVelocityY > 0)
+                        {
+                            if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.up * currentDirectionY, height * 1.5f) == true)
+                                currentVelocityY = 0;
+                            else
+                                currentVelocityY -= deceleration * Time.deltaTime;
+                        }
+                    }
+
+                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis("Left Stick Horizontal") == 0)
+                    {
+                        if (currentVelocityX > 0)
+                        {
+                            if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.right * currentDirectionX, width * 1.5f) == true)
+                                currentVelocityX = 0;
+                            else
+                                currentVelocityX -= deceleration * Time.deltaTime;
+                        }
                     }
                 }
+
                     newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
                     newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
                     gameObject.transform.position = newPosition;
