@@ -10,6 +10,7 @@ public class PlayerScript : MonoBehaviour
     private const float THROWVELOCITY = 250.0f;
     private const float BEAMOFFSET = -0.03f;
     private const float BEAMALPHA = 0.7f;
+    private const float THUMBSTICK_DEADZONE = 0.1f;
 
     public delegate void PlayerEvent(int playerNum);
     public event PlayerEvent Player_Death;
@@ -85,8 +86,6 @@ public class PlayerScript : MonoBehaviour
         inputSourceIndex = int.Parse(inputSource.Substring(inputSource.IndexOf(" ") ) ); //Grabs the index number after 
 
         Debug.Log("PLAYER " + PlayerNumber + " TIED TO INPUT SOURCE: " + inputSource);
-
-        TiePlayerInputSource();
 
         inputManager.Key_Held += PlayerInput;
         inputManager.Key_Released += ApplyDeceleration;
@@ -180,12 +179,15 @@ public class PlayerScript : MonoBehaviour
                             }
                         }
                         //=================================================================================================================
+
+                    PlayerMove(currentDirectionX, currentDirectionY);
                 }
 
                 if (inputSource.Contains("Controller") == true)
                 {
                     //================================================ MOVEMENT ================================================
-                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) != 0.1f)
+                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) >= THUMBSTICK_DEADZONE ||
+                        inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) <= -THUMBSTICK_DEADZONE )
                     {
 
                         if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) > 0)
@@ -194,11 +196,12 @@ public class PlayerScript : MonoBehaviour
                             currentDirectionY = -1;
                     }
 
-                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) != 0.1f)
+                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) >= THUMBSTICK_DEADZONE ||
+                        inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) <= -THUMBSTICK_DEADZONE)
                     {
-                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) > 0)
+                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) > THUMBSTICK_DEADZONE)
                             currentDirectionX = 1;
-                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) < 0)
+                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) < THUMBSTICK_DEADZONE)
                             currentDirectionX = -1;
                     }
                     //=================================================================================================================
@@ -213,8 +216,15 @@ public class PlayerScript : MonoBehaviour
                                 ThrowObject();
                         }
                     }
+
+                    //Only call PlayerMove() if the thumbstick isn't completely idle.
+                    if  ( ((inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) >= THUMBSTICK_DEADZONE ||
+                            inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) <= -THUMBSTICK_DEADZONE)) ||
+                        (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) >= THUMBSTICK_DEADZONE ||
+                            inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) <= -THUMBSTICK_DEADZONE) )
+
+                    PlayerMove(currentDirectionX, currentDirectionY);
                 }
-                PlayerMove(currentDirectionX, currentDirectionY);
                 
             } 
         }
@@ -255,7 +265,8 @@ public class PlayerScript : MonoBehaviour
 
                 if (inputSource.Contains("Controller") == true)
                 {
-                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) == 0)
+                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) <= THUMBSTICK_DEADZONE &&
+                        inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) >= -THUMBSTICK_DEADZONE)
                     {
                         if (currentVelocityY > 0)
                         {
@@ -266,7 +277,8 @@ public class PlayerScript : MonoBehaviour
                         }
                     }
 
-                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) == 0)
+                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) <= THUMBSTICK_DEADZONE &&
+                        inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) >= -THUMBSTICK_DEADZONE)
                     {
                         if (currentVelocityX > 0)
                         {
@@ -277,15 +289,15 @@ public class PlayerScript : MonoBehaviour
                         }
                     }
                 }
-
-                    newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
-                    newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
-                    gameObject.transform.position = newPosition;
             }
-                if (currentVelocityX < 0)
-                    currentVelocityX = 0;
-                if (currentVelocityY < 0)
-                    currentVelocityY = 0;
+            if (currentVelocityX < 0)
+                currentVelocityX = 0;
+            if (currentVelocityY < 0)
+                currentVelocityY = 0;
+
+            newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
+            newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
+            gameObject.transform.position = newPosition;
         }
 	}
 
@@ -398,8 +410,6 @@ public class PlayerScript : MonoBehaviour
             gameObject.transform.FindChild("PlayerArmV1").rotation = newRotation;
 
         selectorBeam.transform.rotation = newRotation;
-
-        Debug.Log(newAngle);
     }
 
 	private void GrabObject()
@@ -544,18 +554,5 @@ public class PlayerScript : MonoBehaviour
         pickupText.GetComponent<PickupAlertScript>().PickupText(pickupInfo.CurrentPickupType.ToString() );
 
         Destroy(pickupInfo.gameObject);
-    }
-
-    private void TiePlayerInputSource()
-    {
-        if (inputSource.Contains("Controller") == true)
-        {
-            //inputManager.Button_Held += ; //MAKE A NEW INPUT FUNCTION OR SHARE IT?
-            //inputManager.Button_Released += ; //SAME AS ABOVE
-        }
-        else if (inputSource.Contains("Keybinds") == true)
-        {
-            
-        }
     }
 }
