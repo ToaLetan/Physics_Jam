@@ -80,10 +80,8 @@ public class PlayerScript : MonoBehaviour
 	// Use this for initialization
 	void Start () 
 	{
-        
-
         inputSource = GameInfoManager.Instance.PlayerInputSources[PlayerNumber];
-        inputSourceIndex = int.Parse(inputSource.Substring(inputSource.IndexOf(" ") ) ); //Grabs the index number after 
+        inputSourceIndex = int.Parse(inputSource.Substring(inputSource.IndexOf(" ") ) ); //Grabs the index number after the input source
 
         Debug.Log("PLAYER " + PlayerNumber + " TIED TO INPUT SOURCE: " + inputSource);
 

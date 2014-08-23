@@ -2,25 +2,32 @@
 using System.Collections;
 using System.Collections.Generic;
 
+public struct TiedController
+{
+    public int playerNum;
+    public XboxController playerController;
+}
+
+public struct TiedKeybinds
+{
+    public int playerNum;
+    public int keybindIndex;
+}
+
 public class MenuManager : MonoBehaviour 
 {
 	private const int NUM_OF_COLOURS = 8;
-	private const int MAX_NUM_OF_PLAYERS = 4;
+    private const int MAX_NUM_OF_PLAYERS = 4;
+
+    private const float THUMBSTICK_DEADZONE = 0.1f;
 
 	private List<GameObject> previewPlayers = new List<GameObject>();
+    private List<TiedController> activeControllers = new List<TiedController>();
+    private List<TiedKeybinds> activeKeybinds = new List<TiedKeybinds>();
 
-	private Color[] colourArray = new Color[NUM_OF_COLOURS];
-
-	//Kinda messy, maybe set up a class for this?
-	private int currentColourPlayer1 = -1;
-	private int currentColourPlayer2 = -1;
-	private int currentColourPlayer3 = -1;
-	private int currentColourPlayer4 = -1;
-
-	private bool canChangeColourPlayer1 = true;
-	private bool canChangeColourPlayer2 = true;
-	private bool canChangeColourPlayer3 = true;
-	private bool canChangeColourPlayer4 = true;
+	private Color[] colourArray = new Color[NUM_OF_COLOURS]; //Array of possible colours
+    private int[] playerColourIndexArray = new int[MAX_NUM_OF_PLAYERS]; //Array of current colour indices (ex. red = 1, blue = 2, etc.)
+    private bool[] canChangePlayerColourArray = new bool[MAX_NUM_OF_PLAYERS]; //Array of bools used to determine if the player can change colour, prevents holding keys to flicker through colours.
 
 	private InputManager inputManager;
 
@@ -37,11 +44,19 @@ public class MenuManager : MonoBehaviour
 
 		PopulateColours();
 		PopulatePreviewPlayers();
-		
+
+        //Set all currentColourIndexes to default at 1 and set all players to be able to change colour.
+        for (int i = 0; i < previewPlayers.Count; i++)
+        {
+            playerColourIndexArray[i] = -1;
+            canChangePlayerColourArray[i] = true;
+        }
 
 		//Set players to start as red.
-		//ApplyColourPreview(1, 0);
-		//ApplyColourPreview(1, 1);
+        for (int i = 0; i < previewPlayers.Count; i++)
+        {
+            ApplyColourPreview(1, i);
+        }
 
 		AnimatePlayers();
 	}
@@ -50,7 +65,32 @@ public class MenuManager : MonoBehaviour
 	void Update () 
 	{
 		inputManager.Update();
+
+        if(activeControllers.Count > 0)
+            UpdateControllerInput();
 	}
+
+    private void UpdateControllerInput()
+    {
+        for (int i = 0; i < activeControllers.Count; i++)
+        {
+            //If moving left or right, apply the colour preview.
+            if (activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.dPadHorizontal) > 0 ||
+                activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.leftThumbstickHorizontal) > 0)
+                ApplyColourPreview(1, activeControllers[i].playerNum);
+
+            if (activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.dPadHorizontal) < 0 ||
+                activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.leftThumbstickHorizontal) < 0)
+                ApplyColourPreview(-1, activeControllers[i].playerNum);
+
+            if (activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.dPadHorizontal) == 0 &&
+                (activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.leftThumbstickHorizontal) < THUMBSTICK_DEADZONE &&
+                activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.leftThumbstickHorizontal) > -THUMBSTICK_DEADZONE))
+            {
+                canChangePlayerColourArray[activeControllers[i].playerNum] = true;
+            }
+        }
+    }
 
 	private void PopulateColours()
 	{
@@ -90,59 +130,27 @@ public class MenuManager : MonoBehaviour
 	private void ApplyColourPreview(int incrementation, int playerNum)
 	{
 		//THIS IS REALLY GHETTO FOR NOW, IMPROVE IT LATER
-
 		Color newColour = Color.cyan;
 
-		for (int i = 0; i < previewPlayers.Count; i++)
-		{
+        if (canChangePlayerColourArray[playerNum] == true)
+        {
+            playerColourIndexArray[playerNum] += incrementation;
+
+            if (playerColourIndexArray[playerNum] >= colourArray.Length)
+                playerColourIndexArray[playerNum] = 0;
+            if (playerColourIndexArray[playerNum] < 0)
+                playerColourIndexArray[playerNum] = colourArray.Length - 1;
+
+            newColour = colourArray[playerColourIndexArray[playerNum]];
+
+            canChangePlayerColourArray[playerNum] = false;
+
+            GameInfoManager.Instance.PlayerColours[playerNum] = newColour;
+
             previewPlayers[playerNum].transform.FindChild("PreviewPlayer").GetChild(0).GetComponent<SpriteRenderer>().color = newColour;
             previewPlayers[playerNum].transform.FindChild("ColourPreview").GetComponent<SpriteRenderer>().color = newColour;
             previewPlayers[playerNum].transform.FindChild("Text_Player" + (playerNum + 1)).GetComponent<SpriteRenderer>().color = newColour;
-		}
-
-		/*
-		if (playerNum == 0 && canChangeColourPlayer1 == true)
-		{
-			currentColourPlayer1 += incrementation;
-
-			if(currentColourPlayer1 >= colourArray.Length)
-				currentColourPlayer1 = 0;
-			if(currentColourPlayer1 < 0)
-				currentColourPlayer1 = colourArray.Length - 1;
-
-			newColour = colourArray [currentColourPlayer1];
-
-			GameInfoManager.Instance.PlayerColours[0] = newColour;
-
-			canChangeColourPlayer1 = false;
-
-			//Apply the colour to the player
-			previewPlayers[playerNum].transform.FindChild("PreviewPlayer").GetChild(0).GetComponent<SpriteRenderer>().color = newColour;
-			previewPlayers[playerNum].transform.FindChild("ColourPreview").GetComponent<SpriteRenderer>().color = newColour;
-			previewPlayers[playerNum].transform.FindChild("Text_Player" + (playerNum+1) ).GetComponent<SpriteRenderer>().color = newColour;
-		} 
-		if (playerNum == 1 && canChangeColourPlayer2 == true)
-		{
-			currentColourPlayer2 += incrementation;
-
-			if(currentColourPlayer2 >= colourArray.Length)
-				currentColourPlayer2 = 0;
-			if(currentColourPlayer2 < 0)
-				currentColourPlayer2 = colourArray.Length - 1;
-
-			newColour = colourArray [currentColourPlayer2];
-
-
-
-			GameInfoManager.Instance.PlayerColours[1] = newColour;
-
-			canChangeColourPlayer2 = false;
-
-			//Apply the colour to the player
-			previewPlayers[playerNum].transform.FindChild("PreviewPlayer").GetChild(0).GetComponent<SpriteRenderer>().color = newColour;
-			previewPlayers[playerNum].transform.FindChild("ColourPreview").GetComponent<SpriteRenderer>().color = newColour;
-			previewPlayers[playerNum].transform.FindChild("Text_Player" + (playerNum+1) ).GetComponent<SpriteRenderer>().color = newColour;
-		}*/
+        }
 	}
 
 	private void MenuInput(int playerNum, List<string> keysHeld)
@@ -154,42 +162,73 @@ public class MenuManager : MonoBehaviour
                 string inputString = inputManager.PlayerKeybindArray[i].ToString() + " " + playerNum;
                 //If there aren't 4 players and the input source hasn't already been bound to someone, join the new player.
                 if (currentJoinedPlayerIndex < MAX_NUM_OF_PLAYERS - 1 && GameInfoManager.Instance.PlayerInputSources.Contains(inputString) == false)
+                {
+                    //Add it to the list of controllers active in the menu.
+                    if (currentJoinedPlayerIndex < MAX_NUM_OF_PLAYERS - 1)
+                    {
+                        TiedKeybinds newKeybind = new TiedKeybinds();
+                        newKeybind.playerNum = currentJoinedPlayerIndex + 1;
+                        newKeybind.keybindIndex = i;
+                        activeKeybinds.Add(newKeybind);
+                    }
                     PlayerJoin(inputString);
+                }
             }
-
-            if (keysHeld.Contains(inputManager.PlayerKeybindArray[i].LeftKey.ToString() ) )
-			{
-				//ApplyColourPreview(-1, i);
-			}
-            if (keysHeld.Contains(inputManager.PlayerKeybindArray[i].RightKey.ToString() ) )
-			{
-				//ApplyColourPreview(1, i);
-			}
 		}
 
-        if (keysHeld.Contains(inputManager.PlayerKeybindArray[0].SelectKey.ToString() ) ) //Start game once enter has been pressed. Make sure to unsub first.
-		{
-            if (currentJoinedPlayerIndex >= 1) //Prevent a game from starting until there's at least two players.
+        for (int j = 0; j < previewPlayers.Count; j++)
+        {
+            if (GameInfoManager.Instance.PlayerInputSources[j].ToString() != "")
             {
-                inputManager.Key_Pressed -= MenuInput;
-                Application.LoadLevel("Main");
+                string inputSource = GameInfoManager.Instance.PlayerInputSources[j].ToString();
+                int inputSourceIndex = 0;
+
+                inputSourceIndex = int.Parse(inputSource.Substring(inputSource.IndexOf(" ") ));
+
+                if (inputSource.Contains("Keybinds"))
+                {
+                    if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LeftKey.ToString()))
+                        ApplyColourPreview(-1, j);
+                    if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].RightKey.ToString()))
+                        ApplyColourPreview(1, j);
+                }
             }
-		}
+        }
+
+            if (keysHeld.Contains(inputManager.PlayerKeybindArray[0].SelectKey.ToString())) //Start game once enter has been pressed. Make sure to unsub first.
+            {
+                if (currentJoinedPlayerIndex >= 1) //Prevent a game from starting until there's at least two players.
+                {
+                    inputManager.Key_Pressed -= MenuInput;
+                    Application.LoadLevel("Main");
+                }
+            }
 	}
 
 	private void CheckReleasedKeys(int playerNum, List<string> keysReleased)
 	{
-		/*
-		for (int i = 0; i < previewPlayers.Count; i++)
-		{
-			if(keysReleased.Contains(inputManager.PlayerKeybindArray [i].LeftKey) && keysReleased.Contains(inputManager.PlayerKeybindArray [i].RightKey) )
-			{
-				if(i == 0)
-					canChangeColourPlayer1 = true;
-				else
-					canChangeColourPlayer2 = true;
-			}
-		}*/
+        for (int i = 0; i < previewPlayers.Count; i++)
+        {
+            if (GameInfoManager.Instance.PlayerInputSources[i].ToString() != "")
+            {
+                string inputSource = GameInfoManager.Instance.PlayerInputSources[i].ToString();
+                int inputSourceIndex = 0;
+
+                inputSourceIndex = int.Parse(inputSource.Substring(inputSource.IndexOf(" ")));
+
+                if (inputSource.Contains("Keybinds"))
+                {
+                    if (keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LeftKey.ToString()) && keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].RightKey.ToString()))
+                    {
+                        for (int j = 0; j < activeKeybinds.Count; j++) //Check which player this activeKeybind belongs to and let that player be able to change colour.
+                        {
+                            if(activeKeybinds[j].keybindIndex == inputSourceIndex)
+                                canChangePlayerColourArray[activeKeybinds[j].playerNum] = true;
+                        }
+                    }
+                }
+            }
+        }
 	}
 
 	private void AnimatePlayers()
@@ -241,7 +280,20 @@ public class MenuManager : MonoBehaviour
                 string inputString = inputManager.ControllerArray[playerNum].ToString() + " " + playerNum;
                 //If there aren't 4 players and the input source hasn't already been bound to someone, join the new player.
                 if (currentJoinedPlayerIndex < MAX_NUM_OF_PLAYERS - 1 && GameInfoManager.Instance.PlayerInputSources.Contains(inputString) == false)
+                {
+                    //Add it to the list of controllers active in the menu.
+                    if (currentJoinedPlayerIndex < MAX_NUM_OF_PLAYERS - 1)
+                    {
+                        TiedController newActiveController = new TiedController();
+                        newActiveController.playerController = inputManager.ControllerArray[playerNum];
+                        newActiveController.playerNum = currentJoinedPlayerIndex + 1;
+
+                        activeControllers.Add(newActiveController);
+                    }
+
                     PlayerJoin(inputString);
+                }
 			}
     }
+
 }
