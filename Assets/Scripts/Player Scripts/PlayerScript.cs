@@ -137,7 +137,10 @@ public class PlayerScript : MonoBehaviour
                 if(inputSource.Contains("Keybinds") == true)
                 {
                     //================================================ MOVEMENT ================================================
-                    if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].UpKey.ToString()) || keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].DownKey.ToString()))
+                    if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].UpKey.ToString()) || keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].DownKey.ToString()) ||
+                        (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LeftKey.ToString()) || keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].RightKey.ToString())))
+                    {
+                        if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].UpKey.ToString()) || keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].DownKey.ToString()))
                         {
 
                             if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].UpKey.ToString()))
@@ -146,15 +149,19 @@ public class PlayerScript : MonoBehaviour
                             }
                             else
                                 currentDirectionY = -1;
+
+
                         }
 
-                    if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LeftKey.ToString()) || keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].RightKey.ToString()))
+                        if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LeftKey.ToString()) || keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].RightKey.ToString()))
                         {
                             if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LeftKey.ToString()))
                                 currentDirectionX = -1;
                             else
                                 currentDirectionX = 1;
                         }
+                        PlayerMove(currentDirectionX, currentDirectionY);
+                    }
                         //=================================================================================================================
 
                         //================================================ BEAM ROTATION ================================================
@@ -177,8 +184,6 @@ public class PlayerScript : MonoBehaviour
                             }
                         }
                         //=================================================================================================================
-
-                    PlayerMove(currentDirectionX, currentDirectionY);
                 }
 
                 if (inputSource.Contains("Controller") == true)
