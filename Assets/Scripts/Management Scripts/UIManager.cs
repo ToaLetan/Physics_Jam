@@ -78,10 +78,10 @@ public class UIManager
                 playerNamesArray[1].transform.localPosition = new Vector3(RIGHTPLAYERSX, TOPPLAYERSY, 1);
                 break;
             case "Text_Player3":
-                playerNamesArray[2].transform.localPosition = new Vector3(LEFTPLAYERSX, -camera.orthographicSize + (UIOffset * 2), 1);
+                playerNamesArray[2].transform.localPosition = new Vector3(LEFTPLAYERSX, -camera.orthographicSize + (UIOffset * 5), 1);
                 break;
             case "Text_Player4":
-                playerNamesArray[3].transform.localPosition = new Vector3(RIGHTPLAYERSX, -camera.orthographicSize + (UIOffset * 2), 1);
+                playerNamesArray[3].transform.localPosition = new Vector3(RIGHTPLAYERSX, -camera.orthographicSize + (UIOffset * 5), 1);
                 break;
         }
     }

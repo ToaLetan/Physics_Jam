@@ -71,6 +71,7 @@
      <Compile Include="Assets\Scripts\Player Scripts\AnimatePreviewScript.cs" />
      <Compile Include="Assets\Scripts\Player Scripts\BeamScript.cs" />
      <Compile Include="Assets\Scripts\Player Scripts\PlayerScript.cs" />
+     <Compile Include="Assets\Scripts\Player Scripts\PlayerSpawnPointScript.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

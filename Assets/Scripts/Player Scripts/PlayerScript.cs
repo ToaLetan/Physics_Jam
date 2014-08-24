@@ -116,9 +116,9 @@ public class PlayerScript : MonoBehaviour
 
     public void SetPlayerColour(Color newColour)
     {
-        if (gameObject.transform.FindChild("PlayerGlowLayerV1") != null)
+        if (gameObject.transform.FindChild("PlayerGlowLayer") != null)
         {
-            SpriteRenderer glowLayerRenderer = gameObject.transform.FindChild("PlayerGlowLayerV1").GetComponent<SpriteRenderer> ();
+            SpriteRenderer glowLayerRenderer = gameObject.transform.FindChild("PlayerGlowLayer").GetComponent<SpriteRenderer> ();
             playerColour = newColour;
             glowLayerRenderer.material.color = playerColour;
         }
@@ -362,16 +362,16 @@ public class PlayerScript : MonoBehaviour
 	{
 		selectorBeam = GameObject.Instantiate (Resources.Load ("Prefabs/PlayerObjects/LineSegment")) as GameObject;
 
-        if (gameObject.transform.FindChild("PlayerArmV1") != null)
+        if (gameObject.transform.FindChild("PlayerArm") != null)
         {
             //Get the position of the player arm and its length, attach the beam to the end of the arm where the hand is.
-            Vector3 playerArmPos = gameObject.transform.FindChild("PlayerArmV1").position;
-            float playerArmLength = gameObject.transform.FindChild("PlayerArmV1").GetComponent<SpriteRenderer>().sprite.bounds.max.x;
+            Vector3 playerArmPos = gameObject.transform.FindChild("PlayerArm").position;
+            float playerArmLength = gameObject.transform.FindChild("PlayerArm").GetComponent<SpriteRenderer>().sprite.bounds.max.x;
 
             playerArmPos.x += playerArmLength + BEAMOFFSET;
 
             selectorBeam.transform.position = playerArmPos;
-            selectorBeam.transform.parent = gameObject.transform.FindChild("PlayerArmV1");
+            selectorBeam.transform.parent = gameObject.transform.FindChild("PlayerArm");
         } 
         else
         {
@@ -394,8 +394,8 @@ public class PlayerScript : MonoBehaviour
         float newAngle = selectorBeam.transform.rotation.eulerAngles.z + turnSpeed * direction * Time.deltaTime;
 		Quaternion newRotation = Quaternion.AngleAxis (newAngle, Vector3.forward);
 
-        if (gameObject.transform.FindChild("PlayerArmV1") != null)
-            gameObject.transform.FindChild("PlayerArmV1").rotation = newRotation;
+        if (gameObject.transform.FindChild("PlayerArm") != null)
+            gameObject.transform.FindChild("PlayerArm").rotation = newRotation;
 
 		selectorBeam.transform.rotation = newRotation;
 	}
@@ -409,8 +409,8 @@ public class PlayerScript : MonoBehaviour
 
         Quaternion newRotation = Quaternion.AngleAxis(newAngle, Vector3.forward);
 
-        if (gameObject.transform.FindChild("PlayerArmV1") != null)
-            gameObject.transform.FindChild("PlayerArmV1").rotation = newRotation;
+        if (gameObject.transform.FindChild("PlayerArm") != null)
+            gameObject.transform.FindChild("PlayerArm").rotation = newRotation;
 
         selectorBeam.transform.rotation = newRotation;
     }

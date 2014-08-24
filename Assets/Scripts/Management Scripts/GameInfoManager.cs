@@ -10,6 +10,7 @@ public class GameInfoManager
 
     public List<Color> PlayerColours = new List<Color>();
     public List<string> PlayerInputSources = new List<string>(); //Where players are getting their controls from (controller 1-4 or keyboard 1-2) by name.
+    public List<bool> JoinedPlayers = new List<bool>(); //Whether or not players 1-4 have joined.
     
     public static GameInfoManager Instance
     {
@@ -29,6 +30,7 @@ public class GameInfoManager
 		{
 			PlayerColours.Add(Color.white);
             PlayerInputSources.Add("");
+            JoinedPlayers.Add(false);
 		}
 
         //Default players 1 and 2 to keyboard if something goes wrong, or if testing through the Main game scene.

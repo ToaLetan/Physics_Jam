@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     public GameEvent GameResumed;
 
     public List<GameObject> PlayerList = new List<GameObject>();
+    public List<GameObject> PlayerSpawnPoints = new List<GameObject>();
 
     private GameObject pauseMenu = null;
 
@@ -42,17 +43,29 @@ public class GameManager : MonoBehaviour
 
     private void InitializeGame()
     {
-        //Get all players, add them to the exposed PlayerList and subscribe to their Player_Death events.
-        for (int i = 0; i < GameObject.FindGameObjectsWithTag("Player").Length; i++)
+        //Associate players to their respective spawn points.
+        for (int i = 0; i < GameObject.FindGameObjectsWithTag("PlayerSpawn").Length; i++)
         {
-            PlayerList.Add(GameObject.FindGameObjectsWithTag("Player") [i]);
-            GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<PlayerScript>().Player_Death += OnPlayerDeath;
-            GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<PlayerScript>().Player_Lose += OnPlayerLose;
-            
-            InputManager.Instance.Key_Pressed += HandleInput;
-            
-            GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<PlayerScript>().SetPlayerColour(GameInfoManager.Instance.PlayerColours[i]);
+            if (GameInfoManager.Instance.JoinedPlayers[i] == true)
+            {
+                PlayerSpawnPoints.Add(GameObject.FindGameObjectsWithTag("PlayerSpawn")[i]);
+                GameObject newPlayer = GameObject.Instantiate(Resources.Load("Prefabs/PlayerObjects/Player")) as GameObject;
+                newPlayer.transform.position = PlayerSpawnPoints[i].transform.position;
+                newPlayer.GetComponent<PlayerScript>().PlayerNumber = i;
+            }
+        }
 
+        //Get all players, add them to the exposed PlayerList and subscribe to their Player_Death events.
+        for (int j = 0; j < GameObject.FindGameObjectsWithTag("Player").Length; j++)
+        {
+            PlayerList.Add(GameObject.FindGameObjectsWithTag("Player")[j]);
+            GameObject.FindGameObjectsWithTag("Player")[j].GetComponent<PlayerScript>().Player_Death += OnPlayerDeath;
+            GameObject.FindGameObjectsWithTag("Player")[j].GetComponent<PlayerScript>().Player_Lose += OnPlayerLose;
+        
+            InputManager.Instance.Key_Pressed += HandleInput;
+        
+            GameObject.FindGameObjectsWithTag("Player")[j].GetComponent<PlayerScript>().SetPlayerColour(GameInfoManager.Instance.PlayerColours[j]);
+        
             UIManager.Instance.ResetUI();
         }
     }

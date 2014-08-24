@@ -55,7 +55,7 @@ public class MenuManager : MonoBehaviour
 		//Set players to start as red.
         for (int i = 0; i < previewPlayers.Count; i++)
         {
-            ApplyColourPreview(1, i);
+            ApplyColourPreview(1 + i, i);
         }
 
 		AnimatePlayers();
@@ -249,7 +249,9 @@ public class MenuManager : MonoBehaviour
         if(currentJoinedPlayerIndex < MAX_NUM_OF_PLAYERS - 1)
             currentJoinedPlayerIndex++;
 
+        //Register their info to the GameInfoManager
         GameInfoManager.Instance.PlayerInputSources[currentJoinedPlayerIndex] = inputSource;
+        GameInfoManager.Instance.JoinedPlayers[currentJoinedPlayerIndex] = true;
 
         //Move the player panels on-screen all fancy-like.
         Vector3 panelPosition = Vector3.zero;
