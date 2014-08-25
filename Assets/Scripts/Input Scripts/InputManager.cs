@@ -191,6 +191,10 @@ public class InputManager
                     allHeldButtons.Add(ControllerArray[j].buttonX);
                 if (ControllerArray[j].GetButtonHeld(ControllerArray[j].buttonY))
                     allHeldButtons.Add(ControllerArray[j].buttonY);
+                if (ControllerArray[j].GetButtonHeld(ControllerArray[j].startButton))
+                    allHeldButtons.Add(ControllerArray[j].startButton);
+                if (ControllerArray[j].GetButtonHeld(ControllerArray[j].backButton))
+                    allHeldButtons.Add(ControllerArray[j].backButton);
 
                 if (allHeldButtons.Count > 0)
                 {
@@ -211,13 +215,17 @@ public class InputManager
                     allPressedButtons.Add(ControllerArray[j].buttonX);
                 if (ControllerArray[j].GetButtonDown(ControllerArray[j].buttonY))
                     allPressedButtons.Add(ControllerArray[j].buttonY);
+                if (ControllerArray[j].GetButtonDown(ControllerArray[j].startButton))
+                    allPressedButtons.Add(ControllerArray[j].startButton);
+                if (ControllerArray[j].GetButtonDown(ControllerArray[j].backButton))
+                    allPressedButtons.Add(ControllerArray[j].backButton);
 
                 if (allPressedButtons.Count > 0)
                 {
                     if (Button_Pressed != null)
                         Button_Pressed(j, allPressedButtons);
 
-                    allHeldButtons.Clear();
+                    allPressedButtons.Clear();
                 }
 
                 //Check all buttons being released.
@@ -230,6 +238,11 @@ public class InputManager
                     allReleasedButtons.Add(ControllerArray[j].buttonX);
                 if (!ControllerArray[j].GetButtonHeld(ControllerArray[j].buttonY))
                     allReleasedButtons.Add(ControllerArray[j].buttonY);
+                if (!ControllerArray[j].GetButtonHeld(ControllerArray[j].startButton))
+                    allReleasedButtons.Add(ControllerArray[j].startButton);
+                if (!ControllerArray[j].GetButtonHeld(ControllerArray[j].backButton))
+                    allReleasedButtons.Add(ControllerArray[j].backButton);
+
 
                 if (allReleasedButtons.Count > 0)
                 {

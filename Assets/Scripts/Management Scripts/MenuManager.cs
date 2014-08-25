@@ -160,6 +160,7 @@ public class MenuManager : MonoBehaviour
             if (keysHeld.Contains(inputManager.PlayerKeybindArray[i].GraborThrowKey.ToString() ) )
             {
                 string inputString = inputManager.PlayerKeybindArray[i].ToString() + " " + playerNum;
+
                 //If there aren't 4 players and the input source hasn't already been bound to someone, join the new player.
                 if (currentJoinedPlayerIndex < MAX_NUM_OF_PLAYERS - 1 && GameInfoManager.Instance.PlayerInputSources.Contains(inputString) == false)
                 {
@@ -195,14 +196,14 @@ public class MenuManager : MonoBehaviour
             }
         }
 
-            if (keysHeld.Contains(inputManager.PlayerKeybindArray[0].SelectKey.ToString())) //Start game once enter has been pressed. Make sure to unsub first.
+        if (keysHeld.Contains(inputManager.PlayerKeybindArray[0].SelectKey.ToString())) //Start game once enter has been pressed. Make sure to unsub first.
+        {
+            if (currentJoinedPlayerIndex >= 1) //Prevent a game from starting until there's at least two players.
             {
-                if (currentJoinedPlayerIndex >= 1) //Prevent a game from starting until there's at least two players.
-                {
-                    inputManager.Key_Pressed -= MenuInput;
-                    Application.LoadLevel("Main");
-                }
+                inputManager.Key_Pressed -= MenuInput;
+                Application.LoadLevel("Main");
             }
+        }
 	}
 
 	private void CheckReleasedKeys(int playerNum, List<string> keysReleased)
@@ -277,25 +278,32 @@ public class MenuManager : MonoBehaviour
 
     private void ButtonMenuInput(int playerNum, List<string> buttonsHeld)
     {
-            if (buttonsHeld.Contains(inputManager.ControllerArray[playerNum].buttonA))
-			{
-                string inputString = inputManager.ControllerArray[playerNum].ToString() + " " + playerNum;
-                //If there aren't 4 players and the input source hasn't already been bound to someone, join the new player.
-                if (currentJoinedPlayerIndex < MAX_NUM_OF_PLAYERS - 1 && GameInfoManager.Instance.PlayerInputSources.Contains(inputString) == false)
+        if (buttonsHeld.Contains(inputManager.ControllerArray[playerNum].buttonA))
+		{
+            string inputString = inputManager.ControllerArray[playerNum].ToString() + " " + playerNum;
+            //If there aren't 4 players and the input source hasn't already been bound to someone, join the new player.
+            if (currentJoinedPlayerIndex < MAX_NUM_OF_PLAYERS - 1 && GameInfoManager.Instance.PlayerInputSources.Contains(inputString) == false)
+            {
+                //Add it to the list of controllers active in the menu.
+                if (currentJoinedPlayerIndex < MAX_NUM_OF_PLAYERS - 1)
                 {
-                    //Add it to the list of controllers active in the menu.
-                    if (currentJoinedPlayerIndex < MAX_NUM_OF_PLAYERS - 1)
-                    {
-                        TiedController newActiveController = new TiedController();
-                        newActiveController.playerController = inputManager.ControllerArray[playerNum];
-                        newActiveController.playerNum = currentJoinedPlayerIndex + 1;
+                    TiedController newActiveController = new TiedController();
+                    newActiveController.playerController = inputManager.ControllerArray[playerNum];
+                    newActiveController.playerNum = currentJoinedPlayerIndex + 1;
 
-                        activeControllers.Add(newActiveController);
-                    }
-
-                    PlayerJoin(inputString);
+                    activeControllers.Add(newActiveController);
                 }
-			}
-    }
 
+                PlayerJoin(inputString);
+            }
+		}
+        if (buttonsHeld.Contains(inputManager.ControllerArray[playerNum].startButton))
+        {
+            if (currentJoinedPlayerIndex >= 1) //Prevent a game from starting until there's at least two players.
+            {
+                inputManager.Key_Pressed -= MenuInput;
+                Application.LoadLevel("Main");
+            }
+        }
+    }
 }
