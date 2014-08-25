@@ -11,7 +11,11 @@ public class GameManager : MonoBehaviour
     public List<GameObject> PlayerList = new List<GameObject>();
     public List<GameObject> PlayerSpawnPoints = new List<GameObject>();
 
+    private List<int> numPlayerLives = new List<int>();
+
     private GameObject pauseMenu = null;
+
+    private int numOfDefeatedPlayers = 0;
 
     private bool isGamePaused = false;
     private bool isGameOver = false;
@@ -52,6 +56,8 @@ public class GameManager : MonoBehaviour
                 GameObject newPlayer = GameObject.Instantiate(Resources.Load("Prefabs/PlayerObjects/Player")) as GameObject;
                 newPlayer.transform.position = PlayerSpawnPoints[i].transform.position;
                 newPlayer.GetComponent<PlayerScript>().PlayerNumber = i;
+
+                numPlayerLives.Add(newPlayer.GetComponent<PlayerScript>().NumLives);
             }
         }
 
@@ -74,23 +80,36 @@ public class GameManager : MonoBehaviour
     {
         //Remove 1 life from the player.
         UIManager.Instance.RemoveLife(playerNum);
+        numPlayerLives[playerNum] -= 1;
     }
 
     private void OnPlayerLose(int playerNum)
     {
-        //Show the winner, and the prompt for what to do next.
-        //THIS IS REALLY CHEAP, IMPROVE IT WHENEVER.
-        if(playerNum == 0)
-            UIManager.Instance.ShowEnding(1);
-        else
-            UIManager.Instance.ShowEnding(0);
+        int mostLives = 0;
+        int playerNumWithMostLives = 0;
+
+        numOfDefeatedPlayers += 1;
 
         for (int i = 0; i < PlayerList.Count; i++)
         {
-            PlayerList[i].GetComponent<PlayerScript>().CanMove = false;
+            if (numPlayerLives[i] > mostLives)
+            {
+                mostLives = numPlayerLives[i];
+                playerNumWithMostLives = i;
+            }
         }
 
-        isGameOver = true;
+        //If they were the second last player, the game is over.
+        //Show the winner (remaining player) and prompt what to do next.
+        if (numOfDefeatedPlayers == PlayerList.Count - 1)
+        {
+            for (int j = 0; j < PlayerList.Count; j++)
+            {
+                PlayerList[j].GetComponent<PlayerScript>().CanMove = false;
+            }
+            UIManager.Instance.ShowEnding(playerNumWithMostLives);
+            isGameOver = true;
+        }
     }
 
     private void HandleInput(int playerNum, List<string> keysPressed)

@@ -492,7 +492,10 @@ public class PlayerScript : MonoBehaviour
             if (Player_Lose != null)
                 Player_Lose(PlayerNumber);
 
-            Respawn(false);
+            //Respawn(false);
+            currentVelocityX = 0;
+            currentVelocityY = 0;
+            canMove = false;
         }
         else
             //Reset the player's position after the death animation has finished.
