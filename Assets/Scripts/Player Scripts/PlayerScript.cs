@@ -510,6 +510,9 @@ public class PlayerScript : MonoBehaviour
 
     private void Respawn(bool useSpawnTimer = true)
     {
+        currentVelocityX = 0;
+        currentVelocityY = 0;
+
         gameObject.transform.position = startPosition;
         gameObject.transform.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
         

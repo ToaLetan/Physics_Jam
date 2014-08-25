@@ -52,15 +52,37 @@ public class CameraEffectsScript : MonoBehaviour
 
     private void KeepPlayersInView()
     {
-        float combinedDist = SpeculativeContactsScript.GetDistance(playerList [0].transform.position, playerList [1].transform.position)/2;
+        float zoomModifier = 0.5f; //Arbitrary value used to reduce zoom slightly.
+        float furthestDistance = 0.0f; //The furthest distance between any two players used to determine how far the camera should zoom in/out.
+        float midPointX = 0.0f; //Midpoints used to position camera in the center.
+        float midPointY = 0.0f;
 
-        if (combinedDist < MINZOOMLEVEL)
-            combinedDist = MINZOOMLEVEL;
+        //Get the largest distances between X and Y values.
+        for (int i = 0; i < playerList.Count; i++)
+        {
+            //Compare the current player to all others, tracking the furthest distance of X and Y values.
+            for (int j = 0; j < playerList.Count; j++)
+            {
+                if (playerList[i] != playerList[j])
+                {
+                    float currentDistance = SpeculativeContactsScript.GetDistance(playerList[i].transform.position, playerList[j].transform.position);
 
-        Vector2 playerMidPoint = new Vector2( (playerList [0].transform.position.x + playerList [1].transform.position.x)/2, 
-                                             (playerList [0].transform.position.y + playerList [1].transform.position.y)/2 );
+                    if (currentDistance > furthestDistance)
+                        furthestDistance = currentDistance;
+                }
+            }
+            midPointX += playerList[i].transform.position.x;
+            midPointY += playerList[i].transform.position.y;
+        }
 
-        ZoomLevel(combinedDist * 1.1f, zoomSpeed);
+        furthestDistance *= zoomModifier; //Multiply the furthest distance by the zoom reduction modifier.
+
+        if (furthestDistance < MINZOOMLEVEL)
+            furthestDistance = MINZOOMLEVEL;
+
+        Vector2 playerMidPoint = new Vector2(midPointX/playerList.Count, midPointY/playerList.Count);
+
+        ZoomLevel(furthestDistance, zoomSpeed);
         MoveToLocation(playerMidPoint, moveSpeed);
     }
 }
