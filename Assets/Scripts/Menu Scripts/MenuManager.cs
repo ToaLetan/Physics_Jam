@@ -26,6 +26,7 @@ public class MenuManager : MonoBehaviour
     private List<TiedKeybinds> activeKeybinds = new List<TiedKeybinds>();
 
 	private Color[] colourArray = new Color[NUM_OF_COLOURS]; //Array of possible colours
+    private Vector3[] panelPositionsArray = new Vector3[MAX_NUM_OF_PLAYERS]; //Array of desired locations for panels to move to.
     private int[] playerColourIndexArray = new int[MAX_NUM_OF_PLAYERS]; //Array of current colour indices (ex. red = 1, blue = 2, etc.)
     private bool[] canChangePlayerColourArray = new bool[MAX_NUM_OF_PLAYERS]; //Array of bools used to determine if the player can change colour, prevents holding keys to flicker through colours.
 
@@ -57,6 +58,12 @@ public class MenuManager : MonoBehaviour
         {
             ApplyColourPreview(1 + i, i);
         }
+
+        //Establish all desired panel positions for when they need to be moved on-screen.
+        panelPositionsArray[0] = new Vector3(-0.50f, 1.05f, previewPlayers[0].transform.parent.transform.position.z);
+        panelPositionsArray[1] = new Vector3(-0.93f, 0.61f, previewPlayers[1].transform.parent.transform.position.z);
+        panelPositionsArray[2] = new Vector3(-1.37f, 0.16f, previewPlayers[2].transform.parent.transform.position.z);
+        panelPositionsArray[3] = new Vector3(-1.81f, -0.29f, previewPlayers[3].transform.parent.transform.position.z);
 
 		AnimatePlayers();
 	}
@@ -254,26 +261,9 @@ public class MenuManager : MonoBehaviour
         GameInfoManager.Instance.PlayerInputSources[currentJoinedPlayerIndex] = inputSource;
         GameInfoManager.Instance.JoinedPlayers[currentJoinedPlayerIndex] = true;
 
-        //Move the player panels on-screen all fancy-like.
-        Vector3 panelPosition = Vector3.zero;
-
-        switch(currentJoinedPlayerIndex)
-        {
-            case 0:
-                panelPosition = new Vector3(-0.50f, 1.05f, previewPlayers[currentJoinedPlayerIndex].transform.parent.transform.position.z);
-                break;
-            case 1:
-                panelPosition = new Vector3(-0.93f, 0.61f, previewPlayers[currentJoinedPlayerIndex].transform.parent.transform.position.z);
-                break;
-            case 2:
-                panelPosition = new Vector3(-1.37f, 0.16f, previewPlayers[currentJoinedPlayerIndex].transform.parent.transform.position.z);
-                break;
-            case 3:
-                panelPosition = new Vector3(-1.81f, -0.29f, previewPlayers[currentJoinedPlayerIndex].transform.parent.transform.position.z);
-                break;
-        }
-
-        previewPlayers[currentJoinedPlayerIndex].transform.parent.transform.position = panelPosition;
+        //Spawn a sweet little join animation
+        GameObject joinAnim = GameObject.Instantiate(Resources.Load("Prefabs/AnimatedPrefabs/JoinAnimation"), panelPositionsArray[currentJoinedPlayerIndex], previewPlayers[currentJoinedPlayerIndex].transform.rotation) as GameObject;
+        joinAnim.GetComponent<AnimationObject>().Animation_Complete += MovePanel;
 	}
 
     private void ButtonMenuInput(int playerNum, List<string> buttonsHeld)
@@ -305,5 +295,10 @@ public class MenuManager : MonoBehaviour
                 Application.LoadLevel("Main");
             }
         }
+    }
+
+    private void MovePanel()
+    {
+        previewPlayers[currentJoinedPlayerIndex].transform.parent.transform.position = panelPositionsArray[currentJoinedPlayerIndex];
     }
 }
