@@ -65,7 +65,7 @@ public class PhysicsObjectScript : MonoBehaviour
         {
             Destroy(gameObject.GetComponent<ProjectileAttributeScript>() );
         }
-        
-        GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SpawnAnimation"), gameObject.transform.position, gameObject.transform.rotation);
+
+        GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/AnimatedPrefabs/SpawnAnimation"), gameObject.transform.position, gameObject.transform.rotation);
     }
 }

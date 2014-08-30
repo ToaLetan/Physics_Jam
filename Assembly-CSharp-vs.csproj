@@ -49,6 +49,7 @@
      <Compile Include="Assets\Scripts\Animation Scripts\AnimationObject.cs" />
      <Compile Include="Assets\Scripts\Animation Scripts\AnimationPlayer.cs" />
      <Compile Include="Assets\Scripts\Animation Scripts\RainbowScript.cs" />
+     <Compile Include="Assets\Scripts\Animation Scripts\TweenComponent.cs" />
      <Compile Include="Assets\Scripts\General Scripts\CameraEffectsScript.cs" />
      <Compile Include="Assets\Scripts\General Scripts\IgnoreCameraScalingScript.cs" />
      <Compile Include="Assets\Scripts\General Scripts\PauseRigidBodyScript.cs" />

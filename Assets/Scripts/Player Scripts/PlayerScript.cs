@@ -518,8 +518,8 @@ public class PlayerScript : MonoBehaviour
 
         gameObject.transform.position = startPosition;
         gameObject.transform.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-        
-        GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SpawnAnimation"), gameObject.transform.position, gameObject.transform.rotation);
+
+        GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/AnimatedPrefabs/SpawnAnimation"), gameObject.transform.position, gameObject.transform.rotation);
 
         canMove = false;
 

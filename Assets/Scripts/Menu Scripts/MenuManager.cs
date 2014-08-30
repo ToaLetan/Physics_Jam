@@ -22,8 +22,10 @@ public class MenuManager : MonoBehaviour
     private const float THUMBSTICK_DEADZONE = 0.1f;
 
 	private List<GameObject> previewPlayers = new List<GameObject>();
+    private List<GameObject> joinPrompts = new List<GameObject>();
     private List<TiedController> activeControllers = new List<TiedController>();
     private List<TiedKeybinds> activeKeybinds = new List<TiedKeybinds>();
+    private List<int> queuedPlayersJoining = new List<int>();
 
 	private Color[] colourArray = new Color[NUM_OF_COLOURS]; //Array of possible colours
     private Vector3[] panelPositionsArray = new Vector3[MAX_NUM_OF_PLAYERS]; //Array of desired locations for panels to move to.
@@ -115,28 +117,39 @@ public class MenuManager : MonoBehaviour
 	private void PopulatePreviewPlayers() //Add the preview player bars in order from top to bottom.
 	{
 		float highestValue = -5;
-		GameObject topmostPlayer = null;
+		GameObject topmostObject = null;
 
 		for (int i = 0; i < MAX_NUM_OF_PLAYERS; i++)
 		{
-			for (int j = 0; j < GameObject.FindGameObjectsWithTag("PlayerSelect").Length; j++)
+			for (int j = 0; j < GameObject.FindGameObjectsWithTag("PlayerSelect").Length; j++) //Arrange the player previews by y-position.
 			{
 				//If the player's the topmost one and isn't already in the previewPlayers array, consider it the current topmost one.
 				if (GameObject.FindGameObjectsWithTag("PlayerSelect")[j].transform.position.y >= highestValue && previewPlayers.Contains(GameObject.FindGameObjectsWithTag("PlayerSelect")[j]) == false)
 				{
 					highestValue = GameObject.FindGameObjectsWithTag("PlayerSelect")[j].transform.position.y;
-					topmostPlayer = GameObject.FindGameObjectsWithTag("PlayerSelect")[j];
+                    topmostObject = GameObject.FindGameObjectsWithTag("PlayerSelect")[j];
 				}
 			}
-			previewPlayers.Add(topmostPlayer);
+            previewPlayers.Add(topmostObject);
 			highestValue = -5;
-			
+            topmostObject = null;
+
+            for (int k = 0; k < GameObject.FindGameObjectsWithTag("JoinPrompt").Length; k++) //Do the same thing with the join prompts
+            {
+                if (GameObject.FindGameObjectsWithTag("JoinPrompt")[k].transform.position.y >= highestValue && joinPrompts.Contains(GameObject.FindGameObjectsWithTag("JoinPrompt")[k]) == false)
+                {
+                    highestValue = GameObject.FindGameObjectsWithTag("JoinPrompt")[k].transform.position.y;
+                    topmostObject = GameObject.FindGameObjectsWithTag("JoinPrompt")[k];
+                }
+            }
+            joinPrompts.Add(topmostObject);
+			highestValue = -5;
+            topmostObject = null;
 		}
 	}
 
 	private void ApplyColourPreview(int incrementation, int playerNum)
 	{
-		//THIS IS REALLY GHETTO FOR NOW, IMPROVE IT LATER
 		Color newColour = Color.cyan;
 
         if (canChangePlayerColourArray[playerNum] == true)
@@ -264,6 +277,14 @@ public class MenuManager : MonoBehaviour
         //Spawn a sweet little join animation
         GameObject joinAnim = GameObject.Instantiate(Resources.Load("Prefabs/AnimatedPrefabs/JoinAnimation"), panelPositionsArray[currentJoinedPlayerIndex], previewPlayers[currentJoinedPlayerIndex].transform.rotation) as GameObject;
         joinAnim.GetComponent<AnimationObject>().Animation_Complete += MovePanel;
+
+        queuedPlayersJoining.Add(currentJoinedPlayerIndex);
+
+        //Hide the prompt
+        for (int i = 0; i < joinPrompts[currentJoinedPlayerIndex].transform.childCount; i++)
+        {
+            joinPrompts[currentJoinedPlayerIndex].transform.GetChild(i).GetComponent<SpriteRenderer>().color = new Color(0, 0, 0, 0);
+        }
 	}
 
     private void ButtonMenuInput(int playerNum, List<string> buttonsHeld)
@@ -299,6 +320,12 @@ public class MenuManager : MonoBehaviour
 
     private void MovePanel()
     {
-        previewPlayers[currentJoinedPlayerIndex].transform.parent.transform.position = panelPositionsArray[currentJoinedPlayerIndex];
+        if (queuedPlayersJoining.Count > 0)
+        {
+            GameObject panel = previewPlayers[queuedPlayersJoining[0]].transform.parent.gameObject;
+            panel.AddComponent<TweenComponent>();
+            panel.GetComponent<TweenComponent>().TweenPositionTo(panelPositionsArray[queuedPlayersJoining[0]], 5.0f);
+            queuedPlayersJoining.Remove(0);
+        }
     }
 }
