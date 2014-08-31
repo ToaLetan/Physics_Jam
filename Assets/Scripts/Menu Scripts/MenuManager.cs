@@ -156,17 +156,30 @@ public class MenuManager : MonoBehaviour
         {
             playerColourIndexArray[playerNum] += incrementation;
 
+            //Prevent players from sharing colours
+            int numPlayersSharingColour = 0;
+            for (int i = 0; i < playerColourIndexArray.Length; i++)
+            {
+                if (i != playerNum && playerColourIndexArray[i] == playerColourIndexArray[playerNum])
+                    numPlayersSharingColour += 1;
+            }
+
+            if (numPlayersSharingColour > 0)
+                playerColourIndexArray[playerNum] += incrementation; //Do a second incrementation
+                
+            //Wrap around if the player goes all the way left/right
             if (playerColourIndexArray[playerNum] >= colourArray.Length)
                 playerColourIndexArray[playerNum] = 0;
             if (playerColourIndexArray[playerNum] < 0)
                 playerColourIndexArray[playerNum] = colourArray.Length - 1;
 
-            newColour = colourArray[playerColourIndexArray[playerNum]];
+            newColour = colourArray[playerColourIndexArray[playerNum]]; //Set the player colour
 
-            canChangePlayerColourArray[playerNum] = false;
+            canChangePlayerColourArray[playerNum] = false; //Disable being able to change colour to slow the process (not causing seizures obviously being a plus.)
 
-            GameInfoManager.Instance.PlayerColours[playerNum] = newColour;
+            GameInfoManager.Instance.PlayerColours[playerNum] = newColour; //Tie the player colour to that player so the GameInfoManager can pass it into the game.
 
+            //Apply the colour to the player previews
             previewPlayers[playerNum].transform.FindChild("PreviewPlayer").GetChild(0).GetComponent<SpriteRenderer>().color = newColour;
             previewPlayers[playerNum].transform.FindChild("ColourPreview").GetComponent<SpriteRenderer>().color = newColour;
             previewPlayers[playerNum].transform.FindChild("Text_Player" + (playerNum + 1)).GetComponent<SpriteRenderer>().color = newColour;
