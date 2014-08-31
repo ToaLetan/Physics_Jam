@@ -68,6 +68,13 @@ public class MenuManager : MonoBehaviour
         panelPositionsArray[3] = new Vector3(-1.81f, -0.29f, previewPlayers[3].transform.parent.transform.position.z);
 
 		AnimatePlayers();
+
+        //Hide the join prompt
+        GameObject startGamePrompt = GameObject.FindGameObjectWithTag("StartGamePrompt");
+        for (int j = 0; j < startGamePrompt.transform.childCount; j++)
+        {
+            startGamePrompt.transform.GetChild(j).GetComponent<SpriteRenderer>().color = new Color(0, 0, 0, 0);
+        }
 	}
 	
 	// Update is called once per frame
@@ -297,6 +304,16 @@ public class MenuManager : MonoBehaviour
         for (int i = 0; i < joinPrompts[currentJoinedPlayerIndex].transform.childCount; i++)
         {
             joinPrompts[currentJoinedPlayerIndex].transform.GetChild(i).GetComponent<SpriteRenderer>().color = new Color(0, 0, 0, 0);
+        }
+
+        //Show the start game prompt if there's at least two people
+        if (currentJoinedPlayerIndex == 1)
+        {
+            GameObject startGamePrompt = GameObject.FindGameObjectWithTag("StartGamePrompt");
+            for (int j = 0; j < startGamePrompt.transform.childCount; j++)
+            {
+                startGamePrompt.transform.GetChild(j).GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
+            }
         }
 	}
 
