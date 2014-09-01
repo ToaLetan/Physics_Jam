@@ -16,10 +16,11 @@ public struct TiedKeybinds
 
 public class MenuManager : MonoBehaviour 
 {
+    private const float THUMBSTICK_DEADZONE = 0.1f;
+    private const float PANEL_MOVESPEED = 5.0f;
+
 	private const int NUM_OF_COLOURS = 8;
     private const int MAX_NUM_OF_PLAYERS = 4;
-
-    private const float THUMBSTICK_DEADZONE = 0.1f;
 
 	private List<GameObject> previewPlayers = new List<GameObject>();
     private List<GameObject> joinPrompts = new List<GameObject>();
@@ -33,6 +34,8 @@ public class MenuManager : MonoBehaviour
     private bool[] canChangePlayerColourArray = new bool[MAX_NUM_OF_PLAYERS]; //Array of bools used to determine if the player can change colour, prevents holding keys to flicker through colours.
 
 	private InputManager inputManager;
+
+    private Vector3 startGamePrompt_Location = new Vector3(1.38f, -1.18f, 0); //Where the prompt to start the game will move to.
 
     private int currentJoinedPlayerIndex = -1; //Player number of whoever joined recently, set to -1 because arrays start at 0.
 
@@ -68,13 +71,6 @@ public class MenuManager : MonoBehaviour
         panelPositionsArray[3] = new Vector3(-1.81f, -0.29f, previewPlayers[3].transform.parent.transform.position.z);
 
 		AnimatePlayers();
-
-        //Hide the join prompt
-        GameObject startGamePrompt = GameObject.FindGameObjectWithTag("StartGamePrompt");
-        for (int j = 0; j < startGamePrompt.transform.childCount; j++)
-        {
-            startGamePrompt.transform.GetChild(j).GetComponent<SpriteRenderer>().color = new Color(0, 0, 0, 0);
-        }
 	}
 	
 	// Update is called once per frame
@@ -312,7 +308,9 @@ public class MenuManager : MonoBehaviour
             GameObject startGamePrompt = GameObject.FindGameObjectWithTag("StartGamePrompt");
             for (int j = 0; j < startGamePrompt.transform.childCount; j++)
             {
-                startGamePrompt.transform.GetChild(j).GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
+                //startGamePrompt.transform.GetChild(j).GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
+                startGamePrompt.AddComponent<TweenComponent>();
+                startGamePrompt.GetComponent<TweenComponent>().TweenPositionTo(startGamePrompt_Location, PANEL_MOVESPEED);
             }
         }
 	}
@@ -354,7 +352,7 @@ public class MenuManager : MonoBehaviour
         {
             GameObject panel = previewPlayers[queuedPlayersJoining[0]].transform.parent.gameObject;
             panel.AddComponent<TweenComponent>();
-            panel.GetComponent<TweenComponent>().TweenPositionTo(panelPositionsArray[queuedPlayersJoining[0]], 5.0f);
+            panel.GetComponent<TweenComponent>().TweenPositionTo(panelPositionsArray[queuedPlayersJoining[0]], PANEL_MOVESPEED);
             queuedPlayersJoining.Remove(0);
         }
     }

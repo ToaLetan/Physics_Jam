@@ -46,7 +46,7 @@ public class PickupSpawner : MonoBehaviour
         float randSpawnX = Random.Range(spawnBoundsLeft, spawnBoundsRight);
         float randSpawnY = Random.Range(spawnBoundsTop, spawnBoundsBottom);
 
-        GameObject.Instantiate(Resources.Load("Prefabs/Pickup"), new Vector3(randSpawnX, randSpawnY, gameObject.transform.position.z), gameObject.transform.rotation );
+        GameObject.Instantiate(Resources.Load("Prefabs/AnimatedPrefabs/Pickup"), new Vector3(randSpawnX, randSpawnY, gameObject.transform.position.z), gameObject.transform.rotation );
 
         //Reset the timer.
         RandomizeSpawnTime();

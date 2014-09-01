@@ -39,7 +39,7 @@ public class PlayerScript : MonoBehaviour
 	private float currentVelocityX = 0;
 	private float currentVelocityY = 0;
 
-	private float turnSpeed = 100.0f;
+	private float turnSpeed = 250.0f;
 
 	private float acceleration = 1.5f;
 	private float deceleration = 4.0f;

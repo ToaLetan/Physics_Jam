@@ -48,6 +48,7 @@ public class TweenComponent : MonoBehaviour
                 if (TweenComplete != null)
                     TweenComplete();
                 IsTweening = false;
+                Destroy(this); //Remove the script when finished.
             }
         }
 	}
