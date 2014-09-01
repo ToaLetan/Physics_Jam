@@ -25,17 +25,7 @@ public class GameInfoManager
     // Use this for initialization
     private GameInfoManager()
     {
-        //Default all player colours to white.
-        for (int i = 0; i < NUM_MAX_PLAYERS; i++)
-		{
-			PlayerColours.Add(Color.white);
-            PlayerInputSources.Add("");
-            JoinedPlayers.Add(false);
-		}
-
-        //Default players 1 and 2 to keyboard if something goes wrong, or if testing through the Main game scene.
-        //PlayerInputSources[0] = "Keybinds 0";
-        //PlayerInputSources[1] = "Keybinds 1";
+        InitializeInfo();
     }
 	
 	// Update is called once per frame
@@ -43,4 +33,25 @@ public class GameInfoManager
     {
 	
 	}
+
+    private void InitializeInfo()
+    {
+        //Default everyone to white, add 4 blank input sources and set 4 players to joined = false.
+        for (int i = 0; i < NUM_MAX_PLAYERS; i++)
+        {
+            PlayerColours.Add(Color.white);
+            PlayerInputSources.Add("");
+            JoinedPlayers.Add(false);
+        }
+    }
+
+    public void Reset()
+    {
+        //Wipe all existing info and initialize again.
+        PlayerColours.Clear();
+        PlayerInputSources.Clear();
+        JoinedPlayers.Clear();
+
+        InitializeInfo();
+    }
 }
