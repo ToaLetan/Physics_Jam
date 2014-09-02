@@ -3,7 +3,7 @@ using System.Collections;
 
 public class AnimationObject : MonoBehaviour 
 {
-    public enum ResolutionType { Stop, Destroy, Loop, FireEvent };
+    public enum ResolutionType { Stop, Destroy, Loop, FireEvent_Stop, FireEvent_Destroy };
     public ResolutionType currentResolutionType = ResolutionType.Stop;
 
     public delegate void ResolvedAnimationEvent();
@@ -33,7 +33,12 @@ public class AnimationObject : MonoBehaviour
                 break;
             case ResolutionType.Loop: //Let the animation repeat
                 break;
-            case ResolutionType.FireEvent: //Fire an event to be handled by specialized functions of other objects, then destroy the animation object.
+            case ResolutionType.FireEvent_Stop: //Fire an event to be handled by specialized functions of other objects.
+                if (Animation_Complete != null)
+                    Animation_Complete();
+                gameObject.GetComponent<Animator>().enabled = false;
+                break;
+            case ResolutionType.FireEvent_Destroy: //Fire an event to be handled by specialized functions of other objects, then destroy the animation object.
                 if (Animation_Complete != null)
                     Animation_Complete();
                 Destroy(gameObject);

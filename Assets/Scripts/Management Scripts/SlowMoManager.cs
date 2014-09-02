@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 public class SlowMoManager
 {
+    public delegate void SlowMoEvent();
+    public event SlowMoEvent SlowMoStarted;
+    public event SlowMoEvent SlowMoEnded;
+
 	public float SlowMoSpeed = 1.0f; //1.0f being normal game speed.
 
 	private float slowMoTimer = 0.0f;
@@ -71,19 +75,23 @@ public class SlowMoManager
 
     private void ApplySlowMotion(bool returnToNormalSpeed)
     {
-        if (returnToNormalSpeed == false)
+        if (returnToNormalSpeed == false) //Start slowmo
         {
             Time.timeScale = Time.timeScale * SlowMoSpeed;  
             Time.fixedDeltaTime = Time.fixedDeltaTime * SlowMoSpeed;  
             Time.maximumDeltaTime = Time.maximumDeltaTime * SlowMoSpeed;
+
+            if (SlowMoStarted != null)
+                SlowMoStarted();
         } 
-        else
+        else //Return to normal speed
         {
             Time.timeScale = Time.timeScale / SlowMoSpeed;  
             Time.fixedDeltaTime = Time.fixedDeltaTime / SlowMoSpeed;  
             Time.maximumDeltaTime = Time.maximumDeltaTime / SlowMoSpeed;
 
-            //SlowMoSpeed = 1.0f;
+            if (SlowMoEnded != null)
+                SlowMoEnded();
         }
     }
 
