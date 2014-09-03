@@ -76,10 +76,13 @@ public class MenuManager : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-		inputManager.Update();
+        if (Application.loadedLevel == 0)
+        {
+            inputManager.Update();
 
-        if(activeControllers.Count > 0)
-            UpdateControllerInput();
+            if (activeControllers.Count > 0)
+                UpdateControllerInput();
+        }
 	}
 
     private void UpdateControllerInput()
@@ -236,8 +239,7 @@ public class MenuManager : MonoBehaviour
         {
             if (currentJoinedPlayerIndex >= 1) //Prevent a game from starting until there's at least two players.
             {
-                inputManager.Key_Pressed -= MenuInput;
-                Application.LoadLevel("Main");
+                LoadGame();
             }
         }
 	}
@@ -340,8 +342,7 @@ public class MenuManager : MonoBehaviour
         {
             if (currentJoinedPlayerIndex >= 1) //Prevent a game from starting until there's at least two players.
             {
-                inputManager.Key_Pressed -= MenuInput;
-                Application.LoadLevel("Main");
+                LoadGame();
             }
         }
     }
@@ -355,5 +356,14 @@ public class MenuManager : MonoBehaviour
             panel.GetComponent<TweenComponent>().TweenPositionTo(panelPositionsArray[queuedPlayersJoining[0]], PANEL_MOVESPEED);
             queuedPlayersJoining.Remove(0);
         }
+    }
+
+    private void LoadGame()
+    {
+        inputManager.Key_Pressed -= MenuInput;
+        inputManager.Key_Released -= CheckReleasedKeys;
+        inputManager.Button_Pressed -= ButtonMenuInput;
+
+        Application.LoadLevel("Main");
     }
 }

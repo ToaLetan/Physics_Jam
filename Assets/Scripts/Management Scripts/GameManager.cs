@@ -20,8 +20,6 @@ public class GameManager : MonoBehaviour
     private bool isGamePaused = false;
     private bool isGameOver = false;
 
-    private XboxController newController;
-
     public bool IsGamePaused
     {
         get { return isGamePaused; }
@@ -32,8 +30,6 @@ public class GameManager : MonoBehaviour
 	void Start () 
 	{
         InitializeGame();
-
-        newController = new XboxController(1);
 	}
 	
 	// Update is called once per frame
@@ -67,13 +63,10 @@ public class GameManager : MonoBehaviour
             PlayerList.Add(GameObject.FindGameObjectsWithTag("Player")[j]);
             GameObject.FindGameObjectsWithTag("Player")[j].GetComponent<PlayerScript>().Player_Death += OnPlayerDeath;
             GameObject.FindGameObjectsWithTag("Player")[j].GetComponent<PlayerScript>().Player_Lose += OnPlayerLose;
-        
-            InputManager.Instance.Key_Pressed += HandleInput;
-        
             GameObject.FindGameObjectsWithTag("Player")[j].GetComponent<PlayerScript>().SetPlayerColour(GameInfoManager.Instance.PlayerColours[j]);
-        
-            UIManager.Instance.ResetUI();
         }
+        InputManager.Instance.Key_Pressed += HandleInput;
+        UIManager.Instance.ResetUI();
     }
 
     private void OnPlayerDeath(int playerNum)
@@ -114,19 +107,6 @@ public class GameManager : MonoBehaviour
 
     private void HandleInput(int playerNum, List<string> keysPressed)
     {
-        /*if(keysHeld.Contains(InputManager.Instance.PlayerKeybindArray [0].SelectKey) ) //GO back to the main menu after unsubbing.
-        {
-            //All players must unsub from InputManager first
-            for(int i = 0; i < PlayerList.Count; i++)
-            {
-                InputManager.Instance.Key_Pressed -= PlayerList[i].GetComponent<PlayerScript>().PlayerInput;
-                InputManager.Instance.Key_Released -= PlayerList[i].GetComponent<PlayerScript>().ApplyDeceleration;
-            }
-
-            InputManager.Instance.Key_Pressed -= HandleInput;
-            Application.LoadLevel("Menu");
-        }*/
-
         if (keysPressed.Contains(InputManager.Instance.PlayerKeybindArray [0].SelectKey.ToString() ) ) //Bring up the pause menu
         {
             if(isGamePaused == false)
