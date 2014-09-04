@@ -26,7 +26,7 @@ public class MenuManager : MonoBehaviour
     private List<GameObject> joinPrompts = new List<GameObject>();
     private List<TiedController> activeControllers = new List<TiedController>();
     private List<TiedKeybinds> activeKeybinds = new List<TiedKeybinds>();
-    private List<int> queuedPlayersJoining = new List<int>();
+    public List<int> queuedPlayersJoining = new List<int>();
 
 	private Color[] colourArray = new Color[NUM_OF_COLOURS]; //Array of possible colours
     private Vector3[] panelPositionsArray = new Vector3[MAX_NUM_OF_PLAYERS]; //Array of desired locations for panels to move to.
@@ -59,10 +59,10 @@ public class MenuManager : MonoBehaviour
         }
 
 		//Set players to start as red.
-        for (int i = 0; i < previewPlayers.Count; i++)
+        /*for (int i = 0; i < previewPlayers.Count; i++)
         {
             ApplyColourPreview(1 + i, i);
-        }
+        }*/
 
         //Establish all desired panel positions for when they need to be moved on-screen.
         panelPositionsArray[0] = new Vector3(-0.50f, 1.05f, previewPlayers[0].transform.parent.transform.position.z);
@@ -110,14 +110,14 @@ public class MenuManager : MonoBehaviour
 	private void PopulateColours()
 	{
 		//THIS IS ALL REALLY TEMPORARY
-		colourArray [0] = Color.red;
-		colourArray [1] = Color.blue;
-		colourArray [2] = Color.green;
-		colourArray [3] = Color.yellow;
-		colourArray [4] = new Color(1, 0, 1); //Pink
-		colourArray [5] = new Color(0.4f, 0, 0.5f); //Purple
-		colourArray [6] = new Color(1, 0.3f, 0); //Orange
-		colourArray [7] = Color.cyan;
+		colourArray[0] = Color.red;
+		colourArray[1] = Color.blue;
+		colourArray[2] = Color.green;
+		colourArray[3] = Color.yellow;
+		colourArray[4] = new Color(1, 0, 1); //Pink
+		colourArray[5] = new Color(0.4f, 0, 0.5f); //Purple
+		colourArray[6] = new Color(1, 0.3f, 0); //Orange
+		colourArray[7] = Color.cyan;
 	}
 
 	private void PopulatePreviewPlayers() //Add the preview player bars in order from top to bottom.
@@ -160,24 +160,24 @@ public class MenuManager : MonoBehaviour
 
         if (canChangePlayerColourArray[playerNum] == true)
         {
-            playerColourIndexArray[playerNum] += incrementation;
+            //Collect all colours currently being used by other players
+            List<int> occupiedColours = new List<int>();
 
-            //Prevent players from sharing colours
-            int numPlayersSharingColour = 0;
             for (int i = 0; i < playerColourIndexArray.Length; i++)
             {
-                if (i != playerNum && playerColourIndexArray[i] == playerColourIndexArray[playerNum])
-                    numPlayersSharingColour += 1;
+                if (playerColourIndexArray[i] > -1)
+                    occupiedColours.Add(playerColourIndexArray[i]);
             }
 
-            if (numPlayersSharingColour > 0)
-                playerColourIndexArray[playerNum] += incrementation; //Do a second incrementation
-                
-            //Wrap around if the player goes all the way left/right
-            if (playerColourIndexArray[playerNum] >= colourArray.Length)
-                playerColourIndexArray[playerNum] = 0;
-            if (playerColourIndexArray[playerNum] < 0)
-                playerColourIndexArray[playerNum] = colourArray.Length - 1;
+            IncrementPlayerColour(incrementation, playerNum); //Change the colour.
+
+            for (int j = 0; j < occupiedColours.Count; j++)
+            {
+                if (occupiedColours.Contains(playerColourIndexArray[playerNum]))
+                {
+                    IncrementPlayerColour(incrementation, playerNum); //Attempt another change.
+                }
+            }
 
             newColour = colourArray[playerColourIndexArray[playerNum]]; //Set the player colour
 
@@ -191,6 +191,17 @@ public class MenuManager : MonoBehaviour
             previewPlayers[playerNum].transform.FindChild("Text_Player" + (playerNum + 1)).GetComponent<SpriteRenderer>().color = newColour;
         }
 	}
+
+    private void IncrementPlayerColour(int incrementation, int playerNum)
+    {
+        playerColourIndexArray[playerNum] += incrementation;
+
+        //Wrap around if the player goes all the way left/right
+        if (playerColourIndexArray[playerNum] >= colourArray.Length)
+            playerColourIndexArray[playerNum] = 0;
+        if (playerColourIndexArray[playerNum] < 0)
+            playerColourIndexArray[playerNum] = colourArray.Length - 1;
+    }
 
 	private void MenuInput(int playerNum, List<string> keysHeld)
 	{
@@ -292,11 +303,15 @@ public class MenuManager : MonoBehaviour
         GameInfoManager.Instance.PlayerInputSources[currentJoinedPlayerIndex] = inputSource;
         GameInfoManager.Instance.JoinedPlayers[currentJoinedPlayerIndex] = true;
 
+        //Default them to a colour.
+        ApplyColourPreview(1 + currentJoinedPlayerIndex, currentJoinedPlayerIndex);
+
+        //Queue them up for handling panel movement.
+        queuedPlayersJoining.Add(currentJoinedPlayerIndex);
+
         //Spawn a sweet little join animation
         GameObject joinAnim = GameObject.Instantiate(Resources.Load("Prefabs/AnimatedPrefabs/JoinAnimation"), panelPositionsArray[currentJoinedPlayerIndex], previewPlayers[currentJoinedPlayerIndex].transform.rotation) as GameObject;
         joinAnim.GetComponent<AnimationObject>().Animation_Complete += MovePanel;
-
-        queuedPlayersJoining.Add(currentJoinedPlayerIndex);
 
         //Hide the prompt
         for (int i = 0; i < joinPrompts[currentJoinedPlayerIndex].transform.childCount; i++)
@@ -354,7 +369,7 @@ public class MenuManager : MonoBehaviour
             GameObject panel = previewPlayers[queuedPlayersJoining[0]].transform.parent.gameObject;
             panel.AddComponent<TweenComponent>();
             panel.GetComponent<TweenComponent>().TweenPositionTo(panelPositionsArray[queuedPlayersJoining[0]], PANEL_MOVESPEED);
-            queuedPlayersJoining.Remove(0);
+            queuedPlayersJoining.RemoveAt(0);
         }
     }
 
