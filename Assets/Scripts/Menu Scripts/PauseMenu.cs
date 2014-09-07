@@ -6,11 +6,18 @@ public class PauseMenu : MonoBehaviour
 {
     private InputManager inputManager = null;
 
-    private GameObject[] menuSelections = new GameObject[3];
+    private GameObject[] menuSelections = new GameObject[4];
 
     private GameManager gameManager = null;
 
-    public int currentSelectionIndex = 0;
+    private int currentSelectionIndex = 0;
+    private int ownerPlayerNum = -1;
+
+    public int OwnerPlayerNum
+    {
+        get { return ownerPlayerNum; }
+        set { ownerPlayerNum = value; }
+    }
 
 	// Use this for initialization
 	void Start () 
@@ -20,7 +27,8 @@ public class PauseMenu : MonoBehaviour
 
         menuSelections [0] = gameObject.transform.FindChild("Text_Resume").gameObject;
         menuSelections [1] = gameObject.transform.FindChild("Text_Restart").gameObject;
-        menuSelections [2] = gameObject.transform.FindChild("Text_Quit").gameObject;
+        menuSelections [2] = gameObject.transform.FindChild("Text_Controls").gameObject;
+        menuSelections [3] = gameObject.transform.FindChild("Text_Quit").gameObject;
 
         gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
 
@@ -36,7 +44,7 @@ public class PauseMenu : MonoBehaviour
 
     private void ProcessSelection(int playerNum, List<string> keysPressed)
     {
-        if (keysPressed.Contains(inputManager.PlayerKeybindArray[0].UpKey.ToString()) || keysPressed.Contains(inputManager.PlayerKeybindArray[1].UpKey.ToString()))
+        if (keysPressed.Contains(inputManager.PlayerKeybindArray[ownerPlayerNum].UpKey.ToString()) || keysPressed.Contains(inputManager.PlayerKeybindArray[ownerPlayerNum].UpKey.ToString()))
         {
             if(currentSelectionIndex - 1 < 0)
                 currentSelectionIndex = menuSelections.Length - 1;
@@ -46,7 +54,7 @@ public class PauseMenu : MonoBehaviour
             HighlightSelection();
         }
 
-        if (keysPressed.Contains(inputManager.PlayerKeybindArray[0].DownKey.ToString()) || keysPressed.Contains(inputManager.PlayerKeybindArray[1].DownKey.ToString()))
+        if (keysPressed.Contains(inputManager.PlayerKeybindArray[ownerPlayerNum].DownKey.ToString()) || keysPressed.Contains(inputManager.PlayerKeybindArray[ownerPlayerNum].DownKey.ToString()))
         {
             if((currentSelectionIndex + 1) >= menuSelections.Length)
                 currentSelectionIndex = 0;
@@ -70,6 +78,11 @@ public class PauseMenu : MonoBehaviour
                 case "Text_Restart":
                     inputManager.Key_Pressed -= ProcessSelection;
                     gameManager.RestartGame();
+                    break;
+
+                case "Text_Controls":
+                    inputManager.Key_Pressed -= ProcessSelection;
+                    Debug.Log("FUNCTION CALL TO SHOW CONTROLS PAGE");
                     break;
                 case "Text_Quit":
                         Application.Quit();

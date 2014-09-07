@@ -87,6 +87,7 @@ public class PlayerScript : MonoBehaviour
 
         inputManager.Key_Held += PlayerInput;
         inputManager.Key_Released += ApplyDeceleration;
+        inputManager.Key_Pressed += MenuInput;
 
         selectionTimer.OnTimerComplete += SetAction;
         respawnTimer.OnTimerComplete += EnableMove;
@@ -303,6 +304,15 @@ public class PlayerScript : MonoBehaviour
             gameObject.transform.position = newPosition;
         }
 	}
+
+    private void MenuInput(int playerNum, List<string> keysPressed)
+    {
+        if (keysPressed.Contains(InputManager.Instance.PlayerKeybindArray[inputSourceIndex].SelectKey.ToString())) //Bring up the pause menu
+        {
+            if (gameManager.IsGamePaused == false)
+                gameManager.ShowPauseMenu(playerNum);
+        }
+    }
 
     private void PlayerMove(int directionX, int directionY)
     {
