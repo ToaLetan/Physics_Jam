@@ -13,6 +13,8 @@ public class PauseMenu : MonoBehaviour
     private int currentSelectionIndex = 0;
     private int ownerPlayerNum = -1;
 
+    private bool isOnControlsScreen = false;
+
     public int OwnerPlayerNum
     {
         get { return ownerPlayerNum; }
@@ -81,8 +83,12 @@ public class PauseMenu : MonoBehaviour
                     break;
 
                 case "Text_Controls":
-                    inputManager.Key_Pressed -= ProcessSelection;
-                    Debug.Log("FUNCTION CALL TO SHOW CONTROLS PAGE");
+                    if (isOnControlsScreen == false)
+                    {
+                        inputManager.Key_Pressed -= ProcessSelection;
+                        Debug.Log("FUNCTION CALL TO SHOW CONTROLS PAGE");
+                        ToggleControlsScreen(true);
+                    }
                     break;
                 case "Text_Quit":
                         Application.Quit();
@@ -110,6 +116,49 @@ public class PauseMenu : MonoBehaviour
         {
             if(i != currentSelectionIndex)
                 menuSelections [i].GetComponent<SpriteRenderer>().color = Color.white;
+        }
+    }
+
+    public void ToggleControlsScreen(bool showControlsScreen)
+    {
+        isOnControlsScreen = showControlsScreen; //True if the controls screen is being shown, otherwise false.
+
+        //Hide the Pause menu
+        if (showControlsScreen == true)
+        {
+            for (int i = 0; i < gameObject.transform.childCount; i++)
+            {
+                if (gameObject.transform.GetChild(i).GetComponent<SpriteRenderer>() != null)
+                {
+                    gameObject.transform.GetChild(i).GetComponent<SpriteRenderer>().color = new Color(0, 0, 0, 0);
+                }
+            }
+
+            GameObject controlsScreen = GameObject.Instantiate(Resources.Load("Prefabs/GUI/Controls_Controller")) as GameObject;
+            controlsScreen.transform.parent = gameObject.transform;
+            controlsScreen.transform.localPosition = Vector3.zero;
+            controlsScreen.transform.localScale = new Vector3(0.775f, 0.775f, 1); //Set the scale because it gets messed up when setting parent. HARDCODED AND GHETTO FOR NOW, FIX LATER?
+        }
+        else
+        {
+            //Remove the controls screen
+            if (gameObject.transform.FindChild("Controls_Controller(Clone)") != null)
+            {
+                gameObject.transform.FindChild("Controls_Controller(Clone)").GetComponent<ControlsScreen>().RemoveControlsScreen();
+            }
+
+            //Show the pause menu
+            for (int i = 0; i < gameObject.transform.childCount; i++)
+            {
+                if (gameObject.transform.GetChild(i).GetComponent<SpriteRenderer>() != null)
+                {
+                    gameObject.transform.GetChild(i).GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
+                }
+            }
+            HighlightSelection();
+
+            //Resub to events
+            inputManager.Key_Pressed += ProcessSelection;
         }
     }
 }
