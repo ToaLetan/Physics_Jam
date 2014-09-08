@@ -134,17 +134,17 @@ public class PauseMenu : MonoBehaviour
                 }
             }
 
-            GameObject controlsScreen = GameObject.Instantiate(Resources.Load("Prefabs/GUI/Controls_Controller")) as GameObject;
+            GameObject controlsScreen = GameObject.Instantiate(Resources.Load("Prefabs/GUI/ControlsScreen")) as GameObject;
             controlsScreen.transform.parent = gameObject.transform;
             controlsScreen.transform.localPosition = Vector3.zero;
-            controlsScreen.transform.localScale = new Vector3(0.775f, 0.775f, 1); //Set the scale because it gets messed up when setting parent. HARDCODED AND GHETTO FOR NOW, FIX LATER?
+            controlsScreen.transform.localScale = new Vector3(0.772f, 0.772f, 0); //Set the scale because it gets messed up when setting parent. HARDCODED AND GHETTO FOR NOW, FIX LATER?
         }
         else
         {
             //Remove the controls screen
-            if (gameObject.transform.FindChild("Controls_Controller(Clone)") != null)
+            if (gameObject.transform.FindChild("ControlsScreen(Clone)") != null)
             {
-                gameObject.transform.FindChild("Controls_Controller(Clone)").GetComponent<ControlsScreen>().RemoveControlsScreen();
+                gameObject.transform.FindChild("ControlsScreen(Clone)").GetComponent<ControlsScreen>().RemoveControlsScreen();
             }
 
             //Show the pause menu
