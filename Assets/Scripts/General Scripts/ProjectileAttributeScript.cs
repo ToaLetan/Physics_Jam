@@ -4,7 +4,7 @@ using System.Collections;
 public class ProjectileAttributeScript : MonoBehaviour 
 {
     private const float ROTATIONSPEED = 45.0f;
-    private const float HOMINGVELOCITY = 1.5f;
+    private const float HOMINGVELOCITY = 2.5f;
 
     public enum ProjectileType { Boomerang, Homing }
     private ProjectileType currentProjectileType;

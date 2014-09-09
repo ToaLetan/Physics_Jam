@@ -8,6 +8,8 @@ public class PhysicsObjectScript : MonoBehaviour
     private const float MAX_VELOCITY_ROTATION = 10.0f;
     private const float MIN_VELOCITY_ROTATION = 0.5f;
 
+    private Timer attributeRemovalTimer;
+
     private Vector3 startPosition;
     private Vector3 startScale;
     private Quaternion startRotation;
@@ -18,12 +20,18 @@ public class PhysicsObjectScript : MonoBehaviour
         startPosition = gameObject.transform.position;
         startScale = gameObject.transform.localScale;
         startRotation = gameObject.transform.rotation;
+
+        attributeRemovalTimer = new Timer(0.5f, false);
+        attributeRemovalTimer.OnTimerComplete += OnRemovalTimerComplete;
 	}
 	
 	// Update is called once per frame
 	void Update () 
     {
         CapVelocity();
+
+        if (attributeRemovalTimer.IsTimerRunning == true)
+            attributeRemovalTimer.Update();
 	}
 
     private void OnCollisionEnter2D(Collision2D collisionObj)
@@ -45,6 +53,18 @@ public class PhysicsObjectScript : MonoBehaviour
 
                         slowmoEmphasis.GetComponent<AnimationObject>().Animation_Complete += OnSlowmoAnimComplete;
                     }
+                }
+            }
+
+            //If the object is a homing projectile, run a timer to remove the homing attribute.
+            if (gameObject.GetComponent<ProjectileAttributeScript>() != null)
+            {
+                if (gameObject.GetComponent<ProjectileAttributeScript>().CurrentProjectileType == ProjectileAttributeScript.ProjectileType.Homing
+                    && attributeRemovalTimer.IsTimerRunning == false)
+                {
+                    Debug.Log("YES");
+
+                    attributeRemovalTimer.StartTimer();
                 }
             }
         }
@@ -95,6 +115,16 @@ public class PhysicsObjectScript : MonoBehaviour
         {
             GameObject.Destroy(GameObject.FindGameObjectWithTag("MainCamera").transform.FindChild("SlowmoEmphasis(Clone)").gameObject);
         }
+    }
+
+    private void OnRemovalTimerComplete()
+    {
+        Debug.Log("DONE");
+
+        if (gameObject.GetComponent<ProjectileAttributeScript>() != null)
+            Destroy(gameObject.GetComponent<ProjectileAttributeScript>());
+
+        //attributeRemovalTimer.OnTimerComplete -= OnRemovalTimerComplete;
     }
 
     private void CapVelocity()
