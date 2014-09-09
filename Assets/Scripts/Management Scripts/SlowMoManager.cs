@@ -103,6 +103,8 @@ public class SlowMoManager
             isReturningToTimerOnResume = true;
 
             ApplySlowMotion(true);
+
+            Debug.Log("STOP SLOWMO");
         }
     }
 
