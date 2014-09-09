@@ -4,28 +4,40 @@ using System.Collections.Generic;
 
 public class PauseMenu : MonoBehaviour 
 {
+    private const float THUMBSTICK_DEADZONE = 0.1f;
+    private const float MIN_THUMBSTICK_POS = 0.5f; //The minimum thumbstick position where it can affect the menu.
+
     private InputManager inputManager = null;
 
     private GameObject[] menuSelections = new GameObject[4];
 
     private GameManager gameManager = null;
 
+    private string ownerInputSource = "";
+
     private int currentSelectionIndex = 0;
-    private int ownerPlayerNum = -1;
+    private int ownerInputIndex = -1;
 
     private bool isOnControlsScreen = false;
+    private bool canChangeSelection = true; //Used to prevent controllers from moving through selections too fast.
 
-    public int OwnerPlayerNum
+    public string OwnerInputSource
     {
-        get { return ownerPlayerNum; }
-        set { ownerPlayerNum = value; }
+        get { return ownerInputSource; }
+        set { ownerInputSource = value; }
+    }
+
+    public int OwnerInputIndex
+    {
+        get { return ownerInputIndex; }
+        set { ownerInputIndex = value; }
     }
 
 	// Use this for initialization
 	void Start () 
 	{
         inputManager = InputManager.Instance;
-        inputManager.Key_Pressed += ProcessSelection;
+        inputManager.Key_Pressed += ProcessInput;
 
         menuSelections [0] = gameObject.transform.FindChild("Text_Resume").gameObject;
         menuSelections [1] = gameObject.transform.FindChild("Text_Restart").gameObject;
@@ -41,67 +53,76 @@ public class PauseMenu : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-	
+        if (ownerInputSource.Contains("Controller") == true)
+        {
+            ProcessInput(ownerInputIndex, null);
+        }
 	}
 
-    private void ProcessSelection(int playerNum, List<string> keysPressed)
+    private void ProcessInput(int playerNum, List<string> keysPressed)
     {
-        if (keysPressed.Contains(inputManager.PlayerKeybindArray[ownerPlayerNum].UpKey.ToString()) || keysPressed.Contains(inputManager.PlayerKeybindArray[ownerPlayerNum].UpKey.ToString()))
+        if (ownerInputSource.Contains("Keybinds") == true)
         {
-            if(currentSelectionIndex - 1 < 0)
-                currentSelectionIndex = menuSelections.Length - 1;
-            else
-                currentSelectionIndex--;
-            
-            HighlightSelection();
-        }
-
-        if (keysPressed.Contains(inputManager.PlayerKeybindArray[ownerPlayerNum].DownKey.ToString()) || keysPressed.Contains(inputManager.PlayerKeybindArray[ownerPlayerNum].DownKey.ToString()))
-        {
-            if((currentSelectionIndex + 1) >= menuSelections.Length)
-                currentSelectionIndex = 0;
-            else
-                currentSelectionIndex++;
-
-            HighlightSelection();
-        }
-
-        if (keysPressed.Contains(inputManager.PlayerKeybindArray[0].SelectKey.ToString()))
-        {
-            switch(menuSelections[currentSelectionIndex].name)
+            if (keysPressed.Contains(inputManager.PlayerKeybindArray[ownerInputIndex].UpKey.ToString()) || keysPressed.Contains(inputManager.PlayerKeybindArray[ownerInputIndex].UpKey.ToString()) )
             {
-                case "Text_Resume":
-                    if(gameManager.IsGamePaused == true)
-                    {
-                        inputManager.Key_Pressed -= ProcessSelection;
-                        gameManager.HidePauseMenu();
-                    }
-                    break;
-                case "Text_Restart":
-                    inputManager.Key_Pressed -= ProcessSelection;
-                    gameManager.RestartGame();
-                    break;
+                IncrementSelection(-1);
+                HighlightSelection();
+            }
 
-                case "Text_Controls":
-                    if (isOnControlsScreen == false)
-                    {
-                        inputManager.Key_Pressed -= ProcessSelection;
-                        Debug.Log("FUNCTION CALL TO SHOW CONTROLS PAGE");
-                        ToggleControlsScreen(true);
-                    }
-                    break;
-                case "Text_Quit":
-                        Application.Quit();
-                    break;
-                default:
-                    if(gameManager.IsGamePaused == true)
-                    {
-                        inputManager.Key_Pressed -= ProcessSelection;
-                        gameManager.HidePauseMenu();
-                    }
-                    break;
+            if (keysPressed.Contains(inputManager.PlayerKeybindArray[ownerInputIndex].DownKey.ToString()) || keysPressed.Contains(inputManager.PlayerKeybindArray[ownerInputIndex].DownKey.ToString()) )
+            {
+                IncrementSelection(1);
+                HighlightSelection();
+            }
+
+            if (keysPressed.Contains(inputManager.PlayerKeybindArray[0].SelectKey.ToString()))
+                ProcessSelection();
+        }
+
+        if (ownerInputSource.Contains("Controller") == true)
+        {
+            if (inputManager.ControllerArray[ownerInputIndex].GetThumbstickAxis(inputManager.ControllerArray[ownerInputIndex].leftThumbstickVertical) > MIN_THUMBSTICK_POS)
+            {
+                if (canChangeSelection == true)
+                {
+                    IncrementSelection(-1);
+                    HighlightSelection();
+                    canChangeSelection = false;
+                }
+            }
+            if (inputManager.ControllerArray[ownerInputIndex].GetThumbstickAxis(inputManager.ControllerArray[ownerInputIndex].leftThumbstickVertical) < -MIN_THUMBSTICK_POS)
+            {
+                if (canChangeSelection == true)
+                {
+                    IncrementSelection(1);
+                    HighlightSelection();
+                    canChangeSelection = false;
+                }
+            }
+
+            if (inputManager.ControllerArray[ownerInputIndex].GetButtonDown(inputManager.ControllerArray[ownerInputIndex].buttonA.ToString()) )
+                ProcessSelection();
+
+            //Allows menu to be used by flicking thumbsticks, prevents flickering.
+            if (inputManager.ControllerArray[ownerInputIndex].GetThumbstickAxis(inputManager.ControllerArray[ownerInputIndex].dPadHorizontal) == 0 &&
+                (inputManager.ControllerArray[ownerInputIndex].GetThumbstickAxis(inputManager.ControllerArray[ownerInputIndex].leftThumbstickVertical) < THUMBSTICK_DEADZONE &&
+                inputManager.ControllerArray[ownerInputIndex].GetThumbstickAxis(inputManager.ControllerArray[ownerInputIndex].leftThumbstickVertical) > -THUMBSTICK_DEADZONE))
+            {
+                canChangeSelection = true;
             }
         }
+    }
+
+    private void IncrementSelection(int index)
+    {
+        if (currentSelectionIndex + index < 0)
+            currentSelectionIndex = menuSelections.Length - 1;
+        
+        else if ((currentSelectionIndex + index) >= menuSelections.Length)
+            currentSelectionIndex = 0;
+        
+        else
+            currentSelectionIndex += index;
     }
 
     private void HighlightSelection()
@@ -116,6 +137,42 @@ public class PauseMenu : MonoBehaviour
         {
             if(i != currentSelectionIndex)
                 menuSelections [i].GetComponent<SpriteRenderer>().color = Color.white;
+        }
+    }
+
+    private void ProcessSelection()
+    {
+        switch (menuSelections[currentSelectionIndex].name)
+        {
+            case "Text_Resume":
+                if (gameManager.IsGamePaused == true)
+                {
+                    inputManager.Key_Pressed -= ProcessInput;
+                    gameManager.HidePauseMenu();
+                }
+                break;
+            case "Text_Restart":
+                inputManager.Key_Pressed -= ProcessInput;
+                gameManager.RestartGame();
+                break;
+
+            case "Text_Controls":
+                if (isOnControlsScreen == false)
+                {
+                    inputManager.Key_Pressed -= ProcessInput;
+                    ToggleControlsScreen(true);
+                }
+                break;
+            case "Text_Quit":
+                Application.Quit();
+                break;
+            default:
+                if (gameManager.IsGamePaused == true)
+                {
+                    inputManager.Key_Pressed -= ProcessInput;
+                    gameManager.HidePauseMenu();
+                }
+                break;
         }
     }
 
@@ -138,6 +195,8 @@ public class PauseMenu : MonoBehaviour
             controlsScreen.transform.parent = gameObject.transform;
             controlsScreen.transform.localPosition = Vector3.zero;
             controlsScreen.transform.localScale = new Vector3(0.772f, 0.772f, 0); //Set the scale because it gets messed up when setting parent. HARDCODED AND GHETTO FOR NOW, FIX LATER?
+
+            controlsScreen.GetComponent<ControlsScreen>().TieInput(ownerInputSource, ownerInputIndex);
         }
         else
         {
@@ -158,7 +217,7 @@ public class PauseMenu : MonoBehaviour
             HighlightSelection();
 
             //Resub to events
-            inputManager.Key_Pressed += ProcessSelection;
+            inputManager.Key_Pressed += ProcessInput;
         }
     }
 }

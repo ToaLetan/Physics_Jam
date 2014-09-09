@@ -114,7 +114,7 @@ public class GameManager : MonoBehaviour
         }*/
     }
 
-    public void ShowPauseMenu( int playerNum)
+    public void ShowPauseMenu( string inputSource, int inputSourceIndex)
     {
         if (GamePaused != null)
             GamePaused();
@@ -125,7 +125,8 @@ public class GameManager : MonoBehaviour
             pauseMenu = GameObject.Instantiate(Resources.Load("Prefabs/GUI/PauseMenu") ) as GameObject;
             pauseMenu.transform.parent = GameObject.FindGameObjectWithTag("MainCamera").transform;
             pauseMenu.transform.localPosition = new Vector3(0, 0, 1);
-            pauseMenu.GetComponent<PauseMenu>().OwnerPlayerNum = playerNum;
+            pauseMenu.GetComponent<PauseMenu>().OwnerInputSource = inputSource;
+            pauseMenu.GetComponent<PauseMenu>().OwnerInputIndex = inputSourceIndex;
         }
 
         isGamePaused = true;

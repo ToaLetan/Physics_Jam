@@ -4,7 +4,9 @@ using System.Collections;
 public class PhysicsObjectScript : MonoBehaviour 
 {
     private const float MIN_SLOWMO_TRIGGER_SPEED = 0.5f;
-    private const float MAX_VELOCITY = 5.0f;
+    private const float MAX_VELOCITY_MOVEMENT = 5.0f;
+    private const float MAX_VELOCITY_ROTATION = 10.0f;
+    private const float MIN_VELOCITY_ROTATION = 0.5f;
 
     private Vector3 startPosition;
     private Vector3 startScale;
@@ -103,21 +105,27 @@ public class PhysicsObjectScript : MonoBehaviour
             float newAngularVelocity = gameObject.gameObject.GetComponent<Rigidbody2D>().angularVelocity;
 
             //Cap movement velocity
-            if (gameObject.GetComponent<Rigidbody2D>().velocity.x > MAX_VELOCITY)
-                newVelocity.x = MAX_VELOCITY;
-            if (gameObject.GetComponent<Rigidbody2D>().velocity.x < -MAX_VELOCITY)
-                newVelocity.x = -MAX_VELOCITY;
+            if (gameObject.GetComponent<Rigidbody2D>().velocity.x > MAX_VELOCITY_MOVEMENT)
+                newVelocity.x = MAX_VELOCITY_MOVEMENT;
+            if (gameObject.GetComponent<Rigidbody2D>().velocity.x < -MAX_VELOCITY_MOVEMENT)
+                newVelocity.x = -MAX_VELOCITY_MOVEMENT;
 
-            if (gameObject.GetComponent<Rigidbody2D>().velocity.y > MAX_VELOCITY)
-                newVelocity.y = MAX_VELOCITY;
-            if (gameObject.GetComponent<Rigidbody2D>().velocity.y < -MAX_VELOCITY)
-                newVelocity.y = -MAX_VELOCITY;
+            if (gameObject.GetComponent<Rigidbody2D>().velocity.y > MAX_VELOCITY_MOVEMENT)
+                newVelocity.y = MAX_VELOCITY_MOVEMENT;
+            if (gameObject.GetComponent<Rigidbody2D>().velocity.y < -MAX_VELOCITY_MOVEMENT)
+                newVelocity.y = -MAX_VELOCITY_MOVEMENT;
 
             //Cap rotation velocity
-            if (gameObject.GetComponent<Rigidbody2D>().angularVelocity > MAX_VELOCITY)
-                newAngularVelocity = MAX_VELOCITY;
-            if (gameObject.GetComponent<Rigidbody2D>().angularVelocity < -MAX_VELOCITY)
-                newAngularVelocity = -MAX_VELOCITY;
+            if (gameObject.GetComponent<Rigidbody2D>().angularVelocity > MAX_VELOCITY_ROTATION)
+                newAngularVelocity = MAX_VELOCITY_ROTATION;
+            if (gameObject.GetComponent<Rigidbody2D>().angularVelocity < -MAX_VELOCITY_ROTATION)
+                newAngularVelocity = -MAX_VELOCITY_ROTATION;
+
+            //Stop constant rotation
+            if (gameObject.GetComponent<Rigidbody2D>().angularVelocity < MIN_VELOCITY_ROTATION)
+                newAngularVelocity = 0;
+            if (gameObject.GetComponent<Rigidbody2D>().angularVelocity > -MIN_VELOCITY_ROTATION)
+                newAngularVelocity = 0;
 
             gameObject.GetComponent<Rigidbody2D>().velocity = newVelocity;
             gameObject.GetComponent<Rigidbody2D>().angularVelocity = newAngularVelocity;

@@ -17,6 +17,7 @@ public struct TiedKeybinds
 public class MenuManager : MonoBehaviour 
 {
     private const float THUMBSTICK_DEADZONE = 0.1f;
+    private const float MIN_THUMBSTICK_POS = 0.5f; //The minimum thumbstick position where it can affect the menu.
     private const float PANEL_MOVESPEED = 5.0f;
 
 	private const int NUM_OF_COLOURS = 8;
@@ -90,12 +91,12 @@ public class MenuManager : MonoBehaviour
         for (int i = 0; i < activeControllers.Count; i++)
         {
             //If moving left or right, apply the colour preview.
-            if (activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.dPadHorizontal) > 0 ||
-                activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.leftThumbstickHorizontal) > 0)
+            if (activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.dPadHorizontal) > MIN_THUMBSTICK_POS ||
+                activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.leftThumbstickHorizontal) > MIN_THUMBSTICK_POS)
                 ApplyColourPreview(1, activeControllers[i].playerNum);
 
-            if (activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.dPadHorizontal) < 0 ||
-                activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.leftThumbstickHorizontal) < 0)
+            if (activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.dPadHorizontal) < -MIN_THUMBSTICK_POS ||
+                activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.leftThumbstickHorizontal) < -MIN_THUMBSTICK_POS)
                 ApplyColourPreview(-1, activeControllers[i].playerNum);
 
             if (activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.dPadHorizontal) == 0 &&

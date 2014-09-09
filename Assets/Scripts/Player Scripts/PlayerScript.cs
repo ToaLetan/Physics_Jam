@@ -88,6 +88,7 @@ public class PlayerScript : MonoBehaviour
         inputManager.Key_Held += PlayerInput;
         inputManager.Key_Released += ApplyDeceleration;
         inputManager.Key_Pressed += MenuInput;
+        inputManager.Button_Pressed += MenuInput;
 
         selectionTimer.OnTimerComplete += SetAction;
         respawnTimer.OnTimerComplete += EnableMove;
@@ -221,6 +222,12 @@ public class PlayerScript : MonoBehaviour
                         }
                     }
 
+                    if (inputManager.ControllerArray[inputSourceIndex].GetButtonDown(inputManager.ControllerArray[inputSourceIndex].startButton.ToString())) //Bring up the pause menu
+                    {
+                        if (gameManager.IsGamePaused == false)
+                            gameManager.ShowPauseMenu(inputSource, inputSourceIndex);
+                    }
+
                     //Only call PlayerMove() if the thumbstick isn't completely idle.
                     if  ( ((inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) >= THUMBSTICK_DEADZONE ||
                             inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) <= -THUMBSTICK_DEADZONE)) ||
@@ -307,10 +314,10 @@ public class PlayerScript : MonoBehaviour
 
     private void MenuInput(int playerNum, List<string> keysPressed)
     {
-        if (keysPressed.Contains(InputManager.Instance.PlayerKeybindArray[inputSourceIndex].SelectKey.ToString())) //Bring up the pause menu
+        if (keysPressed.Contains(InputManager.Instance.PlayerKeybindArray[inputSourceIndex].SelectKey.ToString()) )
         {
             if (gameManager.IsGamePaused == false)
-                gameManager.ShowPauseMenu(playerNum);
+                gameManager.ShowPauseMenu(inputSource, inputSourceIndex);
         }
     }
 

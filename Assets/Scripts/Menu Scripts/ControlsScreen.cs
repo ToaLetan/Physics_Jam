@@ -4,9 +4,29 @@ using System.Collections.Generic;
 
 public class ControlsScreen : MonoBehaviour 
 {
+    private const float MIN_THUMBSTICK_POS = 0.5f; //The minimum thumbstick position where it can affect the menu.
+
     private InputManager inputManager = InputManager.Instance;
 
+    private string ownerInputSource = "";
+
     private int currentPageIndex = 0;
+    private int ownerInputIndex = -1;
+
+    private bool isOnControlsScreen = false;
+    private bool canChangeSelection = true; //Used to prevent controllers from moving through selections too fast.
+
+    public string OwnerInputSource
+    {
+        get { return ownerInputSource; }
+        set { ownerInputSource = value; }
+    }
+
+    public int OwnerInputIndex
+    {
+        get { return ownerInputIndex; }
+        set { ownerInputIndex = value; }
+    }
 
 	// Use this for initialization
 	void Start () 
@@ -18,27 +38,58 @@ public class ControlsScreen : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
     {
-	
+        if (ownerInputSource.Contains("Controller") == true)
+        {
+            ProcessInput(ownerInputIndex, null);
+        }
 	}
+
+    public void TieInput(string inputSource, int inputSourceIndex)
+    {
+        ownerInputSource = inputSource;
+        ownerInputIndex = inputSourceIndex;
+    }
 
     private void ProcessInput(int playerNum, List<string> keysPressed)
     {
-        if (keysPressed.Contains(inputManager.PlayerKeybindArray[playerNum].LeftKey.ToString()))
+        if (ownerInputSource.Contains("Keybinds") == true)
         {
-            if (currentPageIndex == 1)
-                ChangeSelection(0);
-        }
-        if (keysPressed.Contains(inputManager.PlayerKeybindArray[playerNum].RightKey.ToString()))
-        {
-            if (currentPageIndex == 0)
-                ChangeSelection(1);
-        }
-
-        if (keysPressed.Contains(inputManager.PlayerKeybindArray[0].SelectKey.ToString())) //Go back to the Pause Menu.
-        {
-            if (gameObject.transform.parent.GetComponent<PauseMenu>() != null)
+            if (keysPressed.Contains(inputManager.PlayerKeybindArray[playerNum].LeftKey.ToString()))
             {
-                gameObject.transform.parent.GetComponent<PauseMenu>().ToggleControlsScreen(false);
+                if (currentPageIndex == 1)
+                    ChangeSelection(0);
+            }
+
+            if (keysPressed.Contains(inputManager.PlayerKeybindArray[playerNum].RightKey.ToString()))
+            {
+                if (currentPageIndex == 0)
+                    ChangeSelection(1);
+            }
+
+            if (keysPressed.Contains(inputManager.PlayerKeybindArray[0].SelectKey.ToString())) //Go back to the Pause Menu.
+            {
+                if (gameObject.transform.parent.GetComponent<PauseMenu>() != null)
+                    gameObject.transform.parent.GetComponent<PauseMenu>().ToggleControlsScreen(false);
+            }
+        }
+        if (ownerInputSource.Contains("Controller") == true)
+        {
+            if (inputManager.ControllerArray[ownerInputIndex].GetThumbstickAxis(inputManager.ControllerArray[ownerInputIndex].leftThumbstickHorizontal) < -MIN_THUMBSTICK_POS)
+            {
+                if (currentPageIndex == 1)
+                    ChangeSelection(0);
+            }
+
+            if (inputManager.ControllerArray[ownerInputIndex].GetThumbstickAxis(inputManager.ControllerArray[ownerInputIndex].leftThumbstickHorizontal) > MIN_THUMBSTICK_POS)
+            {
+                if (currentPageIndex == 0)
+                    ChangeSelection(1);
+            }
+
+            if (inputManager.ControllerArray[ownerInputIndex].GetButtonDown(inputManager.ControllerArray[ownerInputIndex].buttonB.ToString())) //Go back to the Pause Menu.
+            {
+                if (gameObject.transform.parent.GetComponent<PauseMenu>() != null)
+                    gameObject.transform.parent.GetComponent<PauseMenu>().ToggleControlsScreen(false);
             }
         }
     }
