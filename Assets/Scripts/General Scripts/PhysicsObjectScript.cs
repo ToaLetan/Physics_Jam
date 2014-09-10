@@ -30,8 +30,12 @@ public class PhysicsObjectScript : MonoBehaviour
     {
         CapVelocity();
 
-        if (attributeRemovalTimer.IsTimerRunning == true)
-            attributeRemovalTimer.Update();
+        if (attributeRemovalTimer != null)
+        {
+            if(attributeRemovalTimer.IsTimerRunning == true)
+                attributeRemovalTimer.Update();
+        }
+            
 	}
 
     private void OnCollisionEnter2D(Collision2D collisionObj)
