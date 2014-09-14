@@ -25,6 +25,7 @@ public class PlayerScript : MonoBehaviour
     private GameManager gameManager = null;
 
     private GameObject selectorBeam = null;
+    private GameObject fallSparkAnim = null;
     
     private Timer selectionTimer = new Timer(SELECTIONTIME);
     private Timer respawnTimer = new Timer(RESPAWNTIME);
@@ -47,7 +48,7 @@ public class PlayerScript : MonoBehaviour
 	private int currentDirectionX = 0;
 	private int currentDirectionY = 0;
 
-    private int numLives = 5;
+    public int numLives = 5;
 
     private float width;
     private float height;
@@ -499,37 +500,56 @@ public class PlayerScript : MonoBehaviour
 
     private void Death()
     {
-        if(Player_Death != null)
-            Player_Death(PlayerNumber);
+        //Play death animation.
+        gameObject.GetComponent<Animator>().Play("Player_Fall");
 
-        numLives -= 1;
+        //Hide the arm and selector beam.
+        if (selectorBeam.GetComponent<SpriteRenderer>() != null)
+            selectorBeam.GetComponent<SpriteRenderer>().color = new Color(0, 0, 0, 0);
 
-        if (numLives == 0)
+        for (int i = 0; i < gameObject.transform.childCount; i++)
         {
-            if (Player_Lose != null)
-                Player_Lose(PlayerNumber);
+            if (gameObject.transform.GetChild(i).GetComponent<SpriteRenderer>() != null && gameObject.transform.GetChild(i).name != "PlayerGlowLayer")
+                gameObject.transform.GetChild(i).GetComponent<SpriteRenderer>().color = new Color(0, 0, 0, 0);
 
-            //Respawn(false);
-            currentVelocityX = 0;
-            currentVelocityY = 0;
-            canMove = false;
+            if (gameObject.transform.GetChild(i).name == "PlayerGlowLayer") //Change the Glow Layer sprite to the falling one.
+                gameObject.transform.GetChild(i).GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Player/Player_GlowLayer_Fall");
         }
-        else
-            //Reset the player's position after the death animation has finished.
-            Respawn();
-        
-        //Change the player's pose, hide the arm and selector beam.
-        /*
-        AnimationPlayer.PlayAnimation(gameObject, "Player_Fall");
-        AnimationPlayer.ChangeSprite(gameObject.transform.FindChild("PlayerGlowLayerV1").gameObject, "Sprites/Player/Player_GlowLayer_Fall");
-        selectorBeam.transform.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
-        gameObject.transform.FindChild("PlayerArmV1").transform.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
-        */
+
+        if (gameObject.GetComponent<AnimationObject>() != null)
+            gameObject.GetComponent<AnimationObject>().Animation_Complete += OnDeathAnimComplete;
+
+        canMove = false;
 
     }
 
     private void Respawn(bool useSpawnTimer = true)
     {
+        if (gameObject.GetComponent<SpriteRenderer>() != null && gameObject.GetComponent<SpriteRenderer>().color == new Color(0, 0, 0, 0))
+        {
+            //Show the player
+            if (gameObject.GetComponent<SpriteRenderer>() != null)
+                gameObject.GetComponent<SpriteRenderer>().color = Color.white;
+
+            //Show the beam
+            if (selectorBeam.GetComponent<SpriteRenderer>() != null)
+                selectorBeam.GetComponent<SpriteRenderer>().color = GameInfoManager.Instance.PlayerColours[PlayerNumber];
+
+            for (int i = 0; i < gameObject.transform.childCount; i++)
+            {
+                if (gameObject.transform.GetChild(i).GetComponent<SpriteRenderer>() != null)
+                {
+                    if (gameObject.transform.GetChild(i).name == "PlayerGlowLayer") //Set the Glow Layer to match the player colour and change it to the default version
+                    {
+                        gameObject.transform.GetChild(i).GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Player/PlayerGlowLayerV1");
+                        gameObject.transform.GetChild(i).GetComponent<SpriteRenderer>().color = GameInfoManager.Instance.PlayerColours[PlayerNumber];
+                    }
+                    else
+                        gameObject.transform.GetChild(i).GetComponent<SpriteRenderer>().color = Color.white;
+                }
+            }
+        }
+
         currentVelocityX = 0;
         currentVelocityY = 0;
 
@@ -580,5 +600,73 @@ public class PlayerScript : MonoBehaviour
         pickupText.GetComponent<PickupAlertScript>().PickupText(pickupInfo.CurrentPickupType.ToString() );
 
         Destroy(pickupInfo.gameObject);
+    }
+
+    private void OnDeathAnimComplete()
+    {
+        //Stop death animation
+        if (gameObject.GetComponent<Animator>() != null)
+            gameObject.GetComponent<Animator>().enabled = false;
+
+        //Stop movement.
+        currentVelocityX = 0;
+        currentVelocityY = 0;
+        gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+
+        //Spawn a Fall Spark animation object and set the colour to match the player
+        fallSparkAnim = GameObject.Instantiate(Resources.Load("Prefabs/AnimatedPrefabs/FallSparkAnim"), gameObject.transform.position, 
+                                                            gameObject.transform.rotation) as GameObject;
+        if (fallSparkAnim.GetComponent<SpriteRenderer>() != null)
+            fallSparkAnim.GetComponent<SpriteRenderer>().color = GameInfoManager.Instance.PlayerColours[PlayerNumber];
+
+        if (fallSparkAnim.GetComponent<AnimationObject>() != null)
+            fallSparkAnim.GetComponent<AnimationObject>().Animation_Complete += OnFallSparkAnimComplete;
+
+        //Hide the player
+        if (gameObject.GetComponent<SpriteRenderer>() != null)
+            gameObject.GetComponent<SpriteRenderer>().color = new Color(0, 0, 0, 0);
+
+        for (int i = 0; i < gameObject.transform.childCount; i++)
+        {
+            if (gameObject.transform.GetChild(i).GetComponent<SpriteRenderer>() != null)
+                gameObject.transform.GetChild(i).GetComponent<SpriteRenderer>().color = new Color(0, 0, 0, 0);
+        }
+    }
+
+    private void OnFallSparkAnimComplete()
+    {
+        //Unsub from event
+        fallSparkAnim.GetComponent<AnimationObject>().Animation_Complete -= OnFallSparkAnimComplete;
+
+        //Change back to idle animation
+        if (gameObject.GetComponent<Animator>() != null)
+        {
+            //Re-enable the player's Animator because it gets disabled by AnimationObject
+            gameObject.GetComponent<Animator>().enabled = true;
+
+            gameObject.GetComponent<Animator>().Play("Player_Idle");
+        }
+
+        //Reset the player's position after the death animation has finished.
+        //-1 life
+        if (Player_Death != null)
+            Player_Death(PlayerNumber);
+
+        numLives -= 1;
+
+        if (numLives <= 0)
+        {
+            Debug.Log("GAME OVER NUM LIVES " + numLives);
+
+            if (Player_Lose != null)
+                Player_Lose(PlayerNumber);
+
+            //Respawn(false);
+            currentVelocityX = 0;
+            currentVelocityY = 0;
+            canMove = false;
+        }
+        else
+            Respawn();
     }
 }
