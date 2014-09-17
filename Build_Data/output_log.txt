@@ -1,4 +1,4 @@
-Initialize engine version: 4.5.0f6 (fd4616464986)
+Initialize engine version: 4.5.3f3 (fca41a4fabea)
 GfxDevice: creating device client; threaded=1
 Direct3D:
     Version:  Direct3D 9.0c [aticfx32.dll 8.17.10.1247]
@@ -11,25 +11,26 @@ Platform assembly: E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\UnityEng
 Loading E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\UnityEngine.dll into Unity Child Domain
 Platform assembly: E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\Assembly-CSharp.dll (this message is harmless)
 Loading E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
-- Completed reload, in  0.060 seconds
+- Completed reload, in  0.056 seconds
 desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.
-UnloadTime: 0.388527 ms
-Unloading 3 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+Platform assembly: E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\System.dll (this message is harmless)
+UnloadTime: 1.397378 ms
+Unloading 4 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
 
-Unloading 20 unused Assets to reduce memory usage. Loaded Objects now: 715.
-Total: 0.630901 ms (FindLiveObjects: 0.027699 ms CreateObjectMapping: 0.014214 ms MarkObjects: 0.110435 ms  DeleteObjects: 0.027699 ms)
+Unloading 73 unused Assets to reduce memory usage. Loaded Objects now: 693.
+Total: 2.458350 ms (FindLiveObjects: 0.098406 ms CreateObjectMapping: 0.053212 ms MarkObjects: 0.303239 ms  DeleteObjects: 0.399459 ms)
 
-UnloadTime: 1.048222 ms
-Unloading 2 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+PLAYER 0 TIED TO INPUT SOURCE: Keybinds 0
+ 
+(Filename: C:/BuildAgent/work/d63dfc6385190b60/artifacts/StandalonePlayerGenerated/UnityEngineDebug.cpp Line: 49)
 
-Unloading 153 unused Assets to reduce memory usage. Loaded Objects now: 172.
-Total: 0.855052 ms (FindLiveObjects: 0.010569 ms CreateObjectMapping: 0.015672 ms MarkObjects: 0.133396 ms  DeleteObjects: 0.222692 ms)
+PLAYER 1 TIED TO INPUT SOURCE: Keybinds 1
+ 
+(Filename: C:/BuildAgent/work/d63dfc6385190b60/artifacts/StandalonePlayerGenerated/UnityEngineDebug.cpp Line: 49)
 
-UnloadTime: 0.354631 ms
-Unloading 1 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
-
-Unloading 19 unused Assets to reduce memory usage. Loaded Objects now: 715.
-Total: 0.641471 ms (FindLiveObjects: 0.028064 ms CreateObjectMapping: 0.016765 ms MarkObjects: 0.154171 ms  DeleteObjects: 0.026242 ms)
+GAME OVER NUM LIVES 0
+ 
+(Filename: C:/BuildAgent/work/d63dfc6385190b60/artifacts/StandalonePlayerGenerated/UnityEngineDebug.cpp Line: 49)
 

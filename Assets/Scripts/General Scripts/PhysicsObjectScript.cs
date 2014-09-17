@@ -7,12 +7,15 @@ public class PhysicsObjectScript : MonoBehaviour
     private const float MAX_VELOCITY_MOVEMENT = 5.0f;
     private const float MAX_VELOCITY_ROTATION = 10.0f;
     private const float MIN_VELOCITY_ROTATION = 0.5f;
+    private const float SCALE_FACTOR = -0.85f;
 
     private Timer attributeRemovalTimer;
 
     private Vector3 startPosition;
     private Vector3 startScale;
     private Quaternion startRotation;
+
+    private bool isFalling = false;
 
 	// Use this for initialization
 	void Start () 
@@ -35,7 +38,9 @@ public class PhysicsObjectScript : MonoBehaviour
             if(attributeRemovalTimer.IsTimerRunning == true)
                 attributeRemovalTimer.Update();
         }
-            
+
+        if (isFalling == true)
+            PlayFallAnim();
 	}
 
     private void OnCollisionEnter2D(Collision2D collisionObj)
@@ -66,8 +71,6 @@ public class PhysicsObjectScript : MonoBehaviour
                 if (gameObject.GetComponent<ProjectileAttributeScript>().CurrentProjectileType == ProjectileAttributeScript.ProjectileType.Homing
                     && attributeRemovalTimer.IsTimerRunning == false)
                 {
-                    Debug.Log("YES");
-
                     attributeRemovalTimer.StartTimer();
                 }
             }
@@ -78,20 +81,15 @@ public class PhysicsObjectScript : MonoBehaviour
     {
         if (collisionObj.gameObject.tag == "KillBox")
         {
-            if(gameObject.name.Contains("(Clone)") )
-            {
-                //Unscribe to any events and destroy the object.
-                if(gameObject.GetComponent<PauseRigidBodyScript>() != null)
-                    gameObject.GetComponent<PauseRigidBodyScript>().UnsubscribeFromEvents();
-                Destroy(gameObject);
-            }
-            else
-                Respawn();
+            if(isFalling == false)
+                isFalling = true;
         }
     }
 
     private void Respawn()
     {
+        isFalling = false;
+
         gameObject.transform.position = startPosition;
         gameObject.transform.localScale = startScale;
         gameObject.transform.rotation = startRotation;
@@ -123,8 +121,6 @@ public class PhysicsObjectScript : MonoBehaviour
 
     private void OnRemovalTimerComplete()
     {
-        Debug.Log("DONE");
-
         if (gameObject.GetComponent<ProjectileAttributeScript>() != null)
             Destroy(gameObject.GetComponent<ProjectileAttributeScript>());
 
@@ -163,6 +159,30 @@ public class PhysicsObjectScript : MonoBehaviour
 
             gameObject.GetComponent<Rigidbody2D>().velocity = newVelocity;
             gameObject.GetComponent<Rigidbody2D>().angularVelocity = newAngularVelocity;
+        }
+    }
+
+    private void PlayFallAnim()
+    {
+        if (gameObject.transform.localScale.x > (0.5f) || gameObject.transform.localScale.y > (0.5f))
+        {
+            //Scale the object down.
+            Vector2 newScale = new Vector2(gameObject.transform.localScale.x + (SCALE_FACTOR * startScale.x * Time.deltaTime), 
+                                            gameObject.transform.localScale.y + (SCALE_FACTOR * startScale.y * Time.deltaTime));
+
+            gameObject.transform.localScale = newScale;
+        }
+        else
+        {
+            if (gameObject.name.Contains("(Clone)"))
+            {
+                //Unscribe to any events and destroy the object.
+                if (gameObject.GetComponent<PauseRigidBodyScript>() != null)
+                    gameObject.GetComponent<PauseRigidBodyScript>().UnsubscribeFromEvents();
+                Destroy(gameObject);
+            }
+            else
+                Respawn();
         }
     }
 }
