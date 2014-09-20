@@ -16,8 +16,13 @@ public class PlayerScript : MonoBehaviour
     public event PlayerEvent Player_Death;
     public event PlayerEvent Player_Lose;
 
+    //Powerups
     public enum PlayerAction { Throw_Basic, Throw_Spread, Throw_Boomerang, Throw_Enlarge, Throw_Homing  }
     private PlayerAction currentAction = PlayerAction.Throw_Basic;
+
+    //Active
+    private Active.ActiveType currentActiveType = Active.ActiveType.GravityField;
+    private Active currentActive = null; //Instance of active that's in use.
 
 	public int PlayerNumber = 0;
 
@@ -109,6 +114,8 @@ public class PlayerScript : MonoBehaviour
         selectionTimer.Update();
         respawnTimer.Update();
 
+        UpdateActive();
+
         if (inputSource.Contains("Controller") == true)
         {
             PlayerInput(PlayerNumber, null);
@@ -185,6 +192,9 @@ public class PlayerScript : MonoBehaviour
                                 else
                                     ThrowObject();
                             }
+
+                            //REALLY GHETTO ACTIVE TEST
+                            UseActive();
                         }
                         //=================================================================================================================
                 }
@@ -656,8 +666,6 @@ public class PlayerScript : MonoBehaviour
 
         if (numLives <= 0)
         {
-            Debug.Log("GAME OVER NUM LIVES " + numLives);
-
             if (Player_Lose != null)
                 Player_Lose(PlayerNumber);
 
@@ -668,5 +676,69 @@ public class PlayerScript : MonoBehaviour
         }
         else
             Respawn();
+    }
+
+    private void UpdateActive()
+    {
+        if (currentActive != null)
+        {
+            currentActive.Update();
+        }
+    }
+
+    private void UseActive() //Uses the player's Active
+    {
+        if (currentActive == null)
+        {
+            switch (currentActiveType)
+            {
+                case Active.ActiveType.GravityField:
+                    currentActive = ActivesTypes.GravityField(this);
+                    break;
+                case Active.ActiveType.Reflect:
+                    currentActive = ActivesTypes.Reflect(this);
+                    break;
+                case Active.ActiveType.Slipstream:
+                    currentActive = ActivesTypes.Slipstream(this);
+                    break;
+                case Active.ActiveType.Soak:
+                    currentActive = ActivesTypes.Soak(this);
+                    break;
+                case Active.ActiveType.Overclock:
+                    currentActive = ActivesTypes.Overclock(this);
+                    break;
+                case Active.ActiveType.Slowstream:
+                    currentActive = ActivesTypes.Slowstream(this);
+                    break;
+            }
+
+            if (currentActive != null)
+            {
+                currentActive.Duration.StartTimer();
+                currentActive.Duration.OnTimerComplete += OnActiveDurationEnded;
+            }  
+        }
+    }
+
+    private void OnActiveDurationEnded()
+    {
+        //Start the Cooldown Timer
+        currentActive.Cooldown.StartTimer();
+        currentActive.Cooldown.OnTimerComplete += OnActiveCooldownEnded;
+        currentActive.Duration.OnTimerComplete -= OnActiveDurationEnded;
+
+        //Show the Cooldown overlay on the HUD
+
+        Debug.Log("ACTIVE OVER");
+    }
+
+    private void OnActiveCooldownEnded()
+    {
+        //Reset the Active
+        currentActive.Cooldown.OnTimerComplete -= OnActiveCooldownEnded;
+
+        currentActive = null;
+
+        Debug.Log("COOLDOWN OVER");
     }
 }

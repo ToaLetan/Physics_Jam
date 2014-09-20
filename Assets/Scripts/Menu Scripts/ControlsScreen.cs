@@ -14,7 +14,7 @@ public class ControlsScreen : MonoBehaviour
     private int ownerInputIndex = -1;
 
     private bool isOnControlsScreen = false;
-    private bool canChangeSelection = true; //Used to prevent controllers from moving through selections too fast.
+    //private bool canChangeSelection = true; //Used to prevent controllers from moving through selections too fast.
 
     public string OwnerInputSource
     {
