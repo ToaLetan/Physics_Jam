@@ -46,6 +46,7 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\Actives Scripts\GravFieldScript.cs" />
      <Compile Include="Assets\Scripts\Animation Scripts\AnimationObject.cs" />
      <Compile Include="Assets\Scripts\Animation Scripts\AnimationPlayer.cs" />
      <Compile Include="Assets\Scripts\Animation Scripts\RainbowScript.cs" />

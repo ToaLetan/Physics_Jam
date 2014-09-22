@@ -5,11 +5,11 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{765F8F4D-ED21-0580-EE37-4F020612FF2A}</ProjectGuid>
+	<ProjectGuid>{6E233606-446D-0949-6780-55C0CDACFD84}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
-	<AssemblyName>Assembly-CSharp</AssemblyName>
+	<AssemblyName>Assembly-UnityScript</AssemblyName>
 	<TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
 	<FileAlignment>512</FileAlignment>
 	<BaseDirectory>Assets</BaseDirectory>
@@ -46,36 +46,7 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\Actives Scripts\GravFieldScript.cs" />
-     <Compile Include="Assets\Scripts\Animation Scripts\AnimationObject.cs" />
-     <Compile Include="Assets\Scripts\Animation Scripts\AnimationPlayer.cs" />
-     <Compile Include="Assets\Scripts\Animation Scripts\RainbowScript.cs" />
-     <Compile Include="Assets\Scripts\Animation Scripts\TweenComponent.cs" />
-     <Compile Include="Assets\Scripts\General Scripts\CameraEffectsScript.cs" />
-     <Compile Include="Assets\Scripts\General Scripts\IgnoreCameraScalingScript.cs" />
-     <Compile Include="Assets\Scripts\General Scripts\PauseRigidBodyScript.cs" />
-     <Compile Include="Assets\Scripts\General Scripts\PhysicsObjectScript.cs" />
-     <Compile Include="Assets\Scripts\General Scripts\PickupAlertScript.cs" />
-     <Compile Include="Assets\Scripts\General Scripts\PickupScript.cs" />
-     <Compile Include="Assets\Scripts\General Scripts\ProjectileAttributeScript.cs" />
-     <Compile Include="Assets\Scripts\General Scripts\SpeculativeContactsScript.cs" />
-     <Compile Include="Assets\Scripts\General Scripts\Timer.cs" />
-     <Compile Include="Assets\Scripts\Input Scripts\InputManager.cs" />
-     <Compile Include="Assets\Scripts\Input Scripts\XboxController.cs" />
-     <Compile Include="Assets\Scripts\Management Scripts\GameInfoManager.cs" />
-     <Compile Include="Assets\Scripts\Management Scripts\GameManager.cs" />
-     <Compile Include="Assets\Scripts\Management Scripts\PickupSpawner.cs" />
-     <Compile Include="Assets\Scripts\Management Scripts\SlowMoManager.cs" />
-     <Compile Include="Assets\Scripts\Management Scripts\UIManager.cs" />
-     <Compile Include="Assets\Scripts\Menu Scripts\ControlsScreen.cs" />
-     <Compile Include="Assets\Scripts\Menu Scripts\MenuManager.cs" />
-     <Compile Include="Assets\Scripts\Menu Scripts\PauseMenu.cs" />
-     <Compile Include="Assets\Scripts\Player Scripts\ActionTypes.cs" />
-     <Compile Include="Assets\Scripts\Player Scripts\ActivesTypes.cs" />
-     <Compile Include="Assets\Scripts\Player Scripts\AnimatePreviewScript.cs" />
-     <Compile Include="Assets\Scripts\Player Scripts\BeamScript.cs" />
-     <Compile Include="Assets\Scripts\Player Scripts\PlayerScript.cs" />
-     <Compile Include="Assets\Scripts\Player Scripts\PlayerSpawnPointScript.cs" />
+     <Compile Include="Assets\GravFieldScript.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

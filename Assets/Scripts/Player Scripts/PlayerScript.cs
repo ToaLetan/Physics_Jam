@@ -367,9 +367,7 @@ public class PlayerScript : MonoBehaviour
 		//Replace with a list of collision objects that the player is unable to pass.
 		switch (collisionObj.gameObject.name) 
 		{
-		case "Player":
-		case "Tile_Rock":
-		case "Tile_RockCorner":                       
+		case "Player":                    
             if(currentVelocityX > 0)
 			    currentVelocityX = 0;
             if(currentVelocityY > 0)
