@@ -16,6 +16,7 @@ public class PhysicsObjectScript : MonoBehaviour
     private Quaternion startRotation;
 
     private bool isFalling = false;
+    private bool capVelocity = true;
 
 	// Use this for initialization
 	void Start () 
@@ -31,7 +32,8 @@ public class PhysicsObjectScript : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
     {
-        CapVelocity();
+        if(capVelocity == true)
+            CapVelocity();
 
         if (attributeRemovalTimer != null)
         {
@@ -84,6 +86,19 @@ public class PhysicsObjectScript : MonoBehaviour
             if(isFalling == false)
                 isFalling = true;
         }
+        else if (collisionObj.gameObject.tag == "ActiveZone")
+        {
+            if (collisionObj.gameObject.GetComponent<SpeedZoneScript>() != null)
+            {
+                capVelocity = false;
+
+                Vector2 newVelocity = gameObject.GetComponent<Rigidbody2D>().velocity;
+
+                newVelocity *= collisionObj.gameObject.GetComponent<SpeedZoneScript>().SpeedModifier;
+
+                gameObject.GetComponent<Rigidbody2D>().velocity = newVelocity;
+            }
+        }
     }
 
     private void Respawn()
@@ -95,6 +110,8 @@ public class PhysicsObjectScript : MonoBehaviour
         gameObject.transform.rotation = startRotation;
         gameObject.transform.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
         gameObject.transform.GetComponent<Rigidbody2D>().angularVelocity = 0;
+
+        capVelocity = true;
 
         if (gameObject.GetComponent<ProjectileAttributeScript>() != null)
         {
