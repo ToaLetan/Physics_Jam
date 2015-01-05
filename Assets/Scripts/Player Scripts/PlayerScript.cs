@@ -21,7 +21,7 @@ public class PlayerScript : MonoBehaviour
     private PlayerAction currentAction = PlayerAction.Throw_Basic;
 
     //Active
-    private Active.ActiveType currentActiveType = Active.ActiveType.GravityField;
+    private Active.ActiveType currentActiveType = Active.ActiveType.Slipstream;
     private Active currentActive = null; //Instance of active that's in use.
 
 	public int PlayerNumber = 0;
@@ -60,6 +60,11 @@ public class PlayerScript : MonoBehaviour
 
     private bool canPerformAction = true;
     private bool canMove = true; //Prevents instantly moving upon respawn.
+
+    public GameObject PlayerBeam
+    {
+        get { return selectorBeam; }
+    }
 
     public Color PlayerColour
     {

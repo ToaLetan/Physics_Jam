@@ -5,8 +5,16 @@ public class Active //The base Active class, features cooldown timer and duratio
 {
     public enum ActiveType { None, GravityField, Reflect, Slipstream, Soak, Overclock, Slowstream }
 
+    private const float SHOT_DELAY_TIME = 0.25f;
+
+    private PlayerScript owner = null;
+
     private Timer cooldown;
     private Timer duration;
+    private Timer shotDelay; //Used to space out projectile-type Actives (Speed Up, Speed Down)
+
+    private int currentProjectileNum = 0;
+    private int totalProjectiles = 0;
 
     public Timer Cooldown
     {
@@ -18,10 +26,16 @@ public class Active //The base Active class, features cooldown timer and duratio
         get { return duration; }
     }
 
+    public Timer ShotDelay
+    {
+        get { return shotDelay; }
+    }
+
     public Active(float cooldownTime, float durationTime)
     {
         cooldown = new Timer(cooldownTime);
         duration = new Timer(durationTime);
+        shotDelay = new Timer(SHOT_DELAY_TIME);
     }
 
     public void Update()
@@ -30,6 +44,8 @@ public class Active //The base Active class, features cooldown timer and duratio
             cooldown.Update();
         if (duration.IsTimerRunning == true)
             duration.Update();
+        if (shotDelay.IsTimerRunning == true)
+            shotDelay.Update();
     }
 
     public void UseActive()
@@ -38,6 +54,44 @@ public class Active //The base Active class, features cooldown timer and duratio
         {
             duration.StartTimer();
         }
+    }
+
+    public void PrepareProjectiles(int numProjectiles, PlayerScript playerUsingActive)
+    {
+        owner = playerUsingActive;
+        totalProjectiles = numProjectiles;
+
+        //Fire the first projectile and start the delay timer.
+        //ShootProjectile();
+
+        shotDelay.StartTimer();
+        shotDelay.OnTimerComplete += ShootProjectile;
+    }
+
+    private void ShootProjectile()
+    {
+        if (currentProjectileNum < totalProjectiles)
+        {
+            currentProjectileNum++;
+
+            //Instantiate the Slipstream object here.
+            float projectileDistanceModifier = 0.25f;
+            float minimumDistance = 1.0f;
+
+            //Space the objects out.
+            Vector3 objectPos = owner.gameObject.transform.position + (owner.PlayerBeam.transform.right * ((currentProjectileNum * projectileDistanceModifier) + minimumDistance));
+
+            objectPos.z = owner.transform.position.z;
+
+            GameObject newProjectile = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Glob_Projectile"), owner.PlayerBeam.transform.position, owner.PlayerBeam.transform.rotation) as GameObject;
+
+            newProjectile.GetComponent<ActiveProjectileScript>().Destination = objectPos;
+
+            shotDelay.ResetTimer(true);
+        }
+        else
+            shotDelay.OnTimerComplete -= ShootProjectile;
+        
     }
 }
 
@@ -68,7 +122,24 @@ public static class ActivesTypes //All Actives players can start with. Players s
     {
         Active returnActive = new Active(20.0f, 5.0f);
 
-        //Instantiate the Slipstream object here.
+        returnActive.PrepareProjectiles(3, owner);
+
+        /*
+        for (int i = 0; i < 1; i++)
+        {
+            //Instantiate the Slipstream object here.
+            float projectileDistanceModifier = 0.25f;
+            float minimumDistance = 1.0f;
+
+            //Space the objects out.
+            Vector3 objectPos = owner.gameObject.transform.position + (owner.PlayerBeam.transform.right * ((i * projectileDistanceModifier) + minimumDistance));
+
+            objectPos.z = owner.transform.position.z;
+
+            GameObject newProjectile = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Glob_Projectile"), owner.PlayerBeam.transform.position, owner.PlayerBeam.transform.rotation) as GameObject;
+
+            newProjectile.GetComponent<ActiveProjectileScript>().Destination = objectPos;
+        }*/
 
         return returnActive;
     }

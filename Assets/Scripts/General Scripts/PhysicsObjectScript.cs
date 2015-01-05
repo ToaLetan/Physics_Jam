@@ -17,6 +17,7 @@ public class PhysicsObjectScript : MonoBehaviour
 
     private bool isFalling = false;
     private bool capVelocity = true;
+    private bool hasSpedUp = false;
 
 	// Use this for initialization
 	void Start () 
@@ -90,13 +91,17 @@ public class PhysicsObjectScript : MonoBehaviour
         {
             if (collisionObj.gameObject.GetComponent<SpeedZoneScript>() != null)
             {
-                capVelocity = false;
+                if (hasSpedUp == false) //Prevent speed boosts from stacking.
+                {
+                    hasSpedUp = true;
+                    capVelocity = false;
 
-                Vector2 newVelocity = gameObject.GetComponent<Rigidbody2D>().velocity;
+                    Vector2 newVelocity = gameObject.GetComponent<Rigidbody2D>().velocity;
 
-                newVelocity *= collisionObj.gameObject.GetComponent<SpeedZoneScript>().SpeedModifier;
+                    newVelocity *= collisionObj.gameObject.GetComponent<SpeedZoneScript>().SpeedModifier;
 
-                gameObject.GetComponent<Rigidbody2D>().velocity = newVelocity;
+                    gameObject.GetComponent<Rigidbody2D>().velocity = newVelocity;
+                }
             }
         }
     }
@@ -104,6 +109,7 @@ public class PhysicsObjectScript : MonoBehaviour
     private void Respawn()
     {
         isFalling = false;
+        hasSpedUp = false;
 
         gameObject.transform.position = startPosition;
         gameObject.transform.localScale = startScale;

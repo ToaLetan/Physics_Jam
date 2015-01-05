@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class XboxController
 {
@@ -45,6 +46,7 @@ public class XboxController
 	{
 
 	}
+
 
 	//Input functions
     public bool GetButtonHeld(string buttonName)
