@@ -42,8 +42,18 @@ public class ActiveProjectileScript : MonoBehaviour
                 hasReachedDestination = true;
 
                 //Instantiate the next animation object, destroy this one.
-                GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Glob_Splash"), gameObject.transform.position, Quaternion.identity);
+                switch(ProjectileType)
+                {
+                    case ActiveProjectileType.SpeedUp:
+                        GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Glob_Splash"), gameObject.transform.position, Quaternion.identity);
+                        break;
+                    case ActiveProjectileType.SpeedDown:
+                        GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Glob_SlowSplash"), gameObject.transform.position, Quaternion.identity);
+                        break;
+                    case ActiveProjectileType.Soak:
+                        break;
 
+                }
                 GameObject.Destroy(gameObject);
             }
         }
