@@ -157,6 +157,9 @@ public static class ActivesTypes //All Actives players can start with. Players s
         //Get the connecting object and send it back here, call UseActive();
         //Instantiate and play the anim on the player.
 
+        GameObject reflection = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Reflect_Generate_Anim"), owner.transform.position, owner.transform.rotation) as GameObject;
+
+
         return returnActive;
     }
 

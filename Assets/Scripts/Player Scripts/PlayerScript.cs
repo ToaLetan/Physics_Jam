@@ -21,7 +21,7 @@ public class PlayerScript : MonoBehaviour
     private PlayerAction currentAction = PlayerAction.Throw_Basic;
 
     //Active
-    public Active.ActiveType currentActiveType = Active.ActiveType.Slowstream; //SET TO PUBLIC FOR TESTING
+    public Active.ActiveType currentActiveType = Active.ActiveType.Reflect; //SET TO PUBLIC FOR TESTING
     private Active currentActive = null; //Instance of active that's in use.
 
 	public int PlayerNumber = 0;
