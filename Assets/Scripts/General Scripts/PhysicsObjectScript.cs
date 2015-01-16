@@ -54,7 +54,7 @@ public class PhysicsObjectScript : MonoBehaviour
                (gameObject.transform.GetComponent<Rigidbody2D>().velocity.x > MIN_SLOWMO_TRIGGER_SPEED ||
                 gameObject.transform.GetComponent<Rigidbody2D>().velocity.y > MIN_SLOWMO_TRIGGER_SPEED) )
             {
-                if (SlowMoManager.Instance.IsSlowMoRunning == false)
+                if (SlowMoManager.Instance.IsSlowMoRunning == false) //Play the slow motion effect.
                 {
                     if (GameObject.FindGameObjectWithTag("MainCamera").transform.FindChild("SlowmoEmphasis(Clone)") == null)
                     {
@@ -66,6 +66,17 @@ public class PhysicsObjectScript : MonoBehaviour
                         slowmoEmphasis.GetComponent<AnimationObject>().Animation_Complete += OnSlowmoAnimComplete;
                     }
                 }
+            }
+            //Reflect along the initial trajectory if the player's Reflect Active is in use.
+            if (collisionObj.gameObject.GetComponent<PlayerScript>().PlayerActive != null 
+                && collisionObj.gameObject.GetComponent<PlayerScript>().currentActiveType == Active.ActiveType.Reflect 
+                && collisionObj.gameObject.GetComponent<PlayerScript>().PlayerActive.IsReflective == true)
+            {
+                Vector2 newVelocity = gameObject.GetComponent<Rigidbody2D>().velocity;
+
+                newVelocity *= -1;
+
+                gameObject.GetComponent<Rigidbody2D>().velocity = newVelocity;
             }
 
             //If the object is a homing projectile, run a timer to remove the homing attribute.

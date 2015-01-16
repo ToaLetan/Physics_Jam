@@ -25,7 +25,9 @@ public class ReflectGenerationScript : MonoBehaviour
         {
             hasSpawnedObj = true;
 
-            GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Reflect"), gameObject.transform.position, gameObject.transform.rotation);
+            GameObject reflection = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Reflect"), gameObject.transform.position, gameObject.transform.rotation) as GameObject;
+
+            reflection.transform.parent = gameObject.transform.parent;
         }
     }
 }

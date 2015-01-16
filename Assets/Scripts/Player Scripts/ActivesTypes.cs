@@ -18,6 +18,8 @@ public class Active //The base Active class, features cooldown timer and duratio
     private int currentProjectileNum = 0;
     private int totalProjectiles = 0;
 
+    private bool isReflective = false; //Used by the Reflect active to toggle the state when the player is capable of reflecting objects
+
     public ActiveType ActiveClassification
     {
         get { return activeType; }
@@ -37,6 +39,12 @@ public class Active //The base Active class, features cooldown timer and duratio
     public Timer ShotDelay
     {
         get { return shotDelay; }
+    }
+
+    public bool IsReflective
+    {
+        get { return isReflective; }
+        set { isReflective = value; }
     }
 
     public Active(float cooldownTime, float durationTime)
@@ -61,7 +69,18 @@ public class Active //The base Active class, features cooldown timer and duratio
         if (cooldown.IsTimerRunning == false && duration.IsTimerRunning == false)
         {
             duration.StartTimer();
+            duration.OnTimerComplete += OnDurationComplete;
+
+            if (activeType == ActiveType.Reflect)
+                isReflective = true;
         }
+    }
+
+    private void OnDurationComplete()
+    {
+        //Destroy any objects as necessary
+        if (isReflective == true)
+            isReflective = false;
     }
 
     public void PrepareProjectiles(int numProjectiles, PlayerScript playerUsingActive)
@@ -98,7 +117,6 @@ public class Active //The base Active class, features cooldown timer and duratio
         }
         else
             shotDelay.OnTimerComplete -= ShootProjectile;
-        
     }
 
     private void ShootSpeedProjectile()
@@ -158,7 +176,7 @@ public static class ActivesTypes //All Actives players can start with. Players s
         //Instantiate and play the anim on the player.
 
         GameObject reflection = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Reflect_Generate_Anim"), owner.transform.position, owner.transform.rotation) as GameObject;
-
+        reflection.transform.parent = owner.gameObject.transform;
 
         return returnActive;
     }

@@ -66,6 +66,11 @@ public class PlayerScript : MonoBehaviour
         get { return selectorBeam; }
     }
 
+    public Active PlayerActive
+    {
+        get { return currentActive; }
+    }
+
     public Color PlayerColour
     {
         get { return playerColour; }
@@ -717,8 +722,14 @@ public class PlayerScript : MonoBehaviour
 
             if (currentActive != null)
             {
-                currentActive.Duration.StartTimer();
+                currentActive.UseActive();
+
                 currentActive.Duration.OnTimerComplete += OnActiveDurationEnded;
+
+                if (currentActiveType == Active.ActiveType.Reflect) //Disable collision while Reflect is active.
+                {
+                    gameObject.GetComponent<Rigidbody2D>().drag = 200; //Well we can't disable collision for a while sooooo crank drag the fuck up.
+                }
             }  
         }
     }
@@ -731,6 +742,15 @@ public class PlayerScript : MonoBehaviour
         currentActive.Duration.OnTimerComplete -= OnActiveDurationEnded;
 
         //Show the Cooldown overlay on the HUD
+
+
+        //If the Active is Reflect, stop reflecting objects and reset rigidbody modifications.
+        if (currentActiveType == Active.ActiveType.Reflect)
+        {
+            GameObject.Destroy(gameObject.transform.FindChild("Reflect(Clone)").gameObject );
+
+            gameObject.GetComponent<Rigidbody2D>().drag = 1;
+        }
 
         Debug.Log("ACTIVE OVER");
     }
