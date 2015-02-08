@@ -116,6 +116,11 @@ public class PlayerScript : MonoBehaviour
         height = gameObject.GetComponent<SpriteRenderer>().sprite.bounds.max.y;
 
         startPosition = gameObject.transform.position;
+
+        //By default, the player is already playing the idle animation, but play the idle for the Glow Layer too.
+        //PlayerAnimation("Idle");
+        //PlayerAnimation("Side_Idle");
+        PlayerAnimation("Back_Idle");
 	}
 	
 	// Update is called once per frame
@@ -519,7 +524,7 @@ public class PlayerScript : MonoBehaviour
     private void Death()
     {
         //Play death animation.
-        gameObject.GetComponent<Animator>().Play("Player_Fall");
+        PlayerAnimation("Fall");
 
         //Hide the arm and selector beam.
         if (selectorBeam.GetComponent<SpriteRenderer>() != null)
@@ -529,9 +534,6 @@ public class PlayerScript : MonoBehaviour
         {
             if (gameObject.transform.GetChild(i).GetComponent<SpriteRenderer>() != null && gameObject.transform.GetChild(i).name != "PlayerGlowLayer")
                 gameObject.transform.GetChild(i).GetComponent<SpriteRenderer>().color = new Color(0, 0, 0, 0);
-
-            if (gameObject.transform.GetChild(i).name == "PlayerGlowLayer") //Change the Glow Layer sprite to the falling one.
-                gameObject.transform.GetChild(i).GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Player/Player_GlowLayer_Fall");
         }
 
         if (gameObject.GetComponent<AnimationObject>() != null)
@@ -662,7 +664,7 @@ public class PlayerScript : MonoBehaviour
             //Re-enable the player's Animator because it gets disabled by AnimationObject
             gameObject.GetComponent<Animator>().enabled = true;
 
-            gameObject.GetComponent<Animator>().Play("Player_Idle");
+            PlayerAnimation("Idle");
         }
 
         //Reset the player's position after the death animation has finished.
@@ -684,6 +686,27 @@ public class PlayerScript : MonoBehaviour
         }
         else
             Respawn();
+    }
+
+    private void PlayerAnimation(string animationName, int startFrame = 0)
+    {
+        //I have no idea why the layer is -1.
+
+        if (animationName.Contains("Side")) //If it's a side animation, move the player arm back a layer.
+        {
+            Vector3 armSidePos = gameObject.transform.FindChild("PlayerArm").transform.position;
+            armSidePos.x = gameObject.transform.position.x;
+
+            gameObject.transform.FindChild("PlayerArm").transform.position = armSidePos;
+            gameObject.transform.FindChild("PlayerArm").GetComponent<SpriteRenderer>().sortingOrder = gameObject.GetComponent<SpriteRenderer>().sortingOrder;
+        }
+
+        gameObject.GetComponent<Animator>().Play("Player_" + animationName, -1, startFrame);
+
+        if (gameObject.transform.FindChild("PlayerGlowLayer") != null)
+        {
+            gameObject.transform.FindChild("PlayerGlowLayer").GetComponent<Animator>().Play("GlowLayer_" + animationName, -1, startFrame);
+        }
     }
 
     private void UpdateActive()
@@ -747,6 +770,8 @@ public class PlayerScript : MonoBehaviour
         //If the Active is Reflect, stop reflecting objects and reset rigidbody modifications.
         if (currentActiveType == Active.ActiveType.Reflect)
         {
+            GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Reflect_Despawn"), gameObject.transform.FindChild("Reflect(Clone)").position, Quaternion.identity);
+
             GameObject.Destroy(gameObject.transform.FindChild("Reflect(Clone)").gameObject );
 
             gameObject.GetComponent<Rigidbody2D>().drag = 1;

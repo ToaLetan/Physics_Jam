@@ -52,7 +52,7 @@ public class CameraEffectsScript : MonoBehaviour
 
     private void KeepPlayersInView()
     {
-        float zoomModifier = 0.5f; //Arbitrary value used to reduce zoom slightly.
+        float zoomModifier = 0.65f; //Arbitrary value used to reduce zoom slightly.
         float furthestDistance = 0.0f; //The furthest distance between any two players used to determine how far the camera should zoom in/out.
         float midPointX = 0.0f; //Midpoints used to position camera in the center.
         float midPointY = 0.0f;
