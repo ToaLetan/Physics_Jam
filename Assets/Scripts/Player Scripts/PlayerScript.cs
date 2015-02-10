@@ -24,6 +24,10 @@ public class PlayerScript : MonoBehaviour
     public Active.ActiveType currentActiveType = Active.ActiveType.Reflect; //SET TO PUBLIC FOR TESTING
     private Active currentActive = null; //Instance of active that's in use.
 
+    //Animations
+    public enum PlayerAnim { Idle, Walk }
+    private PlayerAnim currentAnim = PlayerAnim.Idle;
+
 	public int PlayerNumber = 0;
 
     InputManager inputManager = InputManager.Instance;
@@ -118,9 +122,10 @@ public class PlayerScript : MonoBehaviour
         startPosition = gameObject.transform.position;
 
         //By default, the player is already playing the idle animation, but play the idle for the Glow Layer too.
-        //PlayerAnimation("Idle");
+        PlayerAnimation("Idle");
         //PlayerAnimation("Side_Idle");
-        PlayerAnimation("Back_Idle");
+        //PlayerAnimation("Back_Idle");
+        //PlayerAnimation("Front_Walk");
 	}
 	
 	// Update is called once per frame
@@ -174,8 +179,6 @@ public class PlayerScript : MonoBehaviour
                             }
                             else
                                 currentDirectionY = -1;
-
-
                         }
 
                         if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LeftKey.ToString()) || keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].RightKey.ToString()))
@@ -185,7 +188,14 @@ public class PlayerScript : MonoBehaviour
                             else
                                 currentDirectionX = 1;
                         }
+                        //Move the player and play an animation based on the current direction
                         PlayerMove(currentDirectionX, currentDirectionY);
+
+                        if (currentAnim != PlayerAnim.Walk)
+                        {
+                            PlayerAnimation("Front_Walk");
+                            currentAnim = PlayerAnim.Walk;
+                        }
                     }
                         //=================================================================================================================
 
@@ -255,12 +265,27 @@ public class PlayerScript : MonoBehaviour
                     }
 
                     //Only call PlayerMove() if the thumbstick isn't completely idle.
-                    if  ( ((inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) >= THUMBSTICK_DEADZONE ||
+                    if (((inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) >= THUMBSTICK_DEADZONE ||
                             inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) <= -THUMBSTICK_DEADZONE)) ||
                         (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) >= THUMBSTICK_DEADZONE ||
-                            inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) <= -THUMBSTICK_DEADZONE) )
+                            inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) <= -THUMBSTICK_DEADZONE))
+                    {
+                        PlayerMove(currentDirectionX, currentDirectionY);
 
-                    PlayerMove(currentDirectionX, currentDirectionY);
+                        if (currentAnim != PlayerAnim.Walk) //Move the player and play an animation based on the current direction
+                        {
+                            PlayerAnimation("Front_Walk");
+                            currentAnim = PlayerAnim.Walk;
+                        }
+                    }
+                    else //If the thumbstick is idle, play the idle animation.
+                    {
+                        if (currentAnim != PlayerAnim.Idle) //Move the player and play an animation based on the current direction
+                        {
+                            PlayerAnimation("Idle");
+                            currentAnim = PlayerAnim.Idle;
+                        }
+                    }
                 }
                 
             } 
@@ -298,6 +323,17 @@ public class PlayerScript : MonoBehaviour
                                 currentVelocityX -= deceleration * Time.deltaTime;
                         }
                     }
+
+                    //If no movement keys are being held, play the idle animation.
+                    if (keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].UpKey.ToString()) && keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].DownKey.ToString())
+                        && keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LeftKey.ToString()) && keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].RightKey.ToString()))
+                    {
+                        if (currentAnim != PlayerAnim.Idle) //Play the idle animation if it's not already playing.
+                        {
+                            PlayerAnimation("Idle");
+                            currentAnim = PlayerAnim.Idle;
+                        }
+                    }
                 }
 
                 if (inputSource.Contains("Controller") == true)
@@ -327,6 +363,7 @@ public class PlayerScript : MonoBehaviour
                     }
                 }
             }
+
             if (currentVelocityX < 0)
                 currentVelocityX = 0;
             if (currentVelocityY < 0)
