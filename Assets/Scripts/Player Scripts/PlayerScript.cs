@@ -28,6 +28,10 @@ public class PlayerScript : MonoBehaviour
     public enum PlayerAnim { Idle, Walk }
     private PlayerAnim currentAnim = PlayerAnim.Idle;
 
+    //Directuins
+    public enum Direction { Up, Down, Left, Right }
+    private Direction currentDirection = Direction.Down;
+
 	public int PlayerNumber = 0;
 
     InputManager inputManager = InputManager.Instance;
@@ -54,13 +58,15 @@ public class PlayerScript : MonoBehaviour
 	private float acceleration = 1.5f;
 	private float deceleration = 4.0f;
 
+    private float width;
+    private float height;
+
+    private float armInitialPosX = 0.0f;
+
 	private int currentDirectionX = 0;
 	private int currentDirectionY = 0;
 
     public int numLives = 5;
-
-    private float width;
-    private float height;
 
     private bool canPerformAction = true;
     private bool canMove = true; //Prevents instantly moving upon respawn.
@@ -120,12 +126,10 @@ public class PlayerScript : MonoBehaviour
         height = gameObject.GetComponent<SpriteRenderer>().sprite.bounds.max.y;
 
         startPosition = gameObject.transform.position;
+        armInitialPosX = gameObject.transform.FindChild("PlayerArm").transform.localPosition.x;
 
-        //By default, the player is already playing the idle animation, but play the idle for the Glow Layer too.
-        PlayerAnimation("Idle");
-        //PlayerAnimation("Side_Idle");
-        //PlayerAnimation("Back_Idle");
-        //PlayerAnimation("Front_Walk");
+        //Start with playing the idle animation based on currentDirection and currentAnimation.
+        UpdateDirectionalAnim();
 	}
 	
 	// Update is called once per frame
@@ -173,28 +177,38 @@ public class PlayerScript : MonoBehaviour
                         if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].UpKey.ToString()) || keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].DownKey.ToString()))
                         {
 
-                            if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].UpKey.ToString()))
+                            if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].UpKey.ToString()) )
                             {
                                 currentDirectionY = 1;
+                                currentDirection = Direction.Up;
                             }
-                            else
+                            else if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].DownKey.ToString()) ) //Can no longer do a simple else because of the animation.
+                            {
                                 currentDirectionY = -1;
+                                currentDirection = Direction.Down;
+                            }  
                         }
 
                         if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LeftKey.ToString()) || keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].RightKey.ToString()))
                         {
-                            if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LeftKey.ToString()))
+                            if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LeftKey.ToString()) )
+                            {
                                 currentDirectionX = -1;
-                            else
+                                currentDirection = Direction.Left;
+                            }
+                            else if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].RightKey.ToString()) ) //Can no longer do a simple else because of the animation.
+                            {
                                 currentDirectionX = 1;
+                                currentDirection = Direction.Right;
+                            }   
                         }
                         //Move the player and play an animation based on the current direction
                         PlayerMove(currentDirectionX, currentDirectionY);
 
                         if (currentAnim != PlayerAnim.Walk)
                         {
-                            PlayerAnimation("Front_Walk");
                             currentAnim = PlayerAnim.Walk;
+                            UpdateDirectionalAnim();
                         }
                     }
                         //=================================================================================================================
@@ -274,16 +288,16 @@ public class PlayerScript : MonoBehaviour
 
                         if (currentAnim != PlayerAnim.Walk) //Move the player and play an animation based on the current direction
                         {
-                            PlayerAnimation("Front_Walk");
                             currentAnim = PlayerAnim.Walk;
+                            UpdateDirectionalAnim();
                         }
                     }
                     else //If the thumbstick is idle, play the idle animation.
                     {
                         if (currentAnim != PlayerAnim.Idle) //Move the player and play an animation based on the current direction
                         {
-                            PlayerAnimation("Idle");
                             currentAnim = PlayerAnim.Idle;
+                            UpdateDirectionalAnim();
                         }
                     }
                 }
@@ -330,8 +344,8 @@ public class PlayerScript : MonoBehaviour
                     {
                         if (currentAnim != PlayerAnim.Idle) //Play the idle animation if it's not already playing.
                         {
-                            PlayerAnimation("Idle");
                             currentAnim = PlayerAnim.Idle;
+                            UpdateDirectionalAnim();
                         }
                     }
                 }
@@ -737,6 +751,15 @@ public class PlayerScript : MonoBehaviour
             gameObject.transform.FindChild("PlayerArm").transform.position = armSidePos;
             gameObject.transform.FindChild("PlayerArm").GetComponent<SpriteRenderer>().sortingOrder = gameObject.GetComponent<SpriteRenderer>().sortingOrder;
         }
+        else //Otherwise, move the arm to the initial position.
+        {
+            Vector3 armPos = gameObject.transform.FindChild("PlayerArm").transform.localPosition;
+            armPos.x = armInitialPosX;
+
+            gameObject.transform.FindChild("PlayerArm").transform.localPosition = armPos;
+
+            gameObject.transform.FindChild("PlayerArm").GetComponent<SpriteRenderer>().sortingOrder = gameObject.GetComponent<SpriteRenderer>().sortingOrder - 1;
+        }
 
         gameObject.GetComponent<Animator>().Play("Player_" + animationName, -1, startFrame);
 
@@ -744,6 +767,54 @@ public class PlayerScript : MonoBehaviour
         {
             gameObject.transform.FindChild("PlayerGlowLayer").GetComponent<Animator>().Play("GlowLayer_" + animationName, -1, startFrame);
         }
+    }
+
+    private void UpdateDirectionalAnim()
+    {
+        //Determine the direction and animation name first.
+        string animDirectionName = "";
+        string animName = "";
+
+        switch(currentDirection)
+        {
+            case Direction.Up:
+                animDirectionName = "Back";
+                break;
+            case Direction.Down:
+                animDirectionName = "Front";
+                break;
+            case Direction.Left:
+                animDirectionName = "Side";
+                FlipPlayerHorizontally(-1);
+                break;
+            case Direction.Right:
+                animDirectionName = "Side";
+                FlipPlayerHorizontally(1);
+                break;
+        }
+
+        if (animDirectionName != "")
+        {
+            switch(currentAnim)
+            {
+                case PlayerAnim.Idle:
+                    animName = "Idle";
+                    break;
+                case PlayerAnim.Walk:
+                    animName = "Walk";
+                    break;
+            }
+        }
+
+        if (animDirectionName != "" && animName != "") //If the names aren't blank, piece together the string to be used in the PlayerAnimation call.
+        {
+            PlayerAnimation(animDirectionName + "_" + animName);
+        }
+    }
+
+    private void FlipPlayerHorizontally(int flipDir)
+    {
+        gameObject.transform.localScale = new Vector3(-5, 1, 1);
     }
 
     private void UpdateActive()

@@ -61,9 +61,13 @@ public class GameManager : MonoBehaviour
         for (int j = 0; j < GameObject.FindGameObjectsWithTag("Player").Length; j++)
         {
             PlayerList.Add(GameObject.FindGameObjectsWithTag("Player")[j]);
-            GameObject.FindGameObjectsWithTag("Player")[j].GetComponent<PlayerScript>().Player_Death += OnPlayerDeath;
-            GameObject.FindGameObjectsWithTag("Player")[j].GetComponent<PlayerScript>().Player_Lose += OnPlayerLose;
-            GameObject.FindGameObjectsWithTag("Player")[j].GetComponent<PlayerScript>().SetPlayerColour(GameInfoManager.Instance.PlayerColours[j]);
+
+            if (GameObject.FindGameObjectsWithTag("Player")[j].GetComponent<PlayerScript>() != null)
+            {
+                GameObject.FindGameObjectsWithTag("Player")[j].GetComponent<PlayerScript>().Player_Death += OnPlayerDeath;
+                GameObject.FindGameObjectsWithTag("Player")[j].GetComponent<PlayerScript>().Player_Lose += OnPlayerLose;
+                GameObject.FindGameObjectsWithTag("Player")[j].GetComponent<PlayerScript>().SetPlayerColour(GameInfoManager.Instance.PlayerColours[j]);
+            }
         }
         InputManager.Instance.Key_Pressed += HandleInput;
         UIManager.Instance.ResetUI();
