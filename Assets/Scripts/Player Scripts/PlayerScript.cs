@@ -743,7 +743,7 @@ public class PlayerScript : MonoBehaviour
     {
         //I have no idea why the layer is -1.
 
-        if (animationName.Contains("Side")) //If it's a side animation, move the player arm back a layer.
+        if (animationName.Contains("Side") || animationName.Contains("Left") ) //If it's a side animation, move the player arm back a layer.
         {
             Vector3 armSidePos = gameObject.transform.FindChild("PlayerArm").transform.position;
             armSidePos.x = gameObject.transform.position.x;
@@ -784,12 +784,10 @@ public class PlayerScript : MonoBehaviour
                 animDirectionName = "Front";
                 break;
             case Direction.Left:
-                animDirectionName = "Side";
-                FlipPlayerHorizontally(-1);
+                animDirectionName = "Left";
                 break;
             case Direction.Right:
                 animDirectionName = "Side";
-                FlipPlayerHorizontally(1);
                 break;
         }
 
@@ -810,11 +808,6 @@ public class PlayerScript : MonoBehaviour
         {
             PlayerAnimation(animDirectionName + "_" + animName);
         }
-    }
-
-    private void FlipPlayerHorizontally(int flipDir)
-    {
-        gameObject.transform.localScale = new Vector3(-5, 1, 1);
     }
 
     private void UpdateActive()
