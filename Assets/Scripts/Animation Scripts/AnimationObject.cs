@@ -9,16 +9,36 @@ public class AnimationObject : MonoBehaviour
     public delegate void ResolvedAnimationEvent();
     public event ResolvedAnimationEvent Animation_Complete;
 
+    public bool CanBePausedByGameManager = false;
+
+    private GameManager gameManager = null;
+
+    public GameManager GameManager
+    {
+        get { return gameManager; }
+        set { gameManager = value; }
+    }
+
 	// Use this for initialization
 	void Start () 
     {
-
+        if (CanBePausedByGameManager)
+            gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
 	}
 	
 	// Update is called once per frame
 	void Update () 
     {
-
+        if (CanBePausedByGameManager && gameManager != null)
+        {
+            if (gameManager.IsGamePaused)
+                gameObject.GetComponent<Animator>().enabled = false;
+            else
+            {
+                if(gameObject.GetComponent<Animator>().enabled == false)
+                    gameObject.GetComponent<Animator>().enabled = true;
+            }
+        }
 	}
 
     void OnAnimationComplete() //Do something based on the selected resolution to the animation.

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class PlayerScript : MonoBehaviour 
 {
-    private const float MAXVELOCITY = 0.75f;
+    //private const float MAXVELOCITY = 0.75f;
     private const float SELECTIONTIME = 0.5f;
     private const float RESPAWNTIME = 0.8f;
     private const float THROWVELOCITY = 250.0f;
@@ -21,7 +21,7 @@ public class PlayerScript : MonoBehaviour
     private PlayerAction currentAction = PlayerAction.Throw_Basic;
 
     //Active
-    public Active.ActiveType currentActiveType = Active.ActiveType.Reflect; //SET TO PUBLIC FOR TESTING
+    public Active.ActiveType currentActiveType = Active.ActiveType.Overclock; //SET TO PUBLIC FOR TESTING
     private Active currentActive = null; //Instance of active that's in use.
 
     //Animations
@@ -55,6 +55,7 @@ public class PlayerScript : MonoBehaviour
 
 	private float turnSpeed = 250.0f;
 
+    private float maxVelocity = 0.75f;
 	private float acceleration = 1.5f;
 	private float deceleration = 4.0f;
 
@@ -89,6 +90,18 @@ public class PlayerScript : MonoBehaviour
     public Vector3 StartPosition
     {
         get { return startPosition; }
+    }
+
+    public float MaxVelocity
+    {
+        get { return maxVelocity; }
+        set { maxVelocity = value; }
+    }
+
+    public float Acceleration
+    {
+        get { return acceleration; }
+        set { acceleration = value; }
     }
 
     public int NumLives
@@ -402,7 +415,7 @@ public class PlayerScript : MonoBehaviour
     {
         Vector3 newPosition = gameObject.transform.position;
 
-        if (currentVelocityX < MAXVELOCITY)  //As long as the player isn't at top speed, increase velocity.
+        if (currentVelocityX < maxVelocity)  //As long as the player isn't at top speed, increase velocity.
         {
             //Check if the player is going to collide with an object.
             if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.right * currentDirectionX, width * 1.5f) == true)
@@ -410,7 +423,7 @@ public class PlayerScript : MonoBehaviour
             else
                 currentVelocityX += acceleration * Time.deltaTime;
         }
-        if (currentVelocityY < MAXVELOCITY) //Now do the same for the Y-axis
+        if (currentVelocityY < maxVelocity) //Now do the same for the Y-axis
         {
 
             if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.up * currentDirectionY, height * 1.5f) == true)

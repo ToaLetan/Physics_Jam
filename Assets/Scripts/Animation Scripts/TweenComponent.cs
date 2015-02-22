@@ -3,12 +3,43 @@ using System.Collections;
 
 public class TweenComponent : MonoBehaviour 
 {
+    public enum TweenType { Position, Colour }
+
     public delegate void TweenEvent();
     public event TweenEvent TweenComplete;
 
-    public Vector3 targetPosition = Vector3.zero;
-    public float moveSpeed = 0.0f;
-    public bool isTweening = false;
+    private TweenType currentTweenType = TweenType.Position;
+
+    private SpriteRenderer spriteRenderer = null;
+
+    private GameManager gameManager = null;
+
+    public Color targetColour = Color.white;
+
+    private Vector3 targetPosition = Vector3.zero;
+
+    private float tweenSpeed = 0.0f;
+
+    private bool isTweening = false;
+    private bool affectedByPause = false;
+
+    public TweenType CurrentTweenType
+    {
+        get { return currentTweenType; }
+        set { currentTweenType = value; }
+    }
+
+    public GameManager GameManager
+    {
+        get { return gameManager; }
+        set { gameManager = value; }
+    }
+
+    public Color TargetColour
+    {
+        get { return targetColour; }
+        set { targetColour = value; }
+    }
 
     public Vector3 TargetPosition
     {
@@ -16,10 +47,10 @@ public class TweenComponent : MonoBehaviour
         set { targetPosition = value; }
     }
 
-    public float MoveSpeed
+    public float TweenSpeed
     {
-        get { return moveSpeed; }
-        set { moveSpeed = value; }
+        get { return tweenSpeed; }
+        set { tweenSpeed = value; }
     }
 
     public bool IsTweening
@@ -28,35 +59,82 @@ public class TweenComponent : MonoBehaviour
         set { isTweening = value; }
     }
 
+    public bool AffectedByPause
+    {
+        get { return affectedByPause; }
+        set { affectedByPause = value; }
+    }
+
 	// Use this for initialization
 	void Start () 
     {
         //targetPosition = gameObject.transform.position;
+        spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
 	}
 	
 	// Update is called once per frame
 	void Update () 
     {
+        if (affectedByPause == true)
+        {
+            if (gameManager != null && !gameManager.IsGamePaused)
+                UpdateTween();
+        }
+        else
+            UpdateTween(); 
+	}
+
+    private void UpdateTween()
+    {
         if (isTweening == true)
         {
-            if (gameObject.transform.position != targetPosition)
+            switch (currentTweenType)
             {
-                gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, targetPosition, moveSpeed * Time.deltaTime);
-            }
-            else
-            {
-                if (TweenComplete != null)
-                    TweenComplete();
-                IsTweening = false;
-                Destroy(this); //Remove the script when finished.
+                case TweenType.Position:
+                    if (gameObject.transform.position != targetPosition)
+                    {
+                        gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, targetPosition, tweenSpeed * Time.deltaTime);
+                    }
+                    else
+                    {
+                        ResolveTween(true);
+                    }
+                    break;
+                case TweenType.Colour:
+                    if (spriteRenderer.color != targetColour)
+                    {
+                        spriteRenderer.color = Color.Lerp(spriteRenderer.color, targetColour, tweenSpeed * Time.deltaTime);
+                    }
+                    else
+                    {
+                        ResolveTween(false);
+                    }
+                    break;
             }
         }
-	}
+    }
 
     public void TweenPositionTo(Vector3 target, float speed)
     {
         targetPosition = target;
-        moveSpeed = speed;
+        tweenSpeed = speed;
         isTweening = true;
+    }
+
+    public void InitInGameTween() //Called for any Tweens that are used in-game to allow them to be paused.
+    {
+        affectedByPause = true;
+        gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
+    }
+
+    private void ResolveTween(bool destroyComponent)
+    {
+        IsTweening = false;
+
+        if (TweenComplete != null)
+            TweenComplete();
+
+        if(destroyComponent)
+            Destroy(this); //Remove the script when finished.
     }
 }
