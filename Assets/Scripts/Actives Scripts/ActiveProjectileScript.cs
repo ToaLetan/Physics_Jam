@@ -9,15 +9,27 @@ public class ActiveProjectileScript : MonoBehaviour
 
     public ActiveProjectileType ProjectileType = ActiveProjectileType.SpeedUp;
 
+    private PlayerScript ownerPlayer = null;
+
     private Vector3 destination;
 
     private float velocity = 1.5f;
 
     private bool hasReachedDestination = false;
 
+    public PlayerScript OwnerPlayer
+    {
+        set { ownerPlayer = value; }
+    }
+
     public Vector3 Destination
     { 
         set { destination = value; } 
+    }
+
+    public float Velocity
+    {
+        set { velocity = value; }
     }
 
 	// Use this for initialization
@@ -62,5 +74,20 @@ public class ActiveProjectileScript : MonoBehaviour
     private void UpdateMovement()
     {
         gameObject.transform.position += gameObject.transform.right * velocity * Time.deltaTime;
+    }
+
+    private void OnTriggerEnter2D(Collider2D coll)
+    {
+        if (ProjectileType == ActiveProjectileType.Soak)
+        {
+            if (coll.gameObject.GetComponent<PlayerScript>() != null && coll.gameObject.GetComponent<PlayerScript>().PlayerNumber != ownerPlayer.PlayerNumber)
+            {
+                //Flag the player as being soaked, reduce their speed and instantiate and animated prefab attached to them. Finally, destroy the projectile.
+
+                Debug.Log("Projectile collided with player");
+
+                GameObject.Destroy(gameObject);
+            }
+        }
     }
 }

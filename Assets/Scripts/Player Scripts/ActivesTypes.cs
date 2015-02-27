@@ -139,6 +139,7 @@ public class Active //The base Active class, features cooldown timer and duratio
                     ShootSlowProjectile();
                     break;
                 case ActiveType.Soak:
+                    ShootSoakProjectile();
                     break;
             }
 
@@ -178,6 +179,20 @@ public class Active //The base Active class, features cooldown timer and duratio
         GameObject newProjectile = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Glob_Slow_Projectile"), owner.PlayerBeam.transform.position, owner.PlayerBeam.transform.rotation) as GameObject;
 
         newProjectile.GetComponent<ActiveProjectileScript>().Destination = objectPos;
+    }
+
+    private void ShootSoakProjectile()
+    {
+        //Instantiate the Soak Projectile and fire it towards the destination
+
+        float minimumDistance = 10.0f;
+
+        Vector3 projectilePos = owner.gameObject.transform.position + (owner.PlayerBeam.transform.right * minimumDistance);
+
+        GameObject soakProjectile = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Soak_Projectile"), owner.PlayerBeam.transform.position, owner.PlayerBeam.transform.rotation) as GameObject;
+
+        soakProjectile.GetComponent<ActiveProjectileScript>().Destination = projectilePos;
+        soakProjectile.GetComponent<ActiveProjectileScript>().OwnerPlayer = owner;
     }
 
     public void InitializeOverclockAnim(PlayerScript playerUsingActive)
@@ -262,6 +277,7 @@ public static class ActivesTypes //All Actives players can start with. Players s
         returnActive.ActiveClassification = Active.ActiveType.Soak;
 
         //Instantiate the projectile here.
+        returnActive.PrepareProjectiles(1, owner);
 
         return returnActive;
     }
