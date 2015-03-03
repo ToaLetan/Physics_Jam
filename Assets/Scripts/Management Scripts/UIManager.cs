@@ -12,11 +12,13 @@ public class UIManager
     private GameObject[] playerNamesArray = new GameObject[4];
     private List<GameObject> playerLivesList = new List<GameObject>();
 
-    private Camera camera;
+    private GameManager gameManager = null;
 
-    private GameObject combinedUI;
-    private GameObject winnerText;
-    private GameObject endPromptText;
+    private Camera camera = null;
+
+    private GameObject combinedUI = null;
+    private GameObject winnerText = null;
+    private GameObject endPromptText = null;
 
     private static UIManager instance = null;
 
@@ -162,6 +164,7 @@ public class UIManager
     public void ResetUI()
     {
         camera = GameObject.FindGameObjectWithTag("MainCamera").transform.GetComponent<Camera>();
+        gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
 
         if (combinedUI == null)
         {
@@ -180,14 +183,14 @@ public class UIManager
             endPromptText = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/GUI/EndingPrompt")) as GameObject;
             endPromptText.transform.parent = combinedUI.transform;
         }
-        
-        GameObject[] activePlayers = GameObject.FindGameObjectsWithTag("Player");
+
+        Debug.Log(gameManager.PlayerList.Count); //PROBLEM: FOR SOME REASON THIS IS 3 WHEN THERE'S ONLY 2 PEOPLE
         
         //Arrange the player array to match the player numbers.
-        for (int i = 0; i < activePlayers.Length; i++)
+        for (int i = 0; i < gameManager.PlayerList.Count; i++)
         {
-            if(activePlayers[i].transform.GetComponent<PlayerScript>().PlayerNumber == i)
-                playerArray[i] = activePlayers[i];
+            if (gameManager.PlayerList[i].transform.GetComponent<PlayerScript>().PlayerNumber == i)
+                playerArray[i] = gameManager.PlayerList[i];
         }
         
         ConstructHUD();
