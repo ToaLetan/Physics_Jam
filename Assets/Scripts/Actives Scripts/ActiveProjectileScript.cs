@@ -9,7 +9,14 @@ public class ActiveProjectileScript : MonoBehaviour
 
     public ActiveProjectileType ProjectileType = ActiveProjectileType.SpeedUp;
 
+    public delegate void ProjectileEvent(GameObject collisionObject);
+    public event ProjectileEvent OnProjectileCollision;
+
     private PlayerScript ownerPlayer = null;
+
+    private GameObject collidedPlayer = null;
+
+    private Color soakColour = new Color(0.22f, 0.38f, 0.62f, 1.0f);
 
     private Vector3 destination;
 
@@ -20,6 +27,11 @@ public class ActiveProjectileScript : MonoBehaviour
     public PlayerScript OwnerPlayer
     {
         set { ownerPlayer = value; }
+    }
+
+    public GameObject CollidedPlayer
+    {
+        get { return collidedPlayer; }
     }
 
     public Vector3 Destination
@@ -82,7 +94,25 @@ public class ActiveProjectileScript : MonoBehaviour
         {
             if (coll.gameObject.GetComponent<PlayerScript>() != null && coll.gameObject.GetComponent<PlayerScript>().PlayerNumber != ownerPlayer.PlayerNumber)
             {
+                collidedPlayer = coll.gameObject;
+
+                //Fire the event.
+                if (OnProjectileCollision != null)
+                    OnProjectileCollision(collidedPlayer);
+
+                //Play the splash animation
+                GameObject splashAnim = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Soak_Splash"), gameObject.transform.position, Quaternion.identity) as GameObject;
+
                 //Flag the player as being soaked, reduce their speed and instantiate and animated prefab attached to them. Finally, destroy the projectile.
+                GameObject dripAnim = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Soak_Drip"), coll.gameObject.transform.position, Quaternion.identity) as GameObject;
+                dripAnim.transform.parent = coll.gameObject.transform;
+
+                //Colour the player.
+                if(coll.gameObject.GetComponent<SpriteRenderer>() != null)
+                {
+                    coll.gameObject.GetComponent<SpriteRenderer>().color = soakColour;
+                    coll.gameObject.transform.FindChild("PlayerArm").GetComponent<SpriteRenderer>().color = soakColour;
+                }
 
                 Debug.Log("Projectile collided with player");
 

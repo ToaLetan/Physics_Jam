@@ -184,7 +184,7 @@ public class UIManager
             endPromptText.transform.parent = combinedUI.transform;
         }
 
-        Debug.Log(gameManager.PlayerList.Count); //PROBLEM: FOR SOME REASON THIS IS 3 WHEN THERE'S ONLY 2 PEOPLE
+        //Debug.Log(gameManager.PlayerList.Count); //PROBLEM: FOR SOME REASON THIS IS 3 WHEN THERE'S ONLY 2 PEOPLE
         
         //Arrange the player array to match the player numbers.
         for (int i = 0; i < gameManager.PlayerList.Count; i++)

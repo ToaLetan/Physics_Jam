@@ -7,7 +7,9 @@ public class Active //The base Active class, features cooldown timer and duratio
 
     private const float SHOT_DELAY_TIME = 0.25f;
 
-    private PlayerScript owner = null;
+    private PlayerScript owner = null; //The script of the player object using this Active.
+
+    private GameObject affectedPlayer = null; //Used by soak or projectiles that hit another player.
 
     private GameManager gameManager = null;
 
@@ -105,10 +107,24 @@ public class Active //The base Active class, features cooldown timer and duratio
 
         if (activeType == ActiveType.Overclock)
         {
-            //Reset the colour, destroy the Tween Component and Spark Anim object
+            //Reset the colour, destroy the Tween Components and Spark Anim object
             owner.gameObject.GetComponent<SpriteRenderer>().color = Color.white;
+            owner.gameObject.transform.FindChild("PlayerArm").gameObject.GetComponent<SpriteRenderer>().color = Color.white;
+
             GameObject.Destroy(owner.gameObject.GetComponent<TweenComponent>() );
+            GameObject.Destroy(owner.gameObject.transform.FindChild("PlayerArm").gameObject.GetComponent<TweenComponent>() );
             GameObject.Destroy(owner.gameObject.transform.FindChild("Overclock_Spark(Clone)").gameObject);
+        }
+        if (activeType == ActiveType.Soak)
+        {
+            if (affectedPlayer != null)
+            {
+                //Destroy the animation, reset the player's colours and reset their speed.
+                affectedPlayer.GetComponent<SpriteRenderer>().color = Color.white;
+                affectedPlayer.transform.FindChild("PlayerArm").gameObject.GetComponent<SpriteRenderer>().color = Color.white;
+
+                GameObject.Destroy(affectedPlayer.transform.FindChild("Soak_Drip(Clone)").gameObject);
+            }
         }
     }
 
@@ -191,8 +207,11 @@ public class Active //The base Active class, features cooldown timer and duratio
 
         GameObject soakProjectile = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Soak_Projectile"), owner.PlayerBeam.transform.position, owner.PlayerBeam.transform.rotation) as GameObject;
 
+        soakProjectile.GetComponent<ActiveProjectileScript>().Velocity = 5.0f;
         soakProjectile.GetComponent<ActiveProjectileScript>().Destination = projectilePos;
         soakProjectile.GetComponent<ActiveProjectileScript>().OwnerPlayer = owner;
+
+        soakProjectile.GetComponent<ActiveProjectileScript>().OnProjectileCollision += SetAffectedPlayer;
     }
 
     public void InitializeOverclockAnim(PlayerScript playerUsingActive)
@@ -202,15 +221,25 @@ public class Active //The base Active class, features cooldown timer and duratio
         nextTweenColour = colourOverclockRed;
 
         owner.gameObject.AddComponent<TweenComponent>();
-        TweenComponent newTween = owner.gameObject.GetComponent<TweenComponent>();
+        TweenComponent playerTween = owner.gameObject.GetComponent<TweenComponent>();
 
-        newTween.InitInGameTween();
-        newTween.CurrentTweenType = TweenComponent.TweenType.Colour;
-        newTween.TargetColour = colourOverclockRed;
-        newTween.TweenSpeed = 30.0f;
-        newTween.IsTweening = true;
+        owner.gameObject.transform.FindChild("PlayerArm").gameObject.AddComponent<TweenComponent>();
+        TweenComponent armTween = owner.gameObject.transform.FindChild("PlayerArm").gameObject.GetComponent<TweenComponent>();
 
-        newTween.TweenComplete += AnimateOverclock;
+        playerTween.InitInGameTween();
+        playerTween.CurrentTweenType = TweenComponent.TweenType.Colour;
+        playerTween.TargetColour = colourOverclockRed;
+        playerTween.TweenSpeed = 30.0f;
+        playerTween.IsTweening = true;
+
+        armTween.InitInGameTween();
+        armTween.CurrentTweenType = TweenComponent.TweenType.Colour;
+        armTween.TargetColour = colourOverclockRed;
+        armTween.TweenSpeed = 30.0f;
+        armTween.IsTweening = true;
+
+        playerTween.TweenComplete += AnimateOverclock;
+        armTween.TweenComplete += AnimateOverclock;
 
         //Instantiate the spark animation and attach it to the player.
         GameObject sparkAnim = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Overclock_Spark"), owner.gameObject.transform.position, Quaternion.identity) as GameObject;
@@ -220,16 +249,27 @@ public class Active //The base Active class, features cooldown timer and duratio
     public void AnimateOverclock()
     {
         //Add the Tween Component to the player to animate the Overclock effect of overheating.
-        TweenComponent tweenScript = owner.gameObject.GetComponent<TweenComponent>();
+        TweenComponent playerTween = owner.gameObject.GetComponent<TweenComponent>();
+        TweenComponent armTween = owner.gameObject.transform.FindChild("PlayerArm").gameObject.GetComponent<TweenComponent>();
 
         if (nextTweenColour == colourOverclockRed)
             nextTweenColour = colourOverclockOrange;
         else
             nextTweenColour = colourOverclockRed;
 
-        tweenScript.CurrentTweenType = TweenComponent.TweenType.Colour;
-        tweenScript.TargetColour = nextTweenColour;
-        tweenScript.IsTweening = true;
+        playerTween.CurrentTweenType = TweenComponent.TweenType.Colour;
+        playerTween.TargetColour = nextTweenColour;
+        playerTween.IsTweening = true;
+
+        armTween.CurrentTweenType = TweenComponent.TweenType.Colour;
+        armTween.TargetColour = nextTweenColour;
+        armTween.IsTweening = true;
+    }
+
+    private void SetAffectedPlayer(GameObject hitPlayer)
+    {
+        if (affectedPlayer == null && hitPlayer != null)
+            affectedPlayer = hitPlayer;
     }
 }
 

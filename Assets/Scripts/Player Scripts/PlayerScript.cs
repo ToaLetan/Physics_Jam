@@ -865,7 +865,7 @@ public class PlayerScript : MonoBehaviour
 
                 if (currentActiveType == Active.ActiveType.Reflect) //Disable collision while Reflect is active.
                 {
-                    gameObject.GetComponent<Rigidbody2D>().drag = 200; //Well we can't disable collision for a while sooooo crank drag the fuck up.
+                    gameObject.GetComponent<Rigidbody2D>().drag = 250; //Well we can't disable collision for a while sooooo crank drag the fuck up.
                 }
             }  
         }
