@@ -103,9 +103,16 @@ public class ActiveProjectileScript : MonoBehaviour
                 //Play the splash animation
                 GameObject splashAnim = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Soak_Splash"), gameObject.transform.position, Quaternion.identity) as GameObject;
 
+                //Play the puddle animation
+                GameObject puddleAnim = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Soak_Puddle"), gameObject.transform.position, Quaternion.identity) as GameObject;
+
                 //Flag the player as being soaked, reduce their speed and instantiate and animated prefab attached to them. Finally, destroy the projectile.
                 GameObject dripAnim = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Soak_Drip"), coll.gameObject.transform.position, Quaternion.identity) as GameObject;
                 dripAnim.transform.parent = coll.gameObject.transform;
+
+                //Slow down the player.
+                coll.gameObject.GetComponent<PlayerScript>().MaxVelocity = 0.25f;
+                coll.gameObject.GetComponent<PlayerScript>().Acceleration = 1.0f;
 
                 //Colour the player.
                 if(coll.gameObject.GetComponent<SpriteRenderer>() != null)

@@ -46,12 +46,21 @@ public class GameManager : MonoBehaviour
         //Associate players to their respective spawn points.
         for (int i = 0; i < GameObject.FindGameObjectsWithTag("PlayerSpawn").Length; i++)
         {
-            if (GameInfoManager.Instance.JoinedPlayers[i] == true)
+            PlayerSpawnPoints.Add(GameObject.FindGameObjectsWithTag("PlayerSpawn")[i]);
+
+            PlayerSpawnPoints.Sort(SortSpawnPointsByIndex);
+        }
+
+        for(int j = 0; j < PlayerSpawnPoints.Count; j++)
+        {
+            if (GameInfoManager.Instance.JoinedPlayers[j] == true)
             {
-                PlayerSpawnPoints.Add(GameObject.FindGameObjectsWithTag("PlayerSpawn")[i]);
                 GameObject newPlayer = GameObject.Instantiate(Resources.Load("Prefabs/PlayerObjects/Player")) as GameObject;
-                newPlayer.transform.position = PlayerSpawnPoints[i].transform.position;
-                newPlayer.GetComponent<PlayerScript>().PlayerNumber = i;
+
+                //Position the player on the corresponding spawn point.
+
+                newPlayer.transform.position = PlayerSpawnPoints[j].transform.position;
+                newPlayer.GetComponent<PlayerScript>().PlayerNumber = j;
 
                 numPlayerLives.Add(newPlayer.GetComponent<PlayerScript>().NumLives);
             }
@@ -73,6 +82,11 @@ public class GameManager : MonoBehaviour
         }
         InputManager.Instance.Key_Pressed += HandleInput;
         UIManager.Instance.ResetUI();
+    }
+
+    private static int SortSpawnPointsByIndex(GameObject obj1, GameObject obj2)
+    {
+        return obj1.GetComponent<PlayerSpawnPointScript>().owningPlayerTag.CompareTo(obj2.GetComponent<PlayerSpawnPointScript>().owningPlayerTag);
     }
 
     private void OnPlayerDeath(int playerNum)

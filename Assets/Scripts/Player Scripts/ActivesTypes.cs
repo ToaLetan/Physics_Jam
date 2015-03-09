@@ -3,6 +3,11 @@ using System.Collections;
 
 public class Active //The base Active class, features cooldown timer and duration.
 {
+    //Enums directly copied from player script to reset any changes to player movement.
+    private const float DEFAULT_MAX_VELOCITY = 0.75f;
+    private const float DEFAULT_ACCELERATION = 1.5f;
+    private const float DEFAULT_DECELERATION = 4.0f;
+
     public enum ActiveType { None, GravityField, Reflect, Slipstream, Soak, Overclock, Slowstream }
 
     private const float SHOT_DELAY_TIME = 0.25f;
@@ -107,21 +112,32 @@ public class Active //The base Active class, features cooldown timer and duratio
 
         if (activeType == ActiveType.Overclock)
         {
-            //Reset the colour, destroy the Tween Components and Spark Anim object
+            //Reset the colour and speed, destroy the Tween Components and Spark Anim object.
             owner.gameObject.GetComponent<SpriteRenderer>().color = Color.white;
             owner.gameObject.transform.FindChild("PlayerArm").gameObject.GetComponent<SpriteRenderer>().color = Color.white;
 
+            //Reset player speed.
+            if (owner.gameObject.GetComponent<PlayerScript>() != null)
+            {
+                owner.gameObject.GetComponent<PlayerScript>().MaxVelocity = DEFAULT_MAX_VELOCITY;
+                owner.gameObject.GetComponent<PlayerScript>().Acceleration = DEFAULT_ACCELERATION;
+            }
+            
             GameObject.Destroy(owner.gameObject.GetComponent<TweenComponent>() );
             GameObject.Destroy(owner.gameObject.transform.FindChild("PlayerArm").gameObject.GetComponent<TweenComponent>() );
             GameObject.Destroy(owner.gameObject.transform.FindChild("Overclock_Spark(Clone)").gameObject);
         }
         if (activeType == ActiveType.Soak)
         {
-            if (affectedPlayer != null)
+            if (affectedPlayer != null && affectedPlayer.GetComponent<PlayerScript>() != null)
             {
                 //Destroy the animation, reset the player's colours and reset their speed.
                 affectedPlayer.GetComponent<SpriteRenderer>().color = Color.white;
                 affectedPlayer.transform.FindChild("PlayerArm").gameObject.GetComponent<SpriteRenderer>().color = Color.white;
+
+                //Reset player speed.
+                affectedPlayer.GetComponent<PlayerScript>().MaxVelocity = DEFAULT_MAX_VELOCITY;
+                affectedPlayer.GetComponent<PlayerScript>().Acceleration = DEFAULT_ACCELERATION;
 
                 GameObject.Destroy(affectedPlayer.transform.FindChild("Soak_Drip(Clone)").gameObject);
             }

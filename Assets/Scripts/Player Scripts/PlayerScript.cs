@@ -4,7 +4,9 @@ using System.Collections.Generic;
 
 public class PlayerScript : MonoBehaviour 
 {
-    //private const float MAXVELOCITY = 0.75f;
+    private const float DEFAULT_MAX_VELOCITY = 0.75f;
+    private const float DEFAULT_ACCELERATION = 1.5f;
+    private const float DEFAULT_DECELERATION = 4.0f;
     private const float SELECTIONTIME = 0.5f;
     private const float RESPAWNTIME = 0.8f;
     private const float THROWVELOCITY = 250.0f;
@@ -55,9 +57,9 @@ public class PlayerScript : MonoBehaviour
 
 	private float turnSpeed = 250.0f;
 
-    private float maxVelocity = 0.75f;
-	private float acceleration = 1.5f;
-	private float deceleration = 4.0f;
+    private float maxVelocity = DEFAULT_MAX_VELOCITY;
+	private float acceleration = DEFAULT_ACCELERATION;
+    private float deceleration = DEFAULT_DECELERATION;
 
     private float width;
     private float height;
