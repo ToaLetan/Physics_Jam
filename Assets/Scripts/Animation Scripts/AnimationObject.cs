@@ -13,10 +13,18 @@ public class AnimationObject : MonoBehaviour
 
     private GameManager gameManager = null;
 
+    private bool hasAnimationStopped = false;
+
     public GameManager GameManager
     {
         get { return gameManager; }
         set { gameManager = value; }
+    }
+
+    public bool HasAnimationStopped
+    {
+        get { return hasAnimationStopped; }
+        set { hasAnimationStopped = value; }
     }
 
 	// Use this for initialization
@@ -35,8 +43,11 @@ public class AnimationObject : MonoBehaviour
                 gameObject.GetComponent<Animator>().enabled = false;
             else
             {
-                if(gameObject.GetComponent<Animator>().enabled == false)
-                    gameObject.GetComponent<Animator>().enabled = true;
+                if (!hasAnimationStopped)
+                {
+                    if (gameObject.GetComponent<Animator>().enabled == false)
+                        gameObject.GetComponent<Animator>().enabled = true;
+                }
             }
         }
 	}
@@ -46,6 +57,7 @@ public class AnimationObject : MonoBehaviour
         switch (currentResolutionType)
         {
             case ResolutionType.Stop: //Nothing happens, object persists.
+                hasAnimationStopped = true;
                 gameObject.GetComponent<Animator>().enabled = false;
                 break;
             case ResolutionType.Destroy: //Delete the object.
@@ -56,11 +68,13 @@ public class AnimationObject : MonoBehaviour
             case ResolutionType.FireEvent_Stop: //Fire an event to be handled by specialized functions of other objects.
                 if (Animation_Complete != null)
                     Animation_Complete();
+                hasAnimationStopped = true;
                 gameObject.GetComponent<Animator>().enabled = false;
                 break;
             case ResolutionType.FireEvent_Destroy: //Fire an event to be handled by specialized functions of other objects, then destroy the animation object.
                 if (Animation_Complete != null)
                     Animation_Complete();
+                hasAnimationStopped = true;
                 Destroy(gameObject);
                 break;
             default:

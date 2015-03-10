@@ -4,6 +4,7 @@ using System.Collections;
 public class ActiveProjectileScript : MonoBehaviour 
 {
     private const float DESTINATION_DEADZONE = 0.15f;
+    private const float PUDDLE_OFFSET = -0.15f;
 
     public enum ActiveProjectileType { SpeedUp, SpeedDown, Soak };
 
@@ -104,7 +105,10 @@ public class ActiveProjectileScript : MonoBehaviour
                 GameObject splashAnim = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Soak_Splash"), gameObject.transform.position, Quaternion.identity) as GameObject;
 
                 //Play the puddle animation
-                GameObject puddleAnim = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Soak_Puddle"), gameObject.transform.position, Quaternion.identity) as GameObject;
+                Vector3 puddlePos = coll.gameObject.transform.position;
+                puddlePos.y += PUDDLE_OFFSET;
+
+                GameObject puddleAnim = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Soak_Puddle"), puddlePos, Quaternion.identity) as GameObject;
 
                 //Flag the player as being soaked, reduce their speed and instantiate and animated prefab attached to them. Finally, destroy the projectile.
                 GameObject dripAnim = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Soak_Drip"), coll.gameObject.transform.position, Quaternion.identity) as GameObject;
@@ -120,8 +124,6 @@ public class ActiveProjectileScript : MonoBehaviour
                     coll.gameObject.GetComponent<SpriteRenderer>().color = soakColour;
                     coll.gameObject.transform.FindChild("PlayerArm").GetComponent<SpriteRenderer>().color = soakColour;
                 }
-
-                Debug.Log("Projectile collided with player");
 
                 GameObject.Destroy(gameObject);
             }
