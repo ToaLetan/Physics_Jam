@@ -8,7 +8,7 @@ public class Active //The base Active class, features cooldown timer and duratio
     private const float DEFAULT_ACCELERATION = 1.5f;
     private const float DEFAULT_DECELERATION = 4.0f;
 
-    public enum ActiveType { None, GravityField, Reflect, Slipstream, Soak, Overclock, Slowstream }
+    public enum ActiveType { None, GravField, Reflect, SlipGel, Soak, Overclock, SlowGel }
 
     private const float SHOT_DELAY_TIME = 0.25f;
 
@@ -164,10 +164,10 @@ public class Active //The base Active class, features cooldown timer and duratio
 
             switch(activeType)
             {
-                case ActiveType.Slipstream:
+                case ActiveType.SlipGel:
                     ShootSpeedProjectile();
                     break;
-                case ActiveType.Slowstream:
+                case ActiveType.SlowGel:
                     ShootSlowProjectile();
                     break;
                 case ActiveType.Soak:
@@ -296,7 +296,7 @@ public static class ActivesTypes //All Actives players can start with. Players s
     public static Active GravityField(PlayerScript owner) //Create a zone at the end of the player's beam, zone pulls in objs.
     {
         Active returnActive = new Active(20.0f, 5.0f);
-        returnActive.ActiveClassification = Active.ActiveType.GravityField;
+        returnActive.ActiveClassification = Active.ActiveType.GravField;
 
         //Instantiate a Gravity Field Zone object here and UseActive().
 
@@ -320,7 +320,7 @@ public static class ActivesTypes //All Actives players can start with. Players s
     public static Active Slipstream(PlayerScript owner) //Create a rectangular strip oriented with the player's beam that speeds up any objects that cross it.
     {
         Active returnActive = new Active(20.0f, 5.0f);
-        returnActive.ActiveClassification = Active.ActiveType.Slipstream;
+        returnActive.ActiveClassification = Active.ActiveType.SlipGel;
 
         returnActive.PrepareProjectiles(3, owner);
 
@@ -356,7 +356,7 @@ public static class ActivesTypes //All Actives players can start with. Players s
     public static Active Slowstream(PlayerScript owner) //Create a rectangular strip along the player's beam that slows down objects that cross it.
     {
         Active returnActive = new Active(20.0f, 5.0f);
-        returnActive.ActiveClassification = Active.ActiveType.Slowstream;
+        returnActive.ActiveClassification = Active.ActiveType.SlowGel;
 
         //Instantiate the Slowstream object here.
         returnActive.PrepareProjectiles(3, owner);

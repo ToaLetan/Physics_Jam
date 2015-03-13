@@ -839,13 +839,13 @@ public class PlayerScript : MonoBehaviour
         {
             switch (currentActiveType)
             {
-                case Active.ActiveType.GravityField:
+                case Active.ActiveType.GravField:
                     currentActive = ActivesTypes.GravityField(this);
                     break;
                 case Active.ActiveType.Reflect:
                     currentActive = ActivesTypes.Reflect(this);
                     break;
-                case Active.ActiveType.Slipstream:
+                case Active.ActiveType.SlipGel:
                     currentActive = ActivesTypes.Slipstream(this);
                     break;
                 case Active.ActiveType.Soak:
@@ -854,7 +854,7 @@ public class PlayerScript : MonoBehaviour
                 case Active.ActiveType.Overclock:
                     currentActive = ActivesTypes.Overclock(this);
                     break;
-                case Active.ActiveType.Slowstream:
+                case Active.ActiveType.SlowGel:
                     currentActive = ActivesTypes.Slowstream(this);
                     break;
             }

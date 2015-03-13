@@ -4,12 +4,15 @@ using System.Collections.Generic;
 
 public class UIManager
 {
-    private const float LEFTPLAYERSX = -1.16f;
-    private const float RIGHTPLAYERSX = 0.95f;
-    private const float TOPPLAYERSY = 0.95f;
+    private const float LEFT_PLAYERS_X = -1.16f;
+    private const float RIGHT_PLAYERS_X = 0.8f;
+    private const float TOP_PLAYERS_Y = 0.98f;
+    private const float BOTTOM_PLAYERS_Y = -0.86f;
+    private const float COOLDOWN_SPACING = 0.014f;
 
     private GameObject[] playerArray = new GameObject[4];
     private GameObject[] playerNamesArray = new GameObject[4];
+    private GameObject[] playerCooldownsArray = new GameObject[4];
     private List<GameObject> playerLivesList = new List<GameObject>();
 
     private GameManager gameManager = null;
@@ -56,10 +59,21 @@ public class UIManager
                 PositionHUDElements(playerNamesArray[i].name);
 
                 GenerateLifeIcons(playerArray[i].GetComponent<PlayerScript>().NumLives, i);
+
+                //Create the cooldown icons and position them accordingly.
+                playerCooldownsArray[i] = GameObject.Instantiate(Resources.Load("Prefabs/GUI/Active_Cooldown")) as GameObject;
+                playerCooldownsArray[i].transform.parent = combinedUI.transform;
+
+                Vector3 cooldownPos = playerNamesArray[i].transform.position;
+                cooldownPos.x -= (playerCooldownsArray[i].GetComponent<SpriteRenderer>().sprite.bounds.extents.x) + COOLDOWN_SPACING;
+
+                playerCooldownsArray[i].transform.position = cooldownPos;
             }
         }
 
         MatchPlayerColours();
+
+        MatchPlayerActives();
     }
 
     private void PositionHUDElements(string elementName)
@@ -74,16 +88,18 @@ public class UIManager
         switch (elementName)
         {
             case "Text_Player1":
-                playerNamesArray[0].transform.localPosition = new Vector3(LEFTPLAYERSX, TOPPLAYERSY, 1);
+                playerNamesArray[0].transform.localPosition = new Vector3(LEFT_PLAYERS_X, TOP_PLAYERS_Y, 1);
                 break;
             case "Text_Player2":
-                playerNamesArray[1].transform.localPosition = new Vector3(RIGHTPLAYERSX, TOPPLAYERSY, 1);
+                playerNamesArray[1].transform.localPosition = new Vector3(RIGHT_PLAYERS_X, TOP_PLAYERS_Y, 1);
                 break;
             case "Text_Player3":
-                playerNamesArray[2].transform.localPosition = new Vector3(LEFTPLAYERSX, -camera.orthographicSize + (UIOffset * 5), 1);
+                //playerNamesArray[2].transform.localPosition = new Vector3(LEFT_PLAYERS_X, -camera.orthographicSize + (UIOffset * 5), 1);
+                playerNamesArray[2].transform.localPosition = new Vector3(LEFT_PLAYERS_X, BOTTOM_PLAYERS_Y, 1);
                 break;
             case "Text_Player4":
-                playerNamesArray[3].transform.localPosition = new Vector3(RIGHTPLAYERSX, -camera.orthographicSize + (UIOffset * 5), 1);
+                //playerNamesArray[3].transform.localPosition = new Vector3(RIGHT_PLAYERS_X, -camera.orthographicSize + (UIOffset * 5), 1);
+                playerNamesArray[3].transform.localPosition = new Vector3(RIGHT_PLAYERS_X, BOTTOM_PLAYERS_Y, 1);
                 break;
         }
     }
@@ -100,7 +116,8 @@ public class UIManager
             //float lifeIconHeight = newLifeIcon.transform.GetComponent<SpriteRenderer>().bounds.max.y;
 
             newLifeIcon.transform.parent = playerNamesArray[ownerNumber].transform;
-            newLifeIcon.transform.localPosition = new Vector3(-UIOffset * 2 + (UIOffset * i * 2), -UIOffset * 1.5f, 0);
+            //newLifeIcon.transform.localPosition = new Vector3(-UIOffset * 2 + (UIOffset * i * 2), -UIOffset * 1.5f, 0);
+            newLifeIcon.transform.localPosition = new Vector3((UIOffset * i * 2), -newLifeIcon.GetComponent<SpriteRenderer>().sprite.bounds.extents.y + COOLDOWN_SPACING, 0);
 
             playerLivesList.Add(newLifeIcon);
         }
@@ -120,6 +137,27 @@ public class UIManager
                 {
                     playerNamesArray[i].transform.GetChild(j).GetComponent<SpriteRenderer>().material.color = playerArray[i].transform.GetComponent<PlayerScript>().PlayerColour;
                 }
+
+                //Set all cooldown icons' backgrounds to match that player's colour
+                playerCooldownsArray[i].GetComponent<SpriteRenderer>().color = playerArray[i].transform.GetComponent<PlayerScript>().PlayerColour;
+            }
+        }
+    }
+
+    private void MatchPlayerActives()
+    {
+        for (int i = 0; i < playerArray.Length; i++)
+        {
+            if (playerArray[i] != null && playerArray[i].GetComponent<PlayerScript>() != null)
+            {
+                //Get the player's chosen Ability and display it in the UI
+                string abilityName = "";
+
+                abilityName = playerArray[i].GetComponent<PlayerScript>().currentActiveType.ToString();
+
+                Debug.Log(abilityName);
+
+                playerCooldownsArray[i].transform.GetChild(0).GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/UI/Cooldowns/Cooldown_" + abilityName);
             }
         }
     }
