@@ -17,6 +17,8 @@ public class PlayerScript : MonoBehaviour
     public delegate void PlayerEvent(int playerNum);
     public event PlayerEvent Player_Death;
     public event PlayerEvent Player_Lose;
+    public event PlayerEvent Player_Cooldown_Start;
+    public event PlayerEvent Player_Cooldown_Complete;
 
     //Powerups
     public enum PlayerAction { Throw_Basic, Throw_Spread, Throw_Boomerang, Throw_Enlarge, Throw_Homing  }
@@ -869,6 +871,10 @@ public class PlayerScript : MonoBehaviour
                 {
                     gameObject.GetComponent<Rigidbody2D>().drag = 250; //Well we can't disable collision for a while sooooo crank drag the fuck up.
                 }
+
+                //Show the Cooldown overlay on the HUD
+                if (Player_Cooldown_Start != null)
+                    Player_Cooldown_Start(PlayerNumber);
             }  
         }
     }
@@ -880,9 +886,6 @@ public class PlayerScript : MonoBehaviour
         currentActive.Cooldown.OnTimerComplete += OnActiveCooldownEnded;
         currentActive.Duration.OnTimerComplete -= OnActiveDurationEnded;
 
-        //Show the Cooldown overlay on the HUD
-
-
         //If the Active is Reflect, stop reflecting objects and reset rigidbody modifications.
         if (currentActiveType == Active.ActiveType.Reflect)
         {
@@ -892,8 +895,6 @@ public class PlayerScript : MonoBehaviour
 
             gameObject.GetComponent<Rigidbody2D>().drag = 1;
         }
-
-        Debug.Log("ACTIVE OVER");
     }
 
     private void OnActiveCooldownEnded()
@@ -901,8 +902,10 @@ public class PlayerScript : MonoBehaviour
         //Reset the Active
         currentActive.Cooldown.OnTimerComplete -= OnActiveCooldownEnded;
 
-        currentActive = null;
+        //Stop the cooldown UI display.
+        if (Player_Cooldown_Complete != null)
+            Player_Cooldown_Complete(PlayerNumber);
 
-        Debug.Log("COOLDOWN OVER");
+        currentActive = null;
     }
 }

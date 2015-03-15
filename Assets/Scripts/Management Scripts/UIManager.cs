@@ -13,6 +13,10 @@ public class UIManager
     private GameObject[] playerArray = new GameObject[4];
     private GameObject[] playerNamesArray = new GameObject[4];
     private GameObject[] playerCooldownsArray = new GameObject[4];
+
+    private bool[] activeCooldowns = new bool[4];
+    private bool[] flashingCooldowns = new bool[4];
+
     private List<GameObject> playerLivesList = new List<GameObject>();
 
     private GameManager gameManager = null;
@@ -22,6 +26,9 @@ public class UIManager
     private GameObject combinedUI = null;
     private GameObject winnerText = null;
     private GameObject endPromptText = null;
+
+    private Color colourHide = new Color(0, 0, 0, 0);
+    private Color colourFade = new Color(0.17f, 0.23f, 0.25f, 1.0f);
 
     private static UIManager instance = null;
 
@@ -44,7 +51,7 @@ public class UIManager
 	// Update is called once per frame
 	public void Update () 
     {
-
+        UpdateCooldowns();
 	}
 
     public void ConstructHUD() //Instantiate the HUD, consists of 2-4 Player sectors + info/score/etc., game time remaining.
@@ -64,10 +71,20 @@ public class UIManager
                 playerCooldownsArray[i] = GameObject.Instantiate(Resources.Load("Prefabs/GUI/Active_Cooldown")) as GameObject;
                 playerCooldownsArray[i].transform.parent = combinedUI.transform;
 
+                //Set the cooldown icon to the standard sprite.
+                playerCooldownsArray[i].GetComponent<Animator>().Play("CooldownBase", -1);
+                playerCooldownsArray[i].GetComponent<Animator>().enabled = false;
+
                 Vector3 cooldownPos = playerNamesArray[i].transform.position;
                 cooldownPos.x -= (playerCooldownsArray[i].GetComponent<SpriteRenderer>().sprite.bounds.extents.x) + COOLDOWN_SPACING;
 
                 playerCooldownsArray[i].transform.position = cooldownPos;
+
+                //Subscribe to the Player Event for cooldown timers starting. Hide the cooldown sprite for the time being.
+                playerArray[i].GetComponent<PlayerScript>().Player_Cooldown_Start += ShowCooldownDisplay;
+                playerCooldownsArray[i].transform.FindChild("Cooldown_TimeDisplay").GetComponent<SpriteRenderer>().color = colourHide;
+                activeCooldowns[i] = false;
+                flashingCooldowns[i] = false;
             }
         }
 
@@ -157,7 +174,7 @@ public class UIManager
 
                 Debug.Log(abilityName);
 
-                playerCooldownsArray[i].transform.GetChild(0).GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/UI/Cooldowns/Cooldown_" + abilityName);
+                playerCooldownsArray[i].transform.FindChild("Cooldown_Icon").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/UI/Cooldowns/Cooldown_" + abilityName);
             }
         }
     }
@@ -233,5 +250,83 @@ public class UIManager
         
         ConstructHUD();
         HideEnding();
+    }
+
+    private void ShowCooldownDisplay(int playerNum)
+    {
+        if (playerCooldownsArray[playerNum] != null)
+        {
+            //Set the Active background colour to a dark grey, un-hide the cooldown display and scale it down, unsub from the event and flag the cooldown display as active.
+            playerCooldownsArray[playerNum].GetComponent<SpriteRenderer>().color = colourFade;
+
+            playerCooldownsArray[playerNum].transform.FindChild("Cooldown_TimeDisplay").GetComponent<SpriteRenderer>().color = Color.white;
+
+            Vector3 initialScale = playerCooldownsArray[playerNum].transform.FindChild("Cooldown_TimeDisplay").transform.localScale;
+            playerCooldownsArray[playerNum].transform.FindChild("Cooldown_TimeDisplay").transform.localScale = new Vector3(initialScale.x, 0, initialScale.z);
+
+            playerArray[playerNum].GetComponent<PlayerScript>().Player_Cooldown_Complete += CooldownFlash;
+
+            activeCooldowns[playerNum] = true;
+        }
+    }
+
+    private void HideCooldownDisplay(int playerNum)
+    {
+        //Match the background colour to the player, hide the cooldown display, unsub from the event.
+        playerCooldownsArray[playerNum].transform.FindChild("Cooldown_TimeDisplay").GetComponent<SpriteRenderer>().color = colourHide;
+        playerCooldownsArray[playerNum].transform.FindChild("Cooldown_TimeDisplay").localScale = new Vector3(1, 1, 1);
+
+        playerArray[playerNum].GetComponent<PlayerScript>().Player_Cooldown_Complete -= CooldownFlash;
+    }
+
+    private void CooldownFlash(int playerNum)
+    {
+        activeCooldowns[playerNum] = false;
+        flashingCooldowns[playerNum] = true;
+
+        HideCooldownDisplay(playerNum);
+
+        playerCooldownsArray[playerNum].GetComponent<SpriteRenderer>().color = Color.white;
+
+        playerCooldownsArray[playerNum].GetComponent<Animator>().enabled = true;
+        playerCooldownsArray[playerNum].GetComponent<Animator>().Play("CooldownComplete", -1);
+
+        playerCooldownsArray[playerNum].GetComponent<AnimationObject>().Animation_Complete += OnCooldownFlashComplete;
+    }
+
+    private void OnCooldownFlashComplete()
+    {
+        //Set the cooldown icon to the standard sprite.
+        for (int i = 0; i < playerArray.Length; i++)
+        {
+            if (playerCooldownsArray[i] != null && flashingCooldowns[i] == true)
+            {
+                flashingCooldowns[i] = false;
+
+                playerCooldownsArray[i].GetComponent<SpriteRenderer>().color = playerArray[i].GetComponent<PlayerScript>().PlayerColour;
+                playerCooldownsArray[i].GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/UI/Cooldowns/Cooldown_Base");
+
+                playerCooldownsArray[i].GetComponent<Animator>().Play("CooldownBase", -1);
+                playerCooldownsArray[i].GetComponent<Animator>().enabled = false;
+
+                playerCooldownsArray[i].GetComponent<AnimationObject>().Animation_Complete -= OnCooldownFlashComplete;
+            }    
+        }
+    }
+
+    private void UpdateCooldowns()
+    {
+        for (int i = 0; i < playerArray.Length; i++)
+        {
+            if (playerCooldownsArray[i] != null && activeCooldowns[i] == true) //If the player's cooldown timer is active, update the scale.
+            {
+                Vector3 newScale = playerCooldownsArray[i].transform.FindChild("Cooldown_TimeDisplay").transform.localScale;
+                float timerScaleY = playerArray[i].GetComponent<PlayerScript>().PlayerActive.Cooldown.CurrentTime / playerArray[i].GetComponent<PlayerScript>().PlayerActive.Cooldown.TargetTime;
+
+                newScale.y = (float)System.Math.Round(timerScaleY, 2);
+
+                playerCooldownsArray[i].transform.FindChild("Cooldown_TimeDisplay").transform.localScale = newScale;
+            }
+        }
     }
 }

@@ -300,8 +300,6 @@ public class MenuManager : MonoBehaviour
         if(currentJoinedPlayerIndex < MAX_NUM_OF_PLAYERS - 1)
             currentJoinedPlayerIndex++;
 
-        Debug.Log("CURRENT PLAYER NUM: " + currentJoinedPlayerIndex);
-
         //Register their info to the GameInfoManager
         GameInfoManager.Instance.PlayerInputSources[currentJoinedPlayerIndex] = inputSource;
         GameInfoManager.Instance.JoinedPlayers[currentJoinedPlayerIndex] = true;
