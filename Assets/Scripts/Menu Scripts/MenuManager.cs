@@ -116,8 +116,8 @@ public class MenuManager : MonoBehaviour
 		colourArray[2] = Color.green;
 		colourArray[3] = Color.yellow;
 		colourArray[4] = new Color(1, 0, 1); //Pink
-		colourArray[5] = new Color(0.4f, 0, 0.5f); //Purple
-		colourArray[6] = new Color(1, 0.3f, 0); //Orange
+		colourArray[5] = new Color(0.65f, 0.03f, 0.98f); //Purple
+		colourArray[6] = new Color(1, 0.51f, 0.11f); //Orange
 		colourArray[7] = Color.cyan;
 	}
 

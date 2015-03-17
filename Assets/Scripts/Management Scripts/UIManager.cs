@@ -15,7 +15,7 @@ public class UIManager
     private GameObject[] playerCooldownsArray = new GameObject[4];
 
     private bool[] activeCooldowns = new bool[4];
-    private bool[] flashingCooldowns = new bool[4];
+    private bool[] animatingNotifiers = new bool[4];
 
     private List<GameObject> playerLivesList = new List<GameObject>();
 
@@ -71,10 +71,6 @@ public class UIManager
                 playerCooldownsArray[i] = GameObject.Instantiate(Resources.Load("Prefabs/GUI/Active_Cooldown")) as GameObject;
                 playerCooldownsArray[i].transform.parent = combinedUI.transform;
 
-                //Set the cooldown icon to the standard sprite.
-                playerCooldownsArray[i].GetComponent<Animator>().Play("CooldownBase", -1);
-                playerCooldownsArray[i].GetComponent<Animator>().enabled = false;
-
                 Vector3 cooldownPos = playerNamesArray[i].transform.position;
                 cooldownPos.x -= (playerCooldownsArray[i].GetComponent<SpriteRenderer>().sprite.bounds.extents.x) + COOLDOWN_SPACING;
 
@@ -83,8 +79,15 @@ public class UIManager
                 //Subscribe to the Player Event for cooldown timers starting. Hide the cooldown sprite for the time being.
                 playerArray[i].GetComponent<PlayerScript>().Player_Cooldown_Start += ShowCooldownDisplay;
                 playerCooldownsArray[i].transform.FindChild("Cooldown_TimeDisplay").GetComponent<SpriteRenderer>().color = colourHide;
+
+                //Disable the animator for the notifier.
+                playerCooldownsArray[i].transform.FindChild("Cooldown_Done_Anim").GetComponent<Animator>().enabled = false;
+                playerCooldownsArray[i].transform.FindChild("Cooldown_Done_Anim").GetComponent<SpriteRenderer>().color = colourHide;
+
+                playerCooldownsArray[i].transform.FindChild("Cooldown_Done_Anim").GetComponent<AnimationObject>().Animation_Complete += DisableCooldownNotifier;
+
                 activeCooldowns[i] = false;
-                flashingCooldowns[i] = false;
+                animatingNotifiers[i] = false;
             }
         }
 
@@ -264,7 +267,7 @@ public class UIManager
             Vector3 initialScale = playerCooldownsArray[playerNum].transform.FindChild("Cooldown_TimeDisplay").transform.localScale;
             playerCooldownsArray[playerNum].transform.FindChild("Cooldown_TimeDisplay").transform.localScale = new Vector3(initialScale.x, 0, initialScale.z);
 
-            playerArray[playerNum].GetComponent<PlayerScript>().Player_Cooldown_Complete += CooldownFlash;
+            playerArray[playerNum].GetComponent<PlayerScript>().Player_Cooldown_Complete += HideCooldownDisplay;
 
             activeCooldowns[playerNum] = true;
         }
@@ -276,42 +279,17 @@ public class UIManager
         playerCooldownsArray[playerNum].transform.FindChild("Cooldown_TimeDisplay").GetComponent<SpriteRenderer>().color = colourHide;
         playerCooldownsArray[playerNum].transform.FindChild("Cooldown_TimeDisplay").localScale = new Vector3(1, 1, 1);
 
-        playerArray[playerNum].GetComponent<PlayerScript>().Player_Cooldown_Complete -= CooldownFlash;
-    }
+        playerCooldownsArray[playerNum].GetComponent<SpriteRenderer>().color = playerArray[playerNum].GetComponent<PlayerScript>().PlayerColour;
 
-    private void CooldownFlash(int playerNum)
-    {
+        playerArray[playerNum].GetComponent<PlayerScript>().Player_Cooldown_Complete -= HideCooldownDisplay;
+
         activeCooldowns[playerNum] = false;
-        flashingCooldowns[playerNum] = true;
 
-        HideCooldownDisplay(playerNum);
+        //Play the notifier anim
+        playerCooldownsArray[playerNum].transform.FindChild("Cooldown_Done_Anim").GetComponent<SpriteRenderer>().color = Color.white;
+        playerCooldownsArray[playerNum].transform.FindChild("Cooldown_Done_Anim").GetComponent<Animator>().enabled = true;
 
-        playerCooldownsArray[playerNum].GetComponent<SpriteRenderer>().color = Color.white;
-
-        playerCooldownsArray[playerNum].GetComponent<Animator>().enabled = true;
-        playerCooldownsArray[playerNum].GetComponent<Animator>().Play("CooldownComplete", -1);
-
-        playerCooldownsArray[playerNum].GetComponent<AnimationObject>().Animation_Complete += OnCooldownFlashComplete;
-    }
-
-    private void OnCooldownFlashComplete()
-    {
-        //Set the cooldown icon to the standard sprite.
-        for (int i = 0; i < playerArray.Length; i++)
-        {
-            if (playerCooldownsArray[i] != null && flashingCooldowns[i] == true)
-            {
-                flashingCooldowns[i] = false;
-
-                playerCooldownsArray[i].GetComponent<SpriteRenderer>().color = playerArray[i].GetComponent<PlayerScript>().PlayerColour;
-                playerCooldownsArray[i].GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/UI/Cooldowns/Cooldown_Base");
-
-                playerCooldownsArray[i].GetComponent<Animator>().Play("CooldownBase", -1);
-                playerCooldownsArray[i].GetComponent<Animator>().enabled = false;
-
-                playerCooldownsArray[i].GetComponent<AnimationObject>().Animation_Complete -= OnCooldownFlashComplete;
-            }    
-        }
+        animatingNotifiers[playerNum] = true;
     }
 
     private void UpdateCooldowns()
@@ -321,11 +299,25 @@ public class UIManager
             if (playerCooldownsArray[i] != null && activeCooldowns[i] == true) //If the player's cooldown timer is active, update the scale.
             {
                 Vector3 newScale = playerCooldownsArray[i].transform.FindChild("Cooldown_TimeDisplay").transform.localScale;
-                float timerScaleY = playerArray[i].GetComponent<PlayerScript>().PlayerActive.Cooldown.CurrentTime / playerArray[i].GetComponent<PlayerScript>().PlayerActive.Cooldown.TargetTime;
+                float timerScaleY = 1 - (playerArray[i].GetComponent<PlayerScript>().PlayerActive.Cooldown.CurrentTime / playerArray[i].GetComponent<PlayerScript>().PlayerActive.Cooldown.TargetTime);
 
                 newScale.y = (float)System.Math.Round(timerScaleY, 2);
 
                 playerCooldownsArray[i].transform.FindChild("Cooldown_TimeDisplay").transform.localScale = newScale;
+            }
+        }
+    }
+
+    private void DisableCooldownNotifier()
+    {
+        for (int i = 0; i < playerArray.Length; i++)
+        {
+            if (playerCooldownsArray[i] != null && animatingNotifiers[i] == true)
+            {
+                animatingNotifiers[i] = false;
+
+                playerCooldownsArray[i].transform.FindChild("Cooldown_Done_Anim").GetComponent<Animator>().enabled = false;
+                playerCooldownsArray[i].transform.FindChild("Cooldown_Done_Anim").GetComponent<SpriteRenderer>().color = colourHide;
             }
         }
     }

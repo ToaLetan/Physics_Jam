@@ -296,6 +296,7 @@ public static class ActivesTypes //All Actives players can start with. Players s
     public static Active GravityField(PlayerScript owner) //Create a zone at the end of the player's beam, zone pulls in objs.
     {
         Active returnActive = new Active(20.0f, 5.0f);
+
         returnActive.ActiveClassification = Active.ActiveType.GravField;
 
         //Instantiate a Gravity Field Zone object here and UseActive().

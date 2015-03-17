@@ -767,6 +767,7 @@ public class PlayerScript : MonoBehaviour
 
             gameObject.transform.FindChild("PlayerArm").transform.position = armSidePos;
             gameObject.transform.FindChild("PlayerArm").GetComponent<SpriteRenderer>().sortingOrder = gameObject.GetComponent<SpriteRenderer>().sortingOrder;
+            PlayerBeam.transform.GetComponent<SpriteRenderer>().sortingOrder = gameObject.transform.FindChild("PlayerArm").GetComponent<SpriteRenderer>().sortingOrder - 1;
         }
         else //Otherwise, move the arm to the initial position.
         {
@@ -775,7 +776,17 @@ public class PlayerScript : MonoBehaviour
 
             gameObject.transform.FindChild("PlayerArm").transform.localPosition = armPos;
 
-            gameObject.transform.FindChild("PlayerArm").GetComponent<SpriteRenderer>().sortingOrder = gameObject.GetComponent<SpriteRenderer>().sortingOrder - 1;
+            if (animationName.Contains("Front"))
+            {
+                PlayerBeam.transform.GetComponent<SpriteRenderer>().sortingOrder = gameObject.GetComponent<SpriteRenderer>().sortingOrder + 1;
+                gameObject.transform.FindChild("PlayerArm").GetComponent<SpriteRenderer>().sortingOrder = PlayerBeam.transform.GetComponent<SpriteRenderer>().sortingOrder + 1;
+                
+            }
+            else if (animationName.Contains("Back"))
+            {
+                PlayerBeam.transform.GetComponent<SpriteRenderer>().sortingOrder = gameObject.GetComponent<SpriteRenderer>().sortingOrder - 1;
+                gameObject.transform.FindChild("PlayerArm").GetComponent<SpriteRenderer>().sortingOrder = PlayerBeam.transform.GetComponent<SpriteRenderer>().sortingOrder + 1;
+            }
         }
 
         gameObject.GetComponent<Animator>().Play("Player_" + animationName, -1, startFrame);
