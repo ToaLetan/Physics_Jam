@@ -11,6 +11,13 @@ public class GravFieldScript : MonoBehaviour
 
     private GameManager gameManager = null;
 
+    private Active gravFieldActive = null;
+
+    public Active GravFieldActive
+    {
+        set { gravFieldActive = value; }
+    }
+
 	// Use this for initialization
 	void Start () 
     {
@@ -61,5 +68,13 @@ public class GravFieldScript : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void Despawn()
+    {
+        if (gravFieldActive != null)
+            gravFieldActive.Duration.OnTimerComplete -= Despawn;
+
+        GameObject.Destroy(gameObject.transform.parent.gameObject);
     }
 }

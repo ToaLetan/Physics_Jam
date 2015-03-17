@@ -299,7 +299,14 @@ public static class ActivesTypes //All Actives players can start with. Players s
 
         returnActive.ActiveClassification = Active.ActiveType.GravField;
 
-        //Instantiate a Gravity Field Zone object here and UseActive().
+        float distance = 1.0f;
+
+        //Instantiate a Gravity Field Zone object here.
+        Vector3 objectPos = owner.gameObject.transform.position + (owner.PlayerBeam.transform.right *  distance);
+        GameObject gravField = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/GravField"), objectPos, Quaternion.identity) as GameObject;
+
+        gravField.transform.FindChild("GravField_Anim").GetComponent<GravFieldScript>().GravFieldActive = returnActive; //Tie necessary Active info to the object's script.
+        returnActive.Duration.OnTimerComplete += gravField.transform.FindChild("GravField_Anim").GetComponent<GravFieldScript>().Despawn;
 
         return returnActive;
     }
