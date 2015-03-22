@@ -6,7 +6,7 @@ public class ActiveProjectileScript : MonoBehaviour
     private const float DESTINATION_DEADZONE = 0.15f;
     private const float PUDDLE_OFFSET = -0.15f;
 
-    public enum ActiveProjectileType { SpeedUp, SpeedDown, Soak };
+    public enum ActiveProjectileType { SpeedUp, SpeedDown, Soak, GravField };
 
     public ActiveProjectileType ProjectileType = ActiveProjectileType.SpeedUp;
 
@@ -77,7 +77,10 @@ public class ActiveProjectileScript : MonoBehaviour
                         break;
                     case ActiveProjectileType.Soak:
                         break;
-
+                    case ActiveProjectileType.GravField:
+                        //GameObject gravField = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/GravField"), gameObject.transform.position, Quaternion.identity) as GameObject;
+                        GameObject gravField = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Grav_Impact"), gameObject.transform.position, Quaternion.identity) as GameObject;
+                        break;
                 }
                 GameObject.Destroy(gameObject);
             }

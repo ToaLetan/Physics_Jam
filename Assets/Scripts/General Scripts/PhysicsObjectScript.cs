@@ -95,6 +95,9 @@ public class PhysicsObjectScript : MonoBehaviour
     {
         if (collisionObj.gameObject.tag == "KillBox")
         {
+            //Disable the rigidbody
+            gameObject.transform.GetComponent<BoxCollider2D>().enabled = false;
+
             if(isFalling == false)
                 isFalling = true;
         }
@@ -127,6 +130,8 @@ public class PhysicsObjectScript : MonoBehaviour
         gameObject.transform.rotation = startRotation;
         gameObject.transform.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
         gameObject.transform.GetComponent<Rigidbody2D>().angularVelocity = 0;
+
+        gameObject.transform.GetComponent<BoxCollider2D>().enabled = true;
 
         capVelocity = true;
 

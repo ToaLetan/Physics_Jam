@@ -175,8 +175,6 @@ public class UIManager
 
                 abilityName = playerArray[i].GetComponent<PlayerScript>().currentActiveType.ToString();
 
-                Debug.Log(abilityName);
-
                 playerCooldownsArray[i].transform.FindChild("Cooldown_Icon").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/UI/Cooldowns/Cooldown_" + abilityName);
             }
         }

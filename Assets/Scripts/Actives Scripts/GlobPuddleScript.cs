@@ -3,7 +3,7 @@ using System.Collections;
 
 public class GlobPuddleScript : MonoBehaviour 
 {
-    public enum PuddleType { SpeedUp, SpeedDown, Decoration }
+    public enum PuddleType { SpeedUp, SpeedDown, Decoration, GravField }
 
     public PuddleType PuddleClassification;
 
@@ -38,6 +38,9 @@ public class GlobPuddleScript : MonoBehaviour
                     GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/SlowPuddle"), gameObject.transform.position, gameObject.transform.rotation);
                     break;
                 case PuddleType.Decoration:
+                    break;
+                case PuddleType.GravField:
+                    GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/GravField"), gameObject.transform.position, gameObject.transform.rotation);
                     break;
             }
             

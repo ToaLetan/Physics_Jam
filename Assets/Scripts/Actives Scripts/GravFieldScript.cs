@@ -60,7 +60,7 @@ public class GravFieldScript : MonoBehaviour
         {
             for (int i = 0; i < objectsInRange.Count; i++)
             {
-                if (objectsInRange[i].GetComponent<Rigidbody2D>() != null)
+                if (objectsInRange[i] != null && objectsInRange[i].GetComponent<Rigidbody2D>() != null)
                 {
                     Vector2 vectorToGravCenter = new Vector2(gameObject.transform.position.x - objectsInRange[i].transform.position.x, 
                                                                 gameObject.transform.position.y - objectsInRange[i].transform.position.y);

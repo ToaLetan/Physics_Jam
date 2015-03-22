@@ -62,7 +62,7 @@ public class BeamScript : MonoBehaviour
         currentObjectHeld = currentObjectSelected;
 
         if (currentObjectHeld.GetComponent<ProjectileAttributeScript>() != null)
-            Destroy(currentObjectHeld.GetComponent<ProjectileAttributeScript>());
+            Destroy(currentObjectHeld.GetComponent<ProjectileAttributeScript>() );
     }
 
     public void ReleaseObject()

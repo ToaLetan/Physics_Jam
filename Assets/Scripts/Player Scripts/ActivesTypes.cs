@@ -173,6 +173,9 @@ public class Active //The base Active class, features cooldown timer and duratio
                 case ActiveType.Soak:
                     ShootSoakProjectile();
                     break;
+                case ActiveType.GravField:
+                    ShootGravProjectile();
+                    break;
             }
 
             shotDelay.ResetTimer(true);
@@ -228,6 +231,19 @@ public class Active //The base Active class, features cooldown timer and duratio
         soakProjectile.GetComponent<ActiveProjectileScript>().OwnerPlayer = owner;
 
         soakProjectile.GetComponent<ActiveProjectileScript>().OnProjectileCollision += SetAffectedPlayer;
+    }
+
+    private void ShootGravProjectile()
+    {
+        //Instantiate the Grav Field Projectile and fire it towards the destination, which isn't far away.
+        float distance = 1.0f;
+
+        Vector3 projectilePos = owner.gameObject.transform.position + (owner.PlayerBeam.transform.right * distance);
+
+        GameObject gravProjectile = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/GravField_Projectile"), owner.PlayerBeam.transform.position, owner.PlayerBeam.transform.rotation) as GameObject;
+
+        gravProjectile.GetComponent<ActiveProjectileScript>().Destination = projectilePos;
+        gravProjectile.GetComponent<ActiveProjectileScript>().OwnerPlayer = owner;
     }
 
     public void InitializeOverclockAnim(PlayerScript playerUsingActive)
@@ -299,14 +315,19 @@ public static class ActivesTypes //All Actives players can start with. Players s
 
         returnActive.ActiveClassification = Active.ActiveType.GravField;
 
-        float distance = 1.0f;
+        //float distance = 1.0f;
 
         //Instantiate a Gravity Field Zone object here.
+
+        //TODO: Replace with a projectile, travels a short distance before spawning a grav field.
+        returnActive.PrepareProjectiles(1, owner);
+
+        /*
         Vector3 objectPos = owner.gameObject.transform.position + (owner.PlayerBeam.transform.right *  distance);
         GameObject gravField = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/GravField"), objectPos, Quaternion.identity) as GameObject;
 
         gravField.transform.FindChild("GravField_Anim").GetComponent<GravFieldScript>().GravFieldActive = returnActive; //Tie necessary Active info to the object's script.
-        returnActive.Duration.OnTimerComplete += gravField.transform.FindChild("GravField_Anim").GetComponent<GravFieldScript>().Despawn;
+        returnActive.Duration.OnTimerComplete += gravField.transform.FindChild("GravField_Anim").GetComponent<GravFieldScript>().Despawn;*/
 
         return returnActive;
     }
