@@ -23,16 +23,22 @@ public class MenuManager : MonoBehaviour
 	private const int NUM_OF_COLOURS = 8;
     private const int MAX_NUM_OF_PLAYERS = 4;
 
+    private enum PlayerJoinStatus { NotJoined = 0, ColourSelect, AbilitySelect, Done };
+
 	private List<GameObject> previewPlayers = new List<GameObject>();
     private List<GameObject> joinPrompts = new List<GameObject>();
+    private List<GameObject> abilitySelections = new List<GameObject>();
     private List<TiedController> activeControllers = new List<TiedController>();
     private List<TiedKeybinds> activeKeybinds = new List<TiedKeybinds>();
     public List<int> queuedPlayersJoining = new List<int>();
 
+    private PlayerJoinStatus[] playerStatuses = new PlayerJoinStatus[MAX_NUM_OF_PLAYERS]; //Array of bools used to determine if the player is selecting an Ability. False if haven't picked colour first.
 	private Color[] colourArray = new Color[NUM_OF_COLOURS]; //Array of possible colours
     private Vector3[] panelPositionsArray = new Vector3[MAX_NUM_OF_PLAYERS]; //Array of desired locations for panels to move to.
     private int[] playerColourIndexArray = new int[MAX_NUM_OF_PLAYERS]; //Array of current colour indices (ex. red = 1, blue = 2, etc.)
     private bool[] canChangePlayerColourArray = new bool[MAX_NUM_OF_PLAYERS]; //Array of bools used to determine if the player can change colour, prevents holding keys to flicker through colours.
+
+    private float panelDestinationX = -0.93f;
 
 	private InputManager inputManager;
 
@@ -57,19 +63,14 @@ public class MenuManager : MonoBehaviour
         {
             playerColourIndexArray[i] = -1;
             canChangePlayerColourArray[i] = true;
+            playerStatuses[i] = PlayerJoinStatus.NotJoined;
+
+            //Establish all desired panel positions for when they need to be moved on-screen.
+            panelPositionsArray[i] = new Vector3(panelDestinationX, previewPlayers[i].transform.parent.transform.position.y, previewPlayers[i].transform.parent.transform.position.z);
+
+            //Hide all Ability selections
+            ShowHideAbilitySelection(i, false);
         }
-
-		//Set players to start as red.
-        /*for (int i = 0; i < previewPlayers.Count; i++)
-        {
-            ApplyColourPreview(1 + i, i);
-        }*/
-
-        //Establish all desired panel positions for when they need to be moved on-screen.
-        panelPositionsArray[0] = new Vector3(-0.50f, 1.05f, previewPlayers[0].transform.parent.transform.position.z);
-        panelPositionsArray[1] = new Vector3(-0.93f, 0.61f, previewPlayers[1].transform.parent.transform.position.z);
-        panelPositionsArray[2] = new Vector3(-1.37f, 0.16f, previewPlayers[2].transform.parent.transform.position.z);
-        panelPositionsArray[3] = new Vector3(-1.81f, -0.29f, previewPlayers[3].transform.parent.transform.position.z);
 
 		AnimatePlayers();
 	}
@@ -93,11 +94,17 @@ public class MenuManager : MonoBehaviour
             //If moving left or right, apply the colour preview.
             if (activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.dPadHorizontal) > MIN_THUMBSTICK_POS ||
                 activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.leftThumbstickHorizontal) > MIN_THUMBSTICK_POS)
-                ApplyColourPreview(1, activeControllers[i].playerNum);
+            {
+                if (playerStatuses[activeControllers[i].playerNum] == PlayerJoinStatus.ColourSelect)
+                    ApplyColourPreview(1, activeControllers[i].playerNum);
+            } 
 
             if (activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.dPadHorizontal) < -MIN_THUMBSTICK_POS ||
                 activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.leftThumbstickHorizontal) < -MIN_THUMBSTICK_POS)
-                ApplyColourPreview(-1, activeControllers[i].playerNum);
+            {
+                if (playerStatuses[activeControllers[i].playerNum] == PlayerJoinStatus.ColourSelect)
+                    ApplyColourPreview(-1, activeControllers[i].playerNum);
+            } 
 
             if (activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.dPadHorizontal) == 0 &&
                 (activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.leftThumbstickHorizontal) < THUMBSTICK_DEADZONE &&
@@ -138,6 +145,7 @@ public class MenuManager : MonoBehaviour
 				}
 			}
             previewPlayers.Add(topmostObject);
+            abilitySelections.Add(topmostObject.transform.parent.FindChild("CooldownSelect").gameObject);
 			highestValue = -5;
             topmostObject = null;
 
@@ -206,6 +214,7 @@ public class MenuManager : MonoBehaviour
 
 	private void MenuInput(int playerNum, List<string> keysHeld)
 	{
+        //Keyboard input for determining new players
         for (int i = 0; i < inputManager.PlayerKeybindArray.Length; i++)
 		{
             if (keysHeld.Contains(inputManager.PlayerKeybindArray[i].GraborThrowKey.ToString() ) )
@@ -228,6 +237,7 @@ public class MenuManager : MonoBehaviour
             }
 		}
 
+        //Keyboard input for existing players
         for (int j = 0; j < previewPlayers.Count; j++)
         {
             if (GameInfoManager.Instance.PlayerInputSources[j].ToString() != "")
@@ -240,9 +250,23 @@ public class MenuManager : MonoBehaviour
                 if (inputSource.Contains("Keybinds"))
                 {
                     if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LeftKey.ToString()))
-                        ApplyColourPreview(-1, j);
+                    {
+                        if (playerStatuses[j] == PlayerJoinStatus.ColourSelect)
+                            ApplyColourPreview(-1, j);
+                    }
                     if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].RightKey.ToString()))
-                        ApplyColourPreview(1, j);
+                    {
+                        if (playerStatuses[j] == PlayerJoinStatus.ColourSelect)
+                            ApplyColourPreview(1, j);
+                    }
+                    if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].GraborThrowKey.ToString()))
+                    {
+                        if (playerStatuses[j] == PlayerJoinStatus.ColourSelect) //If the player is still selecting a colour, apply the colour and move on to Ability selection.
+                        {
+                            playerStatuses[j] = PlayerJoinStatus.AbilitySelect;
+                            ShowHideAbilitySelection(j, true);
+                        }
+                    }
                 }
             }
         }
@@ -331,6 +355,9 @@ public class MenuManager : MonoBehaviour
                 startGamePrompt.GetComponent<TweenComponent>().TweenPositionTo(startGamePrompt_Location, PANEL_MOVESPEED);
             }
         }
+
+        //Set the player status
+        playerStatuses[currentJoinedPlayerIndex] = PlayerJoinStatus.ColourSelect;
 	}
 
     private void ButtonMenuInput(int playerNum, List<string> buttonsHeld)
@@ -353,8 +380,13 @@ public class MenuManager : MonoBehaviour
 
                 PlayerJoin(inputString);
             }
+            if (playerStatuses[playerNum] == PlayerJoinStatus.ColourSelect ) //If the player is still selecting a colour, apply the colour and move on to Ability selection.
+            {
+                playerStatuses[playerNum] = PlayerJoinStatus.AbilitySelect;
+                ShowHideAbilitySelection(playerNum, true);
+            }
 		}
-        if (buttonsHeld.Contains(inputManager.ControllerArray[playerNum].startButton))
+        else if (buttonsHeld.Contains(inputManager.ControllerArray[playerNum].startButton))
         {
             if (currentJoinedPlayerIndex >= 1) //Prevent a game from starting until there's at least two players.
             {
@@ -370,6 +402,7 @@ public class MenuManager : MonoBehaviour
             GameObject panel = previewPlayers[queuedPlayersJoining[0]].transform.parent.gameObject;
             panel.AddComponent<TweenComponent>();
             panel.GetComponent<TweenComponent>().TweenPositionTo(panelPositionsArray[queuedPlayersJoining[0]], PANEL_MOVESPEED);
+
             queuedPlayersJoining.RemoveAt(0);
         }
     }
@@ -381,5 +414,19 @@ public class MenuManager : MonoBehaviour
         inputManager.Button_Pressed -= ButtonMenuInput;
 
         Application.LoadLevel("Main");
+    }
+
+    private void ShowHideAbilitySelection(int previewIndex, bool showAbility = false)
+    {
+        for (int i = 0; i < abilitySelections[previewIndex].transform.childCount; i++)
+        {
+            if (abilitySelections[previewIndex].transform.GetChild(i).GetComponent<SpriteRenderer>() != null)
+            {
+                abilitySelections[previewIndex].transform.GetChild(i).GetComponent<SpriteRenderer>().enabled = showAbility;
+
+                if (abilitySelections[previewIndex].transform.GetChild(i).name == "Cooldown_Base")
+                    abilitySelections[previewIndex].transform.GetChild(i).GetChild(0).GetComponent<SpriteRenderer>().enabled = showAbility;
+            }
+        }
     }
 }
