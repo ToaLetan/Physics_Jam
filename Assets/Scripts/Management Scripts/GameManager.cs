@@ -78,6 +78,7 @@ public class GameManager : MonoBehaviour
                 existingPlayers[j].GetComponent<PlayerScript>().Player_Death += OnPlayerDeath;
                 existingPlayers[j].GetComponent<PlayerScript>().Player_Lose += OnPlayerLose;
                 existingPlayers[j].GetComponent<PlayerScript>().SetPlayerColour(GameInfoManager.Instance.PlayerColours[j]);
+                existingPlayers[j].GetComponent<PlayerScript>().SetPlayerAbility(GameInfoManager.Instance.PlayerActives[j]);
             }
         }
         InputManager.Instance.Key_Pressed += HandleInput;

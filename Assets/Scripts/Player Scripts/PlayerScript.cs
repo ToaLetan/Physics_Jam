@@ -165,7 +165,7 @@ public class PlayerScript : MonoBehaviour
         }
 	}
 
-    public void SetPlayerColour(Color newColour)
+    public void SetPlayerColour(Color newColour) //Tied to GameManager to set the Colour based on what's established in the GameInfoManager
     {
         if (gameObject.transform.FindChild("PlayerGlowLayer") != null)
         {
@@ -175,6 +175,11 @@ public class PlayerScript : MonoBehaviour
         }
 
         AttachBeam ();
+    }
+
+    public void SetPlayerAbility(Active.ActiveType ability) //Tied to GameManager to set the Ability based on what's established in the GameInfoManager
+    {
+        currentActiveType = ability;
     }
 
 	public void PlayerInput(int playerNum, List<string> keysHeld)

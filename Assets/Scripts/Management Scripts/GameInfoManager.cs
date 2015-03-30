@@ -9,6 +9,7 @@ public class GameInfoManager
     private static GameInfoManager instance = null;
 
     public List<Color> PlayerColours = new List<Color>();
+    public List<Active.ActiveType> PlayerActives = new List<Active.ActiveType>();
     public List<string> PlayerInputSources = new List<string>(); //Where players are getting their controls from (controller 1-4 or keyboard 1-2) by name.
     public List<bool> JoinedPlayers = new List<bool>(); //Whether or not players 1-4 have joined.
     
@@ -40,6 +41,7 @@ public class GameInfoManager
         for (int i = 0; i < NUM_MAX_PLAYERS; i++)
         {
             PlayerColours.Add(Color.white);
+            PlayerActives.Add(Active.ActiveType.GravField);
             PlayerInputSources.Add("");
             JoinedPlayers.Add(false);
         }
@@ -49,6 +51,7 @@ public class GameInfoManager
     {
         //Wipe all existing info and initialize again.
         PlayerColours.Clear();
+        PlayerActives.Clear();
         PlayerInputSources.Clear();
         JoinedPlayers.Clear();
 

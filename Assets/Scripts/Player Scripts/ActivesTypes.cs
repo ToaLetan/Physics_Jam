@@ -8,7 +8,7 @@ public class Active //The base Active class, features cooldown timer and duratio
     private const float DEFAULT_ACCELERATION = 1.5f;
     private const float DEFAULT_DECELERATION = 4.0f;
 
-    public enum ActiveType { None, GravField, Reflect, SlipGel, Soak, Overclock, SlowGel }
+    public enum ActiveType { None = 0, GravField, Reflect, SlipGel, SlowGel, Overclock, Soak }
 
     private const float SHOT_DELAY_TIME = 0.25f;
 

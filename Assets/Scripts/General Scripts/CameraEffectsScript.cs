@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class CameraEffectsScript : MonoBehaviour 
 {
-    private const float MINZOOMLEVEL = 1.0f;
+    private const float MINZOOMLEVEL = 0.96f;
 
     private List<GameObject> playerList = new List<GameObject>();
 

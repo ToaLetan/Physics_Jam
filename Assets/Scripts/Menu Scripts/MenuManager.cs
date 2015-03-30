@@ -22,6 +22,7 @@ public class MenuManager : MonoBehaviour
 
 	private const int NUM_OF_COLOURS = 8;
     private const int MAX_NUM_OF_PLAYERS = 4;
+    private const int NUM_OF_ABILITIES = 6;
 
     private enum PlayerJoinStatus { NotJoined = 0, ColourSelect, AbilitySelect, Done };
 
@@ -36,9 +37,10 @@ public class MenuManager : MonoBehaviour
 	private Color[] colourArray = new Color[NUM_OF_COLOURS]; //Array of possible colours
     private Vector3[] panelPositionsArray = new Vector3[MAX_NUM_OF_PLAYERS]; //Array of desired locations for panels to move to.
     private int[] playerColourIndexArray = new int[MAX_NUM_OF_PLAYERS]; //Array of current colour indices (ex. red = 1, blue = 2, etc.)
+    private int[] playerAbilityIndexArray = new int[MAX_NUM_OF_PLAYERS];
     private bool[] canChangePlayerColourArray = new bool[MAX_NUM_OF_PLAYERS]; //Array of bools used to determine if the player can change colour, prevents holding keys to flicker through colours.
 
-    private float panelDestinationX = -0.93f;
+    private float panelDestinationX = -0.42f;
 
 	private InputManager inputManager;
 
@@ -61,7 +63,8 @@ public class MenuManager : MonoBehaviour
         //Set all currentColourIndexes to default at 1 and set all players to be able to change colour.
         for (int i = 0; i < previewPlayers.Count; i++)
         {
-            playerColourIndexArray[i] = -1;
+            playerColourIndexArray[i] = -1; //Set to -1 to default as white.
+            playerAbilityIndexArray[i] = 1; //Goes from 1-6 for each of the Abilities.
             canChangePlayerColourArray[i] = true;
             playerStatuses[i] = PlayerJoinStatus.NotJoined;
 
@@ -212,6 +215,56 @@ public class MenuManager : MonoBehaviour
             playerColourIndexArray[playerNum] = colourArray.Length - 1;
     }
 
+    private void SelectAbility(int incrementation, int playerNum)
+    {
+        if (canChangePlayerColourArray[playerNum] == true) //Sharing this to prevent ability switching from going too fast.
+        {
+            playerAbilityIndexArray[playerNum] += incrementation;
+
+            if (playerAbilityIndexArray[playerNum] > NUM_OF_ABILITIES)
+                playerAbilityIndexArray[playerNum] = 1;
+            if (playerAbilityIndexArray[playerNum] < 1)
+                playerAbilityIndexArray[playerNum] = NUM_OF_ABILITIES;
+
+            string cooldownName = "";
+
+            switch(playerAbilityIndexArray[playerNum]) //Set the player ability based on the index from 1-6.
+            {
+                case 1:
+                    GameInfoManager.Instance.PlayerActives[playerNum] = Active.ActiveType.GravField;
+                    cooldownName = "GravField";
+                    break;
+                case 2:
+                    GameInfoManager.Instance.PlayerActives[playerNum] = Active.ActiveType.Reflect;
+                    cooldownName = "Reflect";
+                    break;
+                case 3:
+                    GameInfoManager.Instance.PlayerActives[playerNum] = Active.ActiveType.SlipGel;
+                    cooldownName = "SlipGel";
+                    break;
+                case 4:
+                    GameInfoManager.Instance.PlayerActives[playerNum] = Active.ActiveType.SlowGel;
+                    cooldownName = "SlowGel";
+                    break;
+                case 5:
+                    GameInfoManager.Instance.PlayerActives[playerNum] = Active.ActiveType.Overclock;
+                    cooldownName = "Overclock";
+                    break;
+                case 6:
+                    GameInfoManager.Instance.PlayerActives[playerNum] = Active.ActiveType.Soak;
+                    cooldownName = "Soak";
+                    break;
+                default:
+                    break;
+            }
+
+            //Update the Ability info display for icons, name, and description.
+            abilitySelections[playerNum].transform.FindChild("Cooldown_Base").GetChild(0).GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/UI/Cooldowns/Cooldown_" + cooldownName);
+            abilitySelections[playerNum].transform.FindChild("AbilityName").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/UI/Menus/Text_" + cooldownName);
+            abilitySelections[playerNum].transform.FindChild("AbilityDescription").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/UI/Menus/Description_" + cooldownName);
+        }
+    }
+
 	private void MenuInput(int playerNum, List<string> keysHeld)
 	{
         //Keyboard input for determining new players
@@ -253,18 +306,30 @@ public class MenuManager : MonoBehaviour
                     {
                         if (playerStatuses[j] == PlayerJoinStatus.ColourSelect)
                             ApplyColourPreview(-1, j);
+                        else if (playerStatuses[j] == PlayerJoinStatus.AbilitySelect)
+                            SelectAbility(-1, j);
                     }
                     if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].RightKey.ToString()))
                     {
                         if (playerStatuses[j] == PlayerJoinStatus.ColourSelect)
                             ApplyColourPreview(1, j);
+                        else if (playerStatuses[j] == PlayerJoinStatus.AbilitySelect)
+                            SelectAbility(1, j);
                     }
                     if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].GraborThrowKey.ToString()))
                     {
                         if (playerStatuses[j] == PlayerJoinStatus.ColourSelect) //If the player is still selecting a colour, apply the colour and move on to Ability selection.
                         {
-                            playerStatuses[j] = PlayerJoinStatus.AbilitySelect;
-                            ShowHideAbilitySelection(j, true);
+                            //Used to prevent the player status from immediately changing.
+                            if (previewPlayers[j].transform.parent.gameObject.transform.position.x >= panelDestinationX - 0.05f 
+                                && previewPlayers[j].transform.parent.gameObject.transform.position.x <= panelDestinationX + 0.05f) 
+                            {
+                                playerStatuses[j] = PlayerJoinStatus.AbilitySelect;
+
+                                //Hide the colour selection and show ability selection
+                                ShowHideColourSelection(j, false);
+                                ShowHideAbilitySelection(j, true);
+                            }
                         }
                     }
                 }
@@ -428,5 +493,14 @@ public class MenuManager : MonoBehaviour
                     abilitySelections[previewIndex].transform.GetChild(i).GetChild(0).GetComponent<SpriteRenderer>().enabled = showAbility;
             }
         }
+    }
+
+    private void ShowHideColourSelection(int previewIndex, bool showColour = false)
+    {
+        for (int i = 0; i < previewPlayers[previewIndex].transform.childCount; i++)
+        {
+            if (previewPlayers[previewIndex].transform.GetChild(i).gameObject.name != "PreviewPlayer")
+                previewPlayers[previewIndex].transform.GetChild(i).GetComponent<SpriteRenderer>().enabled = showColour;
+        } 
     }
 }
