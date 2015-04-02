@@ -197,10 +197,11 @@ public class MenuManager : MonoBehaviour
 
             GameInfoManager.Instance.PlayerColours[playerNum] = newColour; //Tie the player colour to that player so the GameInfoManager can pass it into the game.
 
-            //Apply the colour to the player previews
+            //Apply the colour to the player previews and their ability cooldown icon.
             previewPlayers[playerNum].transform.FindChild("PreviewPlayer").GetChild(0).GetComponent<SpriteRenderer>().color = newColour;
             previewPlayers[playerNum].transform.FindChild("ColourPreview").GetComponent<SpriteRenderer>().color = newColour;
             previewPlayers[playerNum].transform.FindChild("Text_Player" + (playerNum + 1)).GetComponent<SpriteRenderer>().color = newColour;
+            abilitySelections[playerNum].transform.FindChild("Cooldown_Base").GetComponent<SpriteRenderer>().color = newColour;
         }
 	}
 
