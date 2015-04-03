@@ -100,6 +100,8 @@ public class MenuManager : MonoBehaviour
             {
                 if (playerStatuses[activeControllers[i].playerNum] == PlayerJoinStatus.ColourSelect)
                     ApplyColourPreview(1, activeControllers[i].playerNum);
+                else if (playerStatuses[activeControllers[i].playerNum] == PlayerJoinStatus.AbilitySelect)
+                    SelectAbility(1, activeControllers[i].playerNum);
             } 
 
             if (activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.dPadHorizontal) < -MIN_THUMBSTICK_POS ||
@@ -107,6 +109,8 @@ public class MenuManager : MonoBehaviour
             {
                 if (playerStatuses[activeControllers[i].playerNum] == PlayerJoinStatus.ColourSelect)
                     ApplyColourPreview(-1, activeControllers[i].playerNum);
+                else if (playerStatuses[activeControllers[i].playerNum] == PlayerJoinStatus.AbilitySelect)
+                    SelectAbility(-1, activeControllers[i].playerNum);
             } 
 
             if (activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.dPadHorizontal) == 0 &&
@@ -263,6 +267,8 @@ public class MenuManager : MonoBehaviour
             abilitySelections[playerNum].transform.FindChild("Cooldown_Base").GetChild(0).GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/UI/Cooldowns/Cooldown_" + cooldownName);
             abilitySelections[playerNum].transform.FindChild("AbilityName").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/UI/Menus/Text_" + cooldownName);
             abilitySelections[playerNum].transform.FindChild("AbilityDescription").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/UI/Menus/Description_" + cooldownName);
+
+            canChangePlayerColourArray[playerNum] = false;
         }
     }
 
@@ -326,6 +332,7 @@ public class MenuManager : MonoBehaviour
                                 && previewPlayers[j].transform.parent.gameObject.transform.position.x <= panelDestinationX + 0.05f) 
                             {
                                 playerStatuses[j] = PlayerJoinStatus.AbilitySelect;
+                                UpdateSidePrompt(j);
 
                                 //Hide the colour selection and show ability selection
                                 ShowHideColourSelection(j, false);
@@ -405,10 +412,10 @@ public class MenuManager : MonoBehaviour
         joinAnim.GetComponent<AnimationObject>().Animation_Complete += MovePanel;
 
         //Hide the prompt
-        for (int i = 0; i < joinPrompts[currentJoinedPlayerIndex].transform.childCount; i++)
+        /*for (int i = 0; i < joinPrompts[currentJoinedPlayerIndex].transform.childCount; i++)
         {
             joinPrompts[currentJoinedPlayerIndex].transform.GetChild(i).GetComponent<SpriteRenderer>().color = new Color(0, 0, 0, 0);
-        }
+        }*/
 
         //Show the start game prompt if there's at least two people
         if (currentJoinedPlayerIndex == 1)
@@ -422,12 +429,15 @@ public class MenuManager : MonoBehaviour
             }
         }
 
-        //Set the player status
+        //Set the player status and update their prompt.
         playerStatuses[currentJoinedPlayerIndex] = PlayerJoinStatus.ColourSelect;
+
+        UpdateSidePrompt(currentJoinedPlayerIndex);
 	}
 
     private void ButtonMenuInput(int playerNum, List<string> buttonsHeld)
     {
+        //Check any unregistered controllers (ones that aren't tied to a player)
         if (buttonsHeld.Contains(inputManager.ControllerArray[playerNum].buttonA))
 		{
             string inputString = inputManager.ControllerArray[playerNum].ToString() + " " + playerNum;
@@ -446,17 +456,35 @@ public class MenuManager : MonoBehaviour
 
                 PlayerJoin(inputString);
             }
-            if (playerStatuses[playerNum] == PlayerJoinStatus.ColourSelect ) //If the player is still selecting a colour, apply the colour and move on to Ability selection.
-            {
-                playerStatuses[playerNum] = PlayerJoinStatus.AbilitySelect;
-                ShowHideAbilitySelection(playerNum, true);
-            }
 		}
         else if (buttonsHeld.Contains(inputManager.ControllerArray[playerNum].startButton))
         {
             if (currentJoinedPlayerIndex >= 1) //Prevent a game from starting until there's at least two players.
             {
                 LoadGame();
+            }
+        }
+
+        //Check registered controllers
+        for (int i = 0; i < activeControllers.Count; i++)
+        {
+            if (activeControllers[i].playerController.GetButtonHeld(activeControllers[i].playerController.buttonA) )
+            {
+                int controllerPlayerNum = activeControllers[i].playerNum;
+
+                if (playerStatuses[controllerPlayerNum] == PlayerJoinStatus.ColourSelect) //If the player is still selecting a colour, apply the colour and move on to Ability selection.
+                {
+                    //Used to prevent colour selection from immediately being skipped.
+                    if (previewPlayers[controllerPlayerNum].transform.parent.gameObject.transform.position.x >= panelDestinationX - 0.05f
+                                && previewPlayers[controllerPlayerNum].transform.parent.gameObject.transform.position.x <= panelDestinationX + 0.05f)
+                    {
+                        playerStatuses[controllerPlayerNum] = PlayerJoinStatus.AbilitySelect;
+                        UpdateSidePrompt(controllerPlayerNum);
+
+                        ShowHideAbilitySelection(controllerPlayerNum, true);
+                        ShowHideColourSelection(controllerPlayerNum, false);
+                    }
+                }
             }
         }
     }
@@ -503,5 +531,63 @@ public class MenuManager : MonoBehaviour
             if (previewPlayers[previewIndex].transform.GetChild(i).gameObject.name != "PreviewPlayer")
                 previewPlayers[previewIndex].transform.GetChild(i).GetComponent<SpriteRenderer>().enabled = showColour;
         } 
+    }
+
+    private void UpdateSidePrompt(int playerNum)
+    {
+        Debug.Log(playerNum);
+
+        Vector3 newPromptPos = Vector3.zero;
+
+        Sprite textSprite = joinPrompts[playerNum].transform.FindChild("Join_Text").GetComponent<SpriteRenderer>().sprite;
+
+        switch(playerStatuses[playerNum])
+        {
+            case PlayerJoinStatus.NotJoined:
+                textSprite = Resources.Load<Sprite>("Sprites/UI/Menus/Join_Text");
+                break;
+            case PlayerJoinStatus.ColourSelect:
+                textSprite = Resources.Load<Sprite>("Sprites/UI/Menus/Text_SelectColour");
+                break;
+            case PlayerJoinStatus.AbilitySelect:
+                textSprite = Resources.Load<Sprite>("Sprites/UI/Menus/Text_SelectAbility");
+                break;
+            case PlayerJoinStatus.Done:
+                textSprite = Resources.Load<Sprite>("Sprites/UI/Menus/Text_Ready");
+                break;
+        }
+
+        if (GameInfoManager.Instance.PlayerInputSources[playerNum].Contains("Keybinds 0") ) //Uses the F key, hide other prompts and center the F prompt
+        {
+            joinPrompts[playerNum].transform.FindChild("KEYBOARD_SEMICOLON").GetComponent<SpriteRenderer>().enabled = false;
+            joinPrompts[playerNum].transform.FindChild("XBONE_A").GetComponent<SpriteRenderer>().enabled = false;
+
+            newPromptPos = joinPrompts[playerNum].transform.FindChild("KEYBOARD_F").position;
+            newPromptPos.x = joinPrompts[playerNum].transform.FindChild("Join_Text").position.x;
+
+            joinPrompts[playerNum].transform.FindChild("KEYBOARD_F").position = newPromptPos;
+        }
+        else if (GameInfoManager.Instance.PlayerInputSources[playerNum].Contains("Keybinds 1")) //Uses the ; key, hide other prompts and center the ; prompt
+        {
+            joinPrompts[playerNum].transform.FindChild("KEYBOARD_F").GetComponent<SpriteRenderer>().enabled = false;
+            joinPrompts[playerNum].transform.FindChild("XBONE_A").GetComponent<SpriteRenderer>().enabled = false;
+
+            newPromptPos = joinPrompts[playerNum].transform.FindChild("KEYBOARD_SEMICOLON").position;
+            newPromptPos.x = joinPrompts[playerNum].transform.FindChild("Join_Text").position.x;
+
+            joinPrompts[playerNum].transform.FindChild("KEYBOARD_SEMICOLON").position = newPromptPos;
+        }
+        else if (GameInfoManager.Instance.PlayerInputSources[playerNum].Contains("Controller")) //Uses an Xbox controller, hide other prompts and center the A button prompt
+        {
+            joinPrompts[playerNum].transform.FindChild("KEYBOARD_F").GetComponent<SpriteRenderer>().enabled = false;
+            joinPrompts[playerNum].transform.FindChild("KEYBOARD_SEMICOLON").GetComponent<SpriteRenderer>().enabled = false;
+
+            newPromptPos = joinPrompts[playerNum].transform.FindChild("XBONE_A").position;
+            newPromptPos.x = joinPrompts[playerNum].transform.FindChild("Join_Text").position.x;
+
+            joinPrompts[playerNum].transform.FindChild("XBONE_A").position = newPromptPos;
+        }
+
+        joinPrompts[playerNum].transform.FindChild("Join_Text").GetComponent<SpriteRenderer>().sprite = textSprite;
     }
 }
