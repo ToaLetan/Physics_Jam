@@ -566,6 +566,8 @@ public class MenuManager : MonoBehaviour
             newPromptPos.x = joinPrompts[playerNum].transform.FindChild("Join_Text").position.x;
 
             joinPrompts[playerNum].transform.FindChild("KEYBOARD_F").position = newPromptPos;
+
+            RemovePromptFromOthers(playerNum, "KEYBOARD_F"); //Hide the F Key from all other prompts, since there's only one.
         }
         else if (GameInfoManager.Instance.PlayerInputSources[playerNum].Contains("Keybinds 1")) //Uses the ; key, hide other prompts and center the ; prompt
         {
@@ -576,6 +578,8 @@ public class MenuManager : MonoBehaviour
             newPromptPos.x = joinPrompts[playerNum].transform.FindChild("Join_Text").position.x;
 
             joinPrompts[playerNum].transform.FindChild("KEYBOARD_SEMICOLON").position = newPromptPos;
+
+            RemovePromptFromOthers(playerNum, "KEYBOARD_SEMICOLON"); //Hide the Semicolon Key from all other prompts, since there's only one.
         }
         else if (GameInfoManager.Instance.PlayerInputSources[playerNum].Contains("Controller")) //Uses an Xbox controller, hide other prompts and center the A button prompt
         {
@@ -590,4 +594,56 @@ public class MenuManager : MonoBehaviour
 
         joinPrompts[playerNum].transform.FindChild("Join_Text").GetComponent<SpriteRenderer>().sprite = textSprite;
     }
+
+    private void RemovePromptFromOthers(int claimedUser, string promptNameToHide) //Used to hide keyboard prompts claimed by other users.
+    {
+        for (int i = 0; i < joinPrompts.Count; i++)
+        {
+            if (i != claimedUser)
+            {
+                joinPrompts[i].transform.FindChild(promptNameToHide).GetComponent<SpriteRenderer>().enabled = false;
+
+                //Reposition the other prompts based on how many are left.
+                int numPromptsVisible = 0;
+
+                //First, count up all of the visible prompts.
+                for (int j = 0; j < joinPrompts[i].transform.childCount; j++)
+                {
+                    if (joinPrompts[i].transform.GetChild(j).name != "Join_Text")
+                    {
+                        if (joinPrompts[i].transform.GetChild(j).GetComponent<SpriteRenderer>() != null && joinPrompts[i].transform.GetChild(j).GetComponent<SpriteRenderer>().enabled == true)
+                            numPromptsVisible++;
+                    }
+                }
+
+                if (numPromptsVisible == 2) //Center both prompts.
+                {
+                    for (int k = 0; k < joinPrompts[i].transform.childCount; k++)
+                    {
+                        if (joinPrompts[i].transform.GetChild(k).name != "Join_Text")
+                        {
+                            Vector3 newPos = joinPrompts[i].transform.GetChild(k).position;
+                            newPos.x -= joinPrompts[i].transform.GetChild(k).GetComponent<SpriteRenderer>().bounds.extents.x * 1.5f;
+
+                            joinPrompts[i].transform.GetChild(k).position = newPos;
+                        }
+                    }
+                }
+                else if (numPromptsVisible == 1) //Center the only prompt.
+                {
+                    for (int l = 0; l < joinPrompts[i].transform.childCount; l++)
+                    {
+                        if (joinPrompts[i].transform.GetChild(l).name != "Join_Text")
+                        {
+                            Vector3 newPos = joinPrompts[i].transform.GetChild(l).position;
+                            newPos.x = joinPrompts[i].transform.FindChild("Join_Text").position.x;
+
+                            joinPrompts[i].transform.GetChild(l).position = newPos;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }
