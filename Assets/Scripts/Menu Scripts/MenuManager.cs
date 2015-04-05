@@ -95,27 +95,27 @@ public class MenuManager : MonoBehaviour
         for (int i = 0; i < activeControllers.Count; i++)
         {
             //If moving left or right, apply the colour preview.
-            if (activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.dPadHorizontal) > MIN_THUMBSTICK_POS ||
-                activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.leftThumbstickHorizontal) > MIN_THUMBSTICK_POS)
+            if (activeControllers[i].playerController.GetThumbstickTriggerAxis(activeControllers[i].playerController.dPadHorizontal) > MIN_THUMBSTICK_POS ||
+                activeControllers[i].playerController.GetThumbstickTriggerAxis(activeControllers[i].playerController.leftThumbstickHorizontal) > MIN_THUMBSTICK_POS)
             {
                 if (playerStatuses[activeControllers[i].playerNum] == PlayerJoinStatus.ColourSelect)
                     ApplyColourPreview(1, activeControllers[i].playerNum);
                 else if (playerStatuses[activeControllers[i].playerNum] == PlayerJoinStatus.AbilitySelect)
                     SelectAbility(1, activeControllers[i].playerNum);
-            } 
+            }
 
-            if (activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.dPadHorizontal) < -MIN_THUMBSTICK_POS ||
-                activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.leftThumbstickHorizontal) < -MIN_THUMBSTICK_POS)
+            if (activeControllers[i].playerController.GetThumbstickTriggerAxis(activeControllers[i].playerController.dPadHorizontal) < -MIN_THUMBSTICK_POS ||
+                activeControllers[i].playerController.GetThumbstickTriggerAxis(activeControllers[i].playerController.leftThumbstickHorizontal) < -MIN_THUMBSTICK_POS)
             {
                 if (playerStatuses[activeControllers[i].playerNum] == PlayerJoinStatus.ColourSelect)
                     ApplyColourPreview(-1, activeControllers[i].playerNum);
                 else if (playerStatuses[activeControllers[i].playerNum] == PlayerJoinStatus.AbilitySelect)
                     SelectAbility(-1, activeControllers[i].playerNum);
-            } 
+            }
 
-            if (activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.dPadHorizontal) == 0 &&
-                (activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.leftThumbstickHorizontal) < THUMBSTICK_DEADZONE &&
-                activeControllers[i].playerController.GetThumbstickAxis(activeControllers[i].playerController.leftThumbstickHorizontal) > -THUMBSTICK_DEADZONE))
+            if (activeControllers[i].playerController.GetThumbstickTriggerAxis(activeControllers[i].playerController.dPadHorizontal) == 0 &&
+                (activeControllers[i].playerController.GetThumbstickTriggerAxis(activeControllers[i].playerController.leftThumbstickHorizontal) < THUMBSTICK_DEADZONE &&
+                activeControllers[i].playerController.GetThumbstickTriggerAxis(activeControllers[i].playerController.leftThumbstickHorizontal) > -THUMBSTICK_DEADZONE))
             {
                 canChangePlayerColourArray[activeControllers[i].playerNum] = true;
             }

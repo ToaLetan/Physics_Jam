@@ -16,6 +16,9 @@ public class XboxController
     public string startButton = "Start Button";
     public string backButton = "Back Button";
 
+    public string leftThumbstickClick = "Left Stick Click";
+    public string rightThumbstickClick = "Right Stick Click";
+
     public string leftThumbstickHorizontal = "Left Stick Horizontal";
     public string leftThumbstickVertical = "Left Stick Vertical";
 
@@ -47,7 +50,6 @@ public class XboxController
 
 	}
 
-
 	//Input functions
     public bool GetButtonHeld(string buttonName)
     {
@@ -64,9 +66,8 @@ public class XboxController
         return Input.GetButtonUp(controllerIdentifier + buttonName);
 	}
 
-	public float GetThumbstickAxis(string axisName)
+	public float GetThumbstickTriggerAxis(string axisName)
 	{
         return Input.GetAxis(controllerIdentifier + axisName);
-	}
-	
+	}	
 }

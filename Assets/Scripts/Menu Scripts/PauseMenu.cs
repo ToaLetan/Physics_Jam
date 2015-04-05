@@ -81,7 +81,7 @@ public class PauseMenu : MonoBehaviour
 
         if (ownerInputSource.Contains("Controller") == true)
         {
-            if (inputManager.ControllerArray[ownerInputIndex].GetThumbstickAxis(inputManager.ControllerArray[ownerInputIndex].leftThumbstickVertical) > MIN_THUMBSTICK_POS)
+            if (inputManager.ControllerArray[ownerInputIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[ownerInputIndex].leftThumbstickVertical) > MIN_THUMBSTICK_POS)
             {
                 if (canChangeSelection == true)
                 {
@@ -90,7 +90,7 @@ public class PauseMenu : MonoBehaviour
                     canChangeSelection = false;
                 }
             }
-            if (inputManager.ControllerArray[ownerInputIndex].GetThumbstickAxis(inputManager.ControllerArray[ownerInputIndex].leftThumbstickVertical) < -MIN_THUMBSTICK_POS)
+            if (inputManager.ControllerArray[ownerInputIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[ownerInputIndex].leftThumbstickVertical) < -MIN_THUMBSTICK_POS)
             {
                 if (canChangeSelection == true)
                 {
@@ -104,9 +104,9 @@ public class PauseMenu : MonoBehaviour
                 ProcessSelection();
 
             //Allows menu to be used by flicking thumbsticks, prevents flickering.
-            if (inputManager.ControllerArray[ownerInputIndex].GetThumbstickAxis(inputManager.ControllerArray[ownerInputIndex].dPadHorizontal) == 0 &&
-                (inputManager.ControllerArray[ownerInputIndex].GetThumbstickAxis(inputManager.ControllerArray[ownerInputIndex].leftThumbstickVertical) < THUMBSTICK_DEADZONE &&
-                inputManager.ControllerArray[ownerInputIndex].GetThumbstickAxis(inputManager.ControllerArray[ownerInputIndex].leftThumbstickVertical) > -THUMBSTICK_DEADZONE))
+            if (inputManager.ControllerArray[ownerInputIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[ownerInputIndex].dPadHorizontal) == 0 &&
+                (inputManager.ControllerArray[ownerInputIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[ownerInputIndex].leftThumbstickVertical) < THUMBSTICK_DEADZONE &&
+                inputManager.ControllerArray[ownerInputIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[ownerInputIndex].leftThumbstickVertical) > -THUMBSTICK_DEADZONE))
             {
                 canChangeSelection = true;
             }

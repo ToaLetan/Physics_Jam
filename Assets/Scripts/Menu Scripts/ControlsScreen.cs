@@ -74,13 +74,13 @@ public class ControlsScreen : MonoBehaviour
         }
         if (ownerInputSource.Contains("Controller") == true)
         {
-            if (inputManager.ControllerArray[ownerInputIndex].GetThumbstickAxis(inputManager.ControllerArray[ownerInputIndex].leftThumbstickHorizontal) < -MIN_THUMBSTICK_POS)
+            if (inputManager.ControllerArray[ownerInputIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[ownerInputIndex].leftThumbstickHorizontal) < -MIN_THUMBSTICK_POS)
             {
                 if (currentPageIndex == 1)
                     ChangeSelection(0);
             }
 
-            if (inputManager.ControllerArray[ownerInputIndex].GetThumbstickAxis(inputManager.ControllerArray[ownerInputIndex].leftThumbstickHorizontal) > MIN_THUMBSTICK_POS)
+            if (inputManager.ControllerArray[ownerInputIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[ownerInputIndex].leftThumbstickHorizontal) > MIN_THUMBSTICK_POS)
             {
                 if (currentPageIndex == 0)
                     ChangeSelection(1);

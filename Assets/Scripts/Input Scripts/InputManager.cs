@@ -14,8 +14,9 @@ public struct Keybinds
 	public KeyCode LTurnKey;
 	public KeyCode RTurnKey;
 
-	//Physics manipulation keys
+	//Physics manipulation and ability keys
 	public KeyCode GraborThrowKey;
+    public KeyCode AbilityKey;
 
 	//Menu Keys
 	public KeyCode SelectKey;
@@ -37,10 +38,19 @@ public class InputManager
     public delegate void ButtonHeldEvent(int playerNum, List<string> heldButtons);
     public delegate void ButtonPressedEvent(int playerNum, List<string> pressedButtons);
     public delegate void ButtonReleasedEvent(int playerNum, List<string> releasedButtons);
+    public delegate void AxisEvent(int playerNum, Vector2 axisValues);
+    public delegate void TriggerEvent(int playerNum, float triggerValue);
 
     public event ButtonHeldEvent Button_Held;
     public event ButtonPressedEvent Button_Pressed;
     public event ButtonReleasedEvent Button_Released;
+
+    public event AxisEvent Left_Thumbstick_Axis;
+    public event AxisEvent Right_Thumbstick_Axis;
+    public event AxisEvent DPad_Axis;
+
+    public event TriggerEvent Left_Trigger_Axis;
+    public event TriggerEvent Right_Trigger_Axis;
 
 	public Keybinds[] PlayerKeybindArray = new Keybinds[2]; //Keybinds for up to two keyboard-based players.
 	public XboxController[] ControllerArray = new XboxController[4]; //Supporting up to 4 connected controllers.
@@ -68,6 +78,7 @@ public class InputManager
 		PlayerKeybindArray [0].LTurnKey = KeyCode.Q;
 		PlayerKeybindArray [0].RTurnKey = KeyCode.E;
 		PlayerKeybindArray [0].GraborThrowKey = KeyCode.F;
+        PlayerKeybindArray[0].AbilityKey = KeyCode.R;
 
 		PlayerKeybindArray [1].UpKey = KeyCode.I;
 		PlayerKeybindArray [1].DownKey = KeyCode.K;
@@ -76,6 +87,7 @@ public class InputManager
 		PlayerKeybindArray [1].LTurnKey = KeyCode.U;
 		PlayerKeybindArray [1].RTurnKey = KeyCode.O;
 		PlayerKeybindArray [1].GraborThrowKey = KeyCode.Semicolon;
+        PlayerKeybindArray[1].AbilityKey = KeyCode.P;
 
 		PlayerKeybindArray [0].SelectKey = KeyCode.Return;
 		PlayerKeybindArray [0].ExitKey = KeyCode.Escape;
@@ -89,7 +101,8 @@ public class InputManager
 	// Update is called once per frame
 	public void Update () 
 	{
-		UpdateButtonInput ();
+		UpdateButtonInput();
+        UpdateAxisInput();
 	}
 
 
@@ -115,6 +128,8 @@ public class InputManager
                 allHeldKeys.Add(PlayerKeybindArray[i].RTurnKey.ToString() );
 			if(Input.GetKey(PlayerKeybindArray [i].GraborThrowKey))
                 allHeldKeys.Add(PlayerKeybindArray[i].GraborThrowKey.ToString() );
+            if (Input.GetKey(PlayerKeybindArray[i].AbilityKey))
+                allHeldKeys.Add(PlayerKeybindArray[i].AbilityKey.ToString());
 
 			if(Input.GetKey(PlayerKeybindArray [i].SelectKey))
                 allHeldKeys.Add(PlayerKeybindArray[i].SelectKey.ToString() );
@@ -142,6 +157,8 @@ public class InputManager
                 allPressedKeys.Add(PlayerKeybindArray[i].RTurnKey.ToString() );
 			if(Input.GetKeyDown(PlayerKeybindArray [i].GraborThrowKey))
                 allPressedKeys.Add(PlayerKeybindArray[i].GraborThrowKey.ToString() );
+            if (Input.GetKeyDown(PlayerKeybindArray[i].AbilityKey))
+                allPressedKeys.Add(PlayerKeybindArray[i].AbilityKey.ToString());
 			
 			if(Input.GetKeyDown(PlayerKeybindArray [i].SelectKey))
                 allPressedKeys.Add(PlayerKeybindArray[i].SelectKey.ToString() );
@@ -169,6 +186,8 @@ public class InputManager
                 allReleasedKeys.Add(PlayerKeybindArray[i].RTurnKey.ToString() );
 			if(!Input.GetKey(PlayerKeybindArray [i].GraborThrowKey))
                 allReleasedKeys.Add(PlayerKeybindArray[i].GraborThrowKey.ToString() );
+            if (!Input.GetKey(PlayerKeybindArray[i].AbilityKey))
+                allReleasedKeys.Add(PlayerKeybindArray[i].AbilityKey.ToString());
 			
 			if(allReleasedKeys.Count > 0)
 			{
@@ -253,4 +272,35 @@ public class InputManager
                 }
             }
 	}
+
+    public void UpdateAxisInput()
+    {
+        for (int i = 0; i < ControllerArray.Length; i++)
+        {
+            if (Left_Thumbstick_Axis != null)
+                Left_Thumbstick_Axis(ControllerArray[i].Controller_ID, new Vector2(ControllerArray[i].GetThumbstickTriggerAxis(ControllerArray[i].leftThumbstickHorizontal),
+                                                                                    ControllerArray[i].GetThumbstickTriggerAxis(ControllerArray[i].leftThumbstickVertical)));
+
+            if (Right_Thumbstick_Axis != null)
+                Right_Thumbstick_Axis(ControllerArray[i].Controller_ID, new Vector2(ControllerArray[i].GetThumbstickTriggerAxis(ControllerArray[i].rightThumbstickHorizontal),
+                                                                                    ControllerArray[i].GetThumbstickTriggerAxis(ControllerArray[i].rightThumbstickVertical) ) );
+
+            if (DPad_Axis != null)
+                DPad_Axis(ControllerArray[i].Controller_ID, new Vector2(ControllerArray[i].GetThumbstickTriggerAxis(ControllerArray[i].dPadHorizontal),
+                                                                                    ControllerArray[i].GetThumbstickTriggerAxis(ControllerArray[i].dPadVertical) ) );
+
+            if (Left_Trigger_Axis != null)
+            {
+                if (ControllerArray[i].GetThumbstickTriggerAxis(ControllerArray[i].leftRightTriggers) >= 0)
+                    Left_Trigger_Axis(ControllerArray[i].Controller_ID, ControllerArray[i].GetThumbstickTriggerAxis(ControllerArray[i].leftRightTriggers) );
+            }
+
+            if (Right_Trigger_Axis != null)
+            {
+                if (ControllerArray[i].GetThumbstickTriggerAxis(ControllerArray[i].leftRightTriggers) <= 0)
+                    Right_Trigger_Axis(ControllerArray[i].Controller_ID, ControllerArray[i].GetThumbstickTriggerAxis(ControllerArray[i].leftRightTriggers));
+            }
+        }
+    }
+
 }

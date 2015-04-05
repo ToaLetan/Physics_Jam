@@ -12,7 +12,7 @@ public class PlayerScript : MonoBehaviour
     private const float THROWVELOCITY = 250.0f;
     private const float BEAMOFFSET = -0.03f;
     private const float BEAMALPHA = 0.7f;
-    private const float THUMBSTICK_DEADZONE = 0.1f;
+    private const float THUMBSTICK_TRIGGER_DEADZONE = 0.1f;
 
     public delegate void PlayerEvent(int playerNum);
     public event PlayerEvent Player_Death;
@@ -128,10 +128,25 @@ public class PlayerScript : MonoBehaviour
 
         Debug.Log("PLAYER " + PlayerNumber + " TIED TO INPUT SOURCE: " + inputSource);
 
-        inputManager.Key_Held += PlayerInput;
-        inputManager.Key_Released += ApplyDeceleration;
-        inputManager.Key_Pressed += MenuInput;
-        inputManager.Button_Pressed += MenuInput;
+        if (inputSource.Contains("Keybinds"))
+        {
+            //Keyboard Input
+            inputManager.Key_Held += PlayerInput;
+            inputManager.Key_Released += ApplyDeceleration;
+            inputManager.Key_Pressed += MenuInput;
+        }
+
+        if (inputSource.Contains("Controller"))
+        {
+            //Controller input
+            inputManager.Button_Pressed += MenuInput;
+            inputManager.Right_Thumbstick_Axis += RotateBeamController;
+            inputManager.Left_Thumbstick_Axis += PlayerControllerInput;
+            inputManager.Left_Thumbstick_Axis += ApplyDecelerationController;
+            inputManager.Left_Trigger_Axis += LeftTriggerInput;
+            inputManager.Right_Trigger_Axis += RightTriggerInput;
+        }
+        
 
         selectionTimer.OnTimerComplete += SetAction;
         respawnTimer.OnTimerComplete += EnableMove;
@@ -157,12 +172,12 @@ public class PlayerScript : MonoBehaviour
 
         UpdateActive();
 
-        if (inputSource.Contains("Controller") == true)
+        /*if (inputSource.Contains("Controller") == true) //TODO: Refactor this to use events
         {
             PlayerInput(PlayerNumber, null);
             ApplyDeceleration(PlayerNumber, null);
-            RotateBeamController();
-        }
+            //RotateBeamController();
+        }*/
 	}
 
     public void SetPlayerColour(Color newColour) //Tied to GameManager to set the Colour based on what's established in the GameInfoManager
@@ -235,7 +250,7 @@ public class PlayerScript : MonoBehaviour
                     }
                         //=================================================================================================================
 
-                        //================================================ BEAM ROTATION ================================================
+                        //================================================ BEAM FUNCTIONALITY AND ABILITY ================================================
                     if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LTurnKey.ToString()) || keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].RTurnKey.ToString()))
                         {
                             if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LTurnKey.ToString()))
@@ -253,32 +268,33 @@ public class PlayerScript : MonoBehaviour
                                 else
                                     ThrowObject();
                             }
-
-                            //REALLY GHETTO ACTIVE TEST
-                            UseActive();
                         }
+                    if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].AbilityKey.ToString()))
+                    {
+                        UseActive();
+                    }
                         //=================================================================================================================
                 }
-
+                /*
                 if (inputSource.Contains("Controller") == true)
                 {
                     //================================================ MOVEMENT ================================================
-                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) >= THUMBSTICK_DEADZONE ||
-                        inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) <= -THUMBSTICK_DEADZONE )
+                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) >= THUMBSTICK_DEADZONE ||
+                        inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) <= -THUMBSTICK_DEADZONE)
                     {
 
-                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) > 0)
+                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) > 0)
                             currentDirectionY = 1;
-                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) < 0)
+                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) < 0)
                             currentDirectionY = -1;
                     }
 
-                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) >= THUMBSTICK_DEADZONE ||
-                        inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) <= -THUMBSTICK_DEADZONE)
+                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) >= THUMBSTICK_DEADZONE ||
+                        inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) <= -THUMBSTICK_DEADZONE)
                     {
-                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) > THUMBSTICK_DEADZONE)
+                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) > THUMBSTICK_DEADZONE)
                             currentDirectionX = 1;
-                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) < THUMBSTICK_DEADZONE)
+                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) < THUMBSTICK_DEADZONE)
                             currentDirectionX = -1;
                     }
                     //=================================================================================================================
@@ -301,10 +317,81 @@ public class PlayerScript : MonoBehaviour
                     }
 
                     //Only call PlayerMove() if the thumbstick isn't completely idle.
-                    if (((inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) >= THUMBSTICK_DEADZONE ||
-                            inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) <= -THUMBSTICK_DEADZONE)) ||
-                        (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) >= THUMBSTICK_DEADZONE ||
-                            inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) <= -THUMBSTICK_DEADZONE))
+                    if (((inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) >= THUMBSTICK_DEADZONE ||
+                            inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) <= -THUMBSTICK_DEADZONE)) ||
+                        (inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) >= THUMBSTICK_DEADZONE ||
+                            inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) <= -THUMBSTICK_DEADZONE))
+                    {
+                        PlayerMove(currentDirectionX, currentDirectionY);
+
+                        if (currentAnim != PlayerAnim.Walk) //Move the player and play an animation based on the current direction
+                        {
+                            currentAnim = PlayerAnim.Walk;
+                            UpdateDirectionalAnim();
+                        }
+                    }
+                    else //If the thumbstick is idle, play the idle animation.
+                    {
+                        if (currentAnim != PlayerAnim.Idle) //Move the player and play an animation based on the current direction
+                        {
+                            currentAnim = PlayerAnim.Idle;
+                            UpdateDirectionalAnim();
+                        }
+                    }
+                }*/
+                
+            } 
+        }
+	}
+
+    public void PlayerControllerInput(int playerNum, Vector2 thumbstickVector)
+    {
+        if (playerNum == inputSourceIndex)
+        {
+            if (gameManager.IsGamePaused == false)
+            {
+                Vector3 newPosition = gameObject.transform.position;
+
+                if (canMove == true)
+                {
+                        //================================================ MOVEMENT ================================================
+                    if (thumbstickVector.y >= THUMBSTICK_TRIGGER_DEADZONE || thumbstickVector.y <= -THUMBSTICK_TRIGGER_DEADZONE)
+                    {
+                        if (thumbstickVector.y > 0)
+                        {
+                            currentDirectionY = 1;
+                            currentDirection = Direction.Up;
+                        }
+
+                        if (thumbstickVector.y < 0)
+                        {
+                            currentDirectionY = -1;
+                            currentDirection = Direction.Down;
+                        }
+                    }
+                    else
+                        currentDirectionY = 0;
+
+                    if (thumbstickVector.x >= THUMBSTICK_TRIGGER_DEADZONE || thumbstickVector.x <= -THUMBSTICK_TRIGGER_DEADZONE)
+                    {
+                        if (thumbstickVector.x > THUMBSTICK_TRIGGER_DEADZONE)
+                        {
+                            currentDirectionX = 1;
+                            currentDirection = Direction.Right;
+                        }
+                            
+                        if (thumbstickVector.x < THUMBSTICK_TRIGGER_DEADZONE)
+                        {
+                            currentDirectionX = -1;
+                            currentDirection = Direction.Left;
+                        }  
+                    }
+                    else
+                        currentDirectionX = 0;
+
+                    //Only call PlayerMove() if the thumbstick isn't completely idle.
+                    if (((thumbstickVector.y >= THUMBSTICK_TRIGGER_DEADZONE || thumbstickVector.y <= -THUMBSTICK_TRIGGER_DEADZONE)) ||
+                        (thumbstickVector.x >= THUMBSTICK_TRIGGER_DEADZONE || thumbstickVector.x <= -THUMBSTICK_TRIGGER_DEADZONE))
                     {
                         PlayerMove(currentDirectionX, currentDirectionY);
 
@@ -323,10 +410,43 @@ public class PlayerScript : MonoBehaviour
                         }
                     }
                 }
-                
-            } 
+            }
         }
-	}
+    }
+
+    public void LeftTriggerInput(int playerNum, float triggerValue)
+    {
+        if (playerNum == inputSourceIndex)
+        {
+            if (gameManager.IsGamePaused == false)
+            {
+                if (triggerValue >= THUMBSTICK_TRIGGER_DEADZONE)
+                {
+                    UseActive();
+                }
+            }
+        }
+    }
+
+    public void RightTriggerInput(int playerNum, float triggerValue)
+    {
+        if (playerNum == inputSourceIndex)
+        {
+            if (gameManager.IsGamePaused == false)
+            {
+                if (triggerValue <= -THUMBSTICK_TRIGGER_DEADZONE)
+                {
+                    if (canPerformAction == true)
+                    {
+                        if (selectorBeam.GetComponent<BeamScript>().IsHoldingObject == false)
+                            GrabObject();
+                        else
+                            ThrowObject();
+                    }
+                }
+            }
+        }
+    }
 
 	public void ApplyDeceleration(int playerNum, List<string> keysReleased)
 	{
@@ -371,33 +491,6 @@ public class PlayerScript : MonoBehaviour
                         }
                     }
                 }
-
-                if (inputSource.Contains("Controller") == true)
-                {
-                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) <= THUMBSTICK_DEADZONE &&
-                        inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) >= -THUMBSTICK_DEADZONE)
-                    {
-                        if (currentVelocityY > 0)
-                        {
-                            if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.up * currentDirectionY, height * 1.5f) == true)
-                                currentVelocityY = 0;
-                            else
-                                currentVelocityY -= deceleration * Time.deltaTime;
-                        }
-                    }
-
-                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) <= THUMBSTICK_DEADZONE &&
-                        inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) >= -THUMBSTICK_DEADZONE)
-                    {
-                        if (currentVelocityX > 0)
-                        {
-                            if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.right * currentDirectionX, width * 1.5f) == true)
-                                currentVelocityX = 0;
-                            else
-                                currentVelocityX -= deceleration * Time.deltaTime;
-                        }
-                    }
-                }
             }
 
             if (currentVelocityX < 0)
@@ -408,8 +501,57 @@ public class PlayerScript : MonoBehaviour
             newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
             newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
             gameObject.transform.position = newPosition;
+
+            Debug.Log("PLAYER: " + PlayerNumber + " | currentVelocityX :" + currentVelocityX);
         }
 	}
+
+    private void ApplyDecelerationController(int playerNum, Vector2 leftThumbstick)
+    {
+        if (playerNum == inputSourceIndex)
+        {
+            if (gameManager.IsGamePaused == false)
+            {
+                Vector3 newPosition = gameObject.transform.position;
+
+                if (canMove == true && (currentVelocityX > 0 || currentVelocityY > 0) )
+                {
+                    if (leftThumbstick.y <= THUMBSTICK_TRIGGER_DEADZONE && leftThumbstick.y >= -THUMBSTICK_TRIGGER_DEADZONE)
+                    {
+                        if (currentVelocityY > 0)
+                        {
+                            if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.up * currentDirectionY, height * 1.5f) == true)
+                                currentVelocityY = 0;
+                            else
+                                currentVelocityY -= deceleration * Time.deltaTime;
+                        }
+                    }
+
+                    if (leftThumbstick.x <= THUMBSTICK_TRIGGER_DEADZONE && leftThumbstick.x >= -THUMBSTICK_TRIGGER_DEADZONE)
+                    {
+                        if (currentVelocityX > 0)
+                        {
+                            if (SpeculativeContactsScript.PerformSpeculativeContacts(gameObject.transform.position, Vector2.right * currentDirectionX, width * 1.5f) == true)
+                                currentVelocityX = 0;
+                            else
+                                currentVelocityX -= deceleration * Time.deltaTime;
+                        }
+                    }
+
+                    if (currentVelocityX < 0)
+                        currentVelocityX = 0;
+                    if (currentVelocityY < 0)
+                        currentVelocityY = 0;
+
+                    newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
+                    newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
+                    gameObject.transform.position = newPosition;
+
+                    Debug.Log("PLAYER: " + PlayerNumber + " | currentVelocityX :" + currentVelocityX);
+                }
+            }
+        }
+    }
 
     private void MenuInput(int playerNum, List<string> keysPressed)
     {
@@ -514,19 +656,19 @@ public class PlayerScript : MonoBehaviour
 		selectorBeam.transform.rotation = newRotation;
 	}
 
-    private void RotateBeamController()
+    private void RotateBeamController(int playerNum, Vector2 thumbstickAxis)
     {
-        Vector2 rightThumbstickOrientation = new Vector2(inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].rightThumbstickHorizontal),
-            inputManager.ControllerArray[inputSourceIndex].GetThumbstickAxis(inputManager.ControllerArray[inputSourceIndex].rightThumbstickVertical));
+        if (playerNum == PlayerNumber)
+        {
+            float newAngle = Mathf.Atan2(thumbstickAxis.y, thumbstickAxis.x) * Mathf.Rad2Deg * -1;
 
-        float newAngle = Mathf.Atan2(rightThumbstickOrientation.y, rightThumbstickOrientation.x) * Mathf.Rad2Deg * -1;
+            Quaternion newRotation = Quaternion.AngleAxis(newAngle, Vector3.forward);
 
-        Quaternion newRotation = Quaternion.AngleAxis(newAngle, Vector3.forward);
+            if (gameObject.transform.FindChild("PlayerArm") != null)
+                gameObject.transform.FindChild("PlayerArm").rotation = newRotation;
 
-        if (gameObject.transform.FindChild("PlayerArm") != null)
-            gameObject.transform.FindChild("PlayerArm").rotation = newRotation;
-
-        selectorBeam.transform.rotation = newRotation;
+            selectorBeam.transform.rotation = newRotation;
+        }       
     }
 
 	private void GrabObject()
