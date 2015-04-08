@@ -32,7 +32,7 @@ public class PlayerScript : MonoBehaviour
     public enum PlayerAnim { Idle, Walk }
     private PlayerAnim currentAnim = PlayerAnim.Idle;
 
-    //Directuins
+    //Directions
     public enum Direction { Up, Down, Left, Right }
     private Direction currentDirection = Direction.Down;
 
@@ -172,12 +172,8 @@ public class PlayerScript : MonoBehaviour
 
         UpdateActive();
 
-        /*if (inputSource.Contains("Controller") == true) //TODO: Refactor this to use events
-        {
-            PlayerInput(PlayerNumber, null);
-            ApplyDeceleration(PlayerNumber, null);
-            //RotateBeamController();
-        }*/
+        if (gameManager.IsGamePaused == true)
+            Debug.Log(gameManager.IsGamePaused);
 	}
 
     public void SetPlayerColour(Color newColour) //Tied to GameManager to set the Colour based on what's established in the GameInfoManager
@@ -205,8 +201,6 @@ public class PlayerScript : MonoBehaviour
 
             if (canMove == true)
             {
-                if(inputSource.Contains("Keybinds") == true)
-                {
                     //================================================ MOVEMENT ================================================
                     if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].UpKey.ToString()) || keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].DownKey.ToString()) ||
                         (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LeftKey.ToString()) || keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].RightKey.ToString())))
@@ -273,73 +267,7 @@ public class PlayerScript : MonoBehaviour
                     {
                         UseActive();
                     }
-                        //=================================================================================================================
-                }
-                /*
-                if (inputSource.Contains("Controller") == true)
-                {
-                    //================================================ MOVEMENT ================================================
-                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) >= THUMBSTICK_DEADZONE ||
-                        inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) <= -THUMBSTICK_DEADZONE)
-                    {
-
-                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) > 0)
-                            currentDirectionY = 1;
-                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) < 0)
-                            currentDirectionY = -1;
-                    }
-
-                    if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) >= THUMBSTICK_DEADZONE ||
-                        inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) <= -THUMBSTICK_DEADZONE)
-                    {
-                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) > THUMBSTICK_DEADZONE)
-                            currentDirectionX = 1;
-                        if (inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) < THUMBSTICK_DEADZONE)
-                            currentDirectionX = -1;
-                    }
-                    //=================================================================================================================
-
-                    if (inputManager.ControllerArray[inputSourceIndex].GetButtonDown(inputManager.ControllerArray[inputSourceIndex].rightBumper) )
-                    {
-                        if (canPerformAction == true)
-                        {
-                            if (selectorBeam.GetComponent<BeamScript>().IsHoldingObject == false)
-                                GrabObject();
-                            else
-                                ThrowObject();
-                        }
-                    }
-
-                    if (inputManager.ControllerArray[inputSourceIndex].GetButtonDown(inputManager.ControllerArray[inputSourceIndex].startButton.ToString())) //Bring up the pause menu
-                    {
-                        if (gameManager.IsGamePaused == false)
-                            gameManager.ShowPauseMenu(inputSource, inputSourceIndex);
-                    }
-
-                    //Only call PlayerMove() if the thumbstick isn't completely idle.
-                    if (((inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) >= THUMBSTICK_DEADZONE ||
-                            inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickVertical) <= -THUMBSTICK_DEADZONE)) ||
-                        (inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) >= THUMBSTICK_DEADZONE ||
-                            inputManager.ControllerArray[inputSourceIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[inputSourceIndex].leftThumbstickHorizontal) <= -THUMBSTICK_DEADZONE))
-                    {
-                        PlayerMove(currentDirectionX, currentDirectionY);
-
-                        if (currentAnim != PlayerAnim.Walk) //Move the player and play an animation based on the current direction
-                        {
-                            currentAnim = PlayerAnim.Walk;
-                            UpdateDirectionalAnim();
-                        }
-                    }
-                    else //If the thumbstick is idle, play the idle animation.
-                    {
-                        if (currentAnim != PlayerAnim.Idle) //Move the player and play an animation based on the current direction
-                        {
-                            currentAnim = PlayerAnim.Idle;
-                            UpdateDirectionalAnim();
-                        }
-                    }
-                }*/
-                
+                        //=================================================================================================================       
             } 
         }
 	}
@@ -448,16 +376,14 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
-	public void ApplyDeceleration(int playerNum, List<string> keysReleased)
-	{
+    public void ApplyDeceleration(int playerNum, List<string> keysReleased)
+    {
         if (gameManager.IsGamePaused == false)
         {
             Vector3 newPosition = gameObject.transform.position;
-		
+
             if (canMove == true)
             {
-                if (inputSource.Contains("Keybinds") == true)
-                {
                     if (keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].UpKey.ToString()) && keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].DownKey.ToString()))
                     {
                         if (currentVelocityY > 0)
@@ -490,21 +416,23 @@ public class PlayerScript : MonoBehaviour
                             UpdateDirectionalAnim();
                         }
                     }
-                }
             }
 
-            if (currentVelocityX < 0)
-                currentVelocityX = 0;
-            if (currentVelocityY < 0)
-                currentVelocityY = 0;
 
-            newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
-            newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
-            gameObject.transform.position = newPosition;
+            if (keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].UpKey.ToString()) || keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].DownKey.ToString())
+                        || keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LeftKey.ToString()) || keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].RightKey.ToString()))
+            {
+                if (currentVelocityX < 0)
+                    currentVelocityX = 0;
+                if (currentVelocityY < 0)
+                    currentVelocityY = 0;
 
-            Debug.Log("PLAYER: " + PlayerNumber + " | currentVelocityX :" + currentVelocityX);
+                newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
+                newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
+                gameObject.transform.position = newPosition;
+            }
         }
-	}
+    }
 
     private void ApplyDecelerationController(int playerNum, Vector2 leftThumbstick)
     {
@@ -538,24 +466,22 @@ public class PlayerScript : MonoBehaviour
                         }
                     }
 
-                    if (currentVelocityX < 0)
-                        currentVelocityX = 0;
-                    if (currentVelocityY < 0)
-                        currentVelocityY = 0;
-
-                    newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
-                    newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
-                    gameObject.transform.position = newPosition;
-
-                    Debug.Log("PLAYER: " + PlayerNumber + " | currentVelocityX :" + currentVelocityX);
                 }
+                if (currentVelocityX < 0)
+                    currentVelocityX = 0;
+                if (currentVelocityY < 0)
+                    currentVelocityY = 0;
+
+                newPosition.x += currentVelocityX * currentDirectionX * Time.deltaTime;
+                newPosition.y += currentVelocityY * currentDirectionY * Time.deltaTime;
+                gameObject.transform.position = newPosition;
             }
         }
     }
 
     private void MenuInput(int playerNum, List<string> keysPressed)
     {
-        if (keysPressed.Contains(InputManager.Instance.PlayerKeybindArray[inputSourceIndex].SelectKey.ToString()) )
+        if (keysPressed.Contains(InputManager.Instance.PlayerKeybindArray[0].SelectKey.ToString()) ) //Index is always 0 since there's only one pause and exit key
         {
             if (gameManager.IsGamePaused == false)
                 gameManager.ShowPauseMenu(inputSource, inputSourceIndex);
@@ -647,28 +573,34 @@ public class PlayerScript : MonoBehaviour
 
 	private void RotateBeamKeyboard(int direction)
 	{
-        float newAngle = selectorBeam.transform.rotation.eulerAngles.z + turnSpeed * direction * Time.deltaTime;
-		Quaternion newRotation = Quaternion.AngleAxis (newAngle, Vector3.forward);
-
-        if (gameObject.transform.FindChild("PlayerArm") != null)
-            gameObject.transform.FindChild("PlayerArm").rotation = newRotation;
-
-		selectorBeam.transform.rotation = newRotation;
-	}
-
-    private void RotateBeamController(int playerNum, Vector2 thumbstickAxis)
-    {
-        if (playerNum == PlayerNumber)
+        if (gameManager.IsGamePaused == false)
         {
-            float newAngle = Mathf.Atan2(thumbstickAxis.y, thumbstickAxis.x) * Mathf.Rad2Deg * -1;
-
+            float newAngle = selectorBeam.transform.rotation.eulerAngles.z + turnSpeed * direction * Time.deltaTime;
             Quaternion newRotation = Quaternion.AngleAxis(newAngle, Vector3.forward);
 
             if (gameObject.transform.FindChild("PlayerArm") != null)
                 gameObject.transform.FindChild("PlayerArm").rotation = newRotation;
 
             selectorBeam.transform.rotation = newRotation;
-        }       
+        }
+	}
+
+    private void RotateBeamController(int playerNum, Vector2 thumbstickAxis)
+    {
+        if (gameManager.IsGamePaused == false)
+        {
+            if (playerNum == PlayerNumber)
+            {
+                float newAngle = Mathf.Atan2(thumbstickAxis.y, thumbstickAxis.x) * Mathf.Rad2Deg * -1;
+
+                Quaternion newRotation = Quaternion.AngleAxis(newAngle, Vector3.forward);
+
+                if (gameObject.transform.FindChild("PlayerArm") != null)
+                    gameObject.transform.FindChild("PlayerArm").rotation = newRotation;
+
+                selectorBeam.transform.rotation = newRotation;
+            }     
+        }
     }
 
 	private void GrabObject()

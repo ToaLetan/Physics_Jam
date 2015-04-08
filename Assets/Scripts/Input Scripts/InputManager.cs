@@ -89,7 +89,7 @@ public class InputManager
 		PlayerKeybindArray [1].GraborThrowKey = KeyCode.Semicolon;
         PlayerKeybindArray[1].AbilityKey = KeyCode.P;
 
-		PlayerKeybindArray [0].SelectKey = KeyCode.Return;
+		PlayerKeybindArray [0].SelectKey = KeyCode.Return; //Only exists once to prevent game from "double-pausing"
 		PlayerKeybindArray [0].ExitKey = KeyCode.Escape;
 
 		for (int i = 0; i < ControllerArray.Length; i++)

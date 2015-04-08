@@ -535,8 +535,6 @@ public class MenuManager : MonoBehaviour
 
     private void UpdateSidePrompt(int playerNum)
     {
-        Debug.Log(playerNum);
-
         Vector3 newPromptPos = Vector3.zero;
 
         Sprite textSprite = joinPrompts[playerNum].transform.FindChild("Join_Text").GetComponent<SpriteRenderer>().sprite;
