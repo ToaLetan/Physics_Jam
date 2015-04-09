@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
 
     private int numOfDefeatedPlayers = 0;
 
-    public bool isGamePaused = false; //EXPOSED TO PUBLIC FOR DEBUGGING
+    private bool isGamePaused = false;
     private bool isGameOver = false;
 
     public bool IsGamePaused

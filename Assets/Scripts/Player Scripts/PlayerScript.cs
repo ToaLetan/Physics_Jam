@@ -171,9 +171,6 @@ public class PlayerScript : MonoBehaviour
         respawnTimer.Update();
 
         UpdateActive();
-
-        if (gameManager.IsGamePaused == true)
-            Debug.Log(gameManager.IsGamePaused);
 	}
 
     public void SetPlayerColour(Color newColour) //Tied to GameManager to set the Colour based on what's established in the GameInfoManager
@@ -479,9 +476,10 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
-    private void MenuInput(int playerNum, List<string> keysPressed)
+    private void MenuInput(int playerNum, List<string> keysButtonsPressed)
     {
-        if (keysPressed.Contains(InputManager.Instance.PlayerKeybindArray[0].SelectKey.ToString()) ) //Index is always 0 since there's only one pause and exit key
+        if (keysButtonsPressed.Contains(InputManager.Instance.PlayerKeybindArray[0].SelectKey.ToString()) 
+            || keysButtonsPressed.Contains(InputManager.Instance.ControllerArray[inputSourceIndex].startButton)) //Index is always 0 for keyboard since there's only one pause and exit key
         {
             if (gameManager.IsGamePaused == false)
                 gameManager.ShowPauseMenu(inputSource, inputSourceIndex);

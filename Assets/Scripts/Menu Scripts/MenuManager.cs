@@ -36,6 +36,7 @@ public class MenuManager : MonoBehaviour
     private PlayerJoinStatus[] playerStatuses = new PlayerJoinStatus[MAX_NUM_OF_PLAYERS]; //Array of bools used to determine if the player is selecting an Ability. False if haven't picked colour first.
 	private Color[] colourArray = new Color[NUM_OF_COLOURS]; //Array of possible colours
     private Vector3[] panelPositionsArray = new Vector3[MAX_NUM_OF_PLAYERS]; //Array of desired locations for panels to move to.
+    private Vector3[] originalPanelPositionsArray = new Vector3[MAX_NUM_OF_PLAYERS];
     private int[] playerColourIndexArray = new int[MAX_NUM_OF_PLAYERS]; //Array of current colour indices (ex. red = 1, blue = 2, etc.)
     private int[] playerAbilityIndexArray = new int[MAX_NUM_OF_PLAYERS];
     private bool[] canChangePlayerColourArray = new bool[MAX_NUM_OF_PLAYERS]; //Array of bools used to determine if the player can change colour, prevents holding keys to flicker through colours.
@@ -71,8 +72,12 @@ public class MenuManager : MonoBehaviour
             //Establish all desired panel positions for when they need to be moved on-screen.
             panelPositionsArray[i] = new Vector3(panelDestinationX, previewPlayers[i].transform.parent.transform.position.y, previewPlayers[i].transform.parent.transform.position.z);
 
-            //Hide all Ability selections
+            GameObject currentPanel = previewPlayers[i].transform.parent.gameObject;
+            originalPanelPositionsArray[i] = currentPanel.transform.position;
+
+            //Hide all Ability selections and back prompts
             ShowHideAbilitySelection(i, false);
+            ShowHideBackPrompt(i, false);
         }
 
 		AnimatePlayers();
@@ -433,7 +438,23 @@ public class MenuManager : MonoBehaviour
         playerStatuses[currentJoinedPlayerIndex] = PlayerJoinStatus.ColourSelect;
 
         UpdateSidePrompt(currentJoinedPlayerIndex);
+
+        ShowHideBackPrompt(currentJoinedPlayerIndex, true);
 	}
+
+    private void PlayerQuit(int playerNum)
+    {   
+        //Remove their information from the GameInfoManager, reset their colour, join status, ability, and the current Joined Player Index so the next player to join replaces them.
+        GameInfoManager.Instance.PlayerInputSources[playerNum] = "";
+        GameInfoManager.Instance.JoinedPlayers[playerNum] = false;
+
+        playerStatuses[playerNum] = PlayerJoinStatus.NotJoined;
+        playerColourIndexArray[playerNum] = -1;
+        playerAbilityIndexArray[playerNum] = 1;
+        canChangePlayerColourArray[playerNum] = true;
+
+        currentJoinedPlayerIndex = playerNum - 1;
+    }
 
     private void ButtonMenuInput(int playerNum, List<string> buttonsHeld)
     {
@@ -463,6 +484,10 @@ public class MenuManager : MonoBehaviour
             {
                 LoadGame();
             }
+        }
+        else if (buttonsHeld.Contains(inputManager.ControllerArray[playerNum].buttonB))
+        {
+            Back(playerNum);
         }
 
         //Check registered controllers
@@ -501,6 +526,14 @@ public class MenuManager : MonoBehaviour
         }
     }
 
+    private void MovePanelBack(int panelNum)
+    {
+        GameObject panel = previewPlayers[panelNum].transform.parent.gameObject;
+
+        panel.AddComponent<TweenComponent>();
+        panel.GetComponent<TweenComponent>().TweenPositionTo(originalPanelPositionsArray[panelNum], PANEL_MOVESPEED);
+    }
+
     private void LoadGame()
     {
         inputManager.Key_Pressed -= MenuInput;
@@ -531,6 +564,35 @@ public class MenuManager : MonoBehaviour
             if (previewPlayers[previewIndex].transform.GetChild(i).gameObject.name != "PreviewPlayer")
                 previewPlayers[previewIndex].transform.GetChild(i).GetComponent<SpriteRenderer>().enabled = showColour;
         } 
+    }
+
+    private void ShowHideBackPrompt(int previewIndex, bool showPrompt = false)
+    {
+        if (previewPlayers[previewIndex].transform.parent.FindChild("BackPrompt").GetComponent<SpriteRenderer>() != null)
+        {
+            previewPlayers[previewIndex].transform.parent.FindChild("BackPrompt").GetComponent<SpriteRenderer>().enabled = showPrompt;
+            previewPlayers[previewIndex].transform.parent.FindChild("BackPrompt").GetChild(0).GetComponent<SpriteRenderer>().enabled = showPrompt;
+        }
+    }
+
+    private void SetBackPrompt(int previewIndex, bool useKeyboardPrompt = false)
+    {
+        GameObject prompt = previewPlayers[previewIndex].transform.parent.FindChild("BackPrompt").GetChild(0).gameObject;
+
+        if (prompt.GetComponent<SpriteRenderer>() != null)
+        {
+            if (useKeyboardPrompt == true)
+            {
+                if (GameInfoManager.Instance.PlayerInputSources[previewIndex].Contains("Keybinds 0"))
+                    prompt.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Buttons/KEYBOARD_R");
+                if (GameInfoManager.Instance.PlayerInputSources[previewIndex].Contains("Keybinds 1"))
+                    prompt.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Buttons/KEYBOARD_P");
+            }
+            else
+            {
+                prompt.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Buttons/XBONE_B");
+            }
+        }
     }
 
     private void UpdateSidePrompt(int playerNum)
@@ -566,6 +628,8 @@ public class MenuManager : MonoBehaviour
             joinPrompts[playerNum].transform.FindChild("KEYBOARD_F").position = newPromptPos;
 
             RemovePromptFromOthers(playerNum, "KEYBOARD_F"); //Hide the F Key from all other prompts, since there's only one.
+
+            SetBackPrompt(playerNum, true); //Set the back prompt to use R
         }
         else if (GameInfoManager.Instance.PlayerInputSources[playerNum].Contains("Keybinds 1")) //Uses the ; key, hide other prompts and center the ; prompt
         {
@@ -578,6 +642,8 @@ public class MenuManager : MonoBehaviour
             joinPrompts[playerNum].transform.FindChild("KEYBOARD_SEMICOLON").position = newPromptPos;
 
             RemovePromptFromOthers(playerNum, "KEYBOARD_SEMICOLON"); //Hide the Semicolon Key from all other prompts, since there's only one.
+
+            SetBackPrompt(playerNum, true); //Set the back prompt to use P
         }
         else if (GameInfoManager.Instance.PlayerInputSources[playerNum].Contains("Controller")) //Uses an Xbox controller, hide other prompts and center the A button prompt
         {
@@ -588,6 +654,8 @@ public class MenuManager : MonoBehaviour
             newPromptPos.x = joinPrompts[playerNum].transform.FindChild("Join_Text").position.x;
 
             joinPrompts[playerNum].transform.FindChild("XBONE_A").position = newPromptPos;
+
+            SetBackPrompt(playerNum, false); //Set the back prompt to use the Xbox B button
         }
 
         joinPrompts[playerNum].transform.FindChild("Join_Text").GetComponent<SpriteRenderer>().sprite = textSprite;
@@ -644,4 +712,22 @@ public class MenuManager : MonoBehaviour
         }
     }
 
+    private void Back(int playerNum)
+    {
+        PlayerJoinStatus playerStatus = playerStatuses[playerNum];
+
+        switch(playerStatus)
+        {
+            case PlayerJoinStatus.ColourSelect: //Go back to not joined.
+                PlayerQuit(playerNum);
+                MovePanelBack(playerNum);
+                break;
+            case PlayerJoinStatus.AbilitySelect: //Go back to Colour selection.
+                break;
+            case PlayerJoinStatus.Done: //Go back to Ability selection.
+                break;
+            default:
+                break;
+        }
+    }
 }
