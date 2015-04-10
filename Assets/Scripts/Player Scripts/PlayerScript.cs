@@ -587,8 +587,10 @@ public class PlayerScript : MonoBehaviour
     {
         if (gameManager.IsGamePaused == false)
         {
-            if (playerNum == PlayerNumber)
+            if (playerNum == inputSourceIndex)
             {
+                Debug.Log(thumbstickAxis.x);
+
                 float newAngle = Mathf.Atan2(thumbstickAxis.y, thumbstickAxis.x) * Mathf.Rad2Deg * -1;
 
                 Quaternion newRotation = Quaternion.AngleAxis(newAngle, Vector3.forward);

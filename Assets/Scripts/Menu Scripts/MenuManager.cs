@@ -31,7 +31,7 @@ public class MenuManager : MonoBehaviour
     private List<GameObject> abilitySelections = new List<GameObject>();
     private List<TiedController> activeControllers = new List<TiedController>();
     private List<TiedKeybinds> activeKeybinds = new List<TiedKeybinds>();
-    public List<int> queuedPlayersJoining = new List<int>();
+    private List<int> queuedPlayersJoining = new List<int>();
 
     private PlayerJoinStatus[] playerStatuses = new PlayerJoinStatus[MAX_NUM_OF_PLAYERS]; //Array of bools used to determine if the player is selecting an Ability. False if haven't picked colour first.
 	private Color[] colourArray = new Color[NUM_OF_COLOURS]; //Array of possible colours
@@ -41,13 +41,17 @@ public class MenuManager : MonoBehaviour
     private int[] playerAbilityIndexArray = new int[MAX_NUM_OF_PLAYERS];
     private bool[] canChangePlayerColourArray = new bool[MAX_NUM_OF_PLAYERS]; //Array of bools used to determine if the player can change colour, prevents holding keys to flicker through colours.
 
+    private Vector3 prompt_F_OriginalPos = Vector3.zero;
+    private Vector3 prompt_Semicolon_OriginalPos = Vector3.zero;
+    private Vector3 prompt_XboxA_OriginalPos = Vector3.zero;
+
     private float panelDestinationX = -0.42f;
 
 	private InputManager inputManager;
 
     private Vector3 startGamePrompt_Location = new Vector3(1.38f, -1.18f, 0); //Where the prompt to start the game will move to.
 
-    private int currentJoinedPlayerIndex = -1; //Player number of whoever joined recently, set to -1 because arrays start at 0.
+    public int currentJoinedPlayerIndex = -1; //Player number of whoever joined recently, set to -1 because arrays start at 0.
 
 	// Use this for initialization
 	void Start () 
@@ -72,6 +76,7 @@ public class MenuManager : MonoBehaviour
             //Establish all desired panel positions for when they need to be moved on-screen.
             panelPositionsArray[i] = new Vector3(panelDestinationX, previewPlayers[i].transform.parent.transform.position.y, previewPlayers[i].transform.parent.transform.position.z);
 
+            //Store the original positions.
             GameObject currentPanel = previewPlayers[i].transform.parent.gameObject;
             originalPanelPositionsArray[i] = currentPanel.transform.position;
 
@@ -79,6 +84,11 @@ public class MenuManager : MonoBehaviour
             ShowHideAbilitySelection(i, false);
             ShowHideBackPrompt(i, false);
         }
+
+        //Store the original prompt local positions.
+        prompt_F_OriginalPos = joinPrompts[0].transform.FindChild("KEYBOARD_F").localPosition;
+        prompt_Semicolon_OriginalPos = joinPrompts[0].transform.FindChild("KEYBOARD_SEMICOLON").localPosition;
+        prompt_XboxA_OriginalPos = joinPrompts[0].transform.FindChild("XBONE_A").localPosition;
 
 		AnimatePlayers();
 	}
@@ -312,7 +322,7 @@ public class MenuManager : MonoBehaviour
 
                 inputSourceIndex = int.Parse(inputSource.Substring(inputSource.IndexOf(" ") ));
 
-                if (inputSource.Contains("Keybinds"))
+                if (inputSource.Contains("Keybinds") == true)
                 {
                     if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LeftKey.ToString()))
                     {
@@ -333,8 +343,8 @@ public class MenuManager : MonoBehaviour
                         if (playerStatuses[j] == PlayerJoinStatus.ColourSelect) //If the player is still selecting a colour, apply the colour and move on to Ability selection.
                         {
                             //Used to prevent the player status from immediately changing.
-                            if (previewPlayers[j].transform.parent.gameObject.transform.position.x >= panelDestinationX - 0.05f 
-                                && previewPlayers[j].transform.parent.gameObject.transform.position.x <= panelDestinationX + 0.05f) 
+                            if (previewPlayers[j].transform.parent.gameObject.transform.position.x >= panelDestinationX - 0.05f
+                                && previewPlayers[j].transform.parent.gameObject.transform.position.x <= panelDestinationX + 0.05f)
                             {
                                 playerStatuses[j] = PlayerJoinStatus.AbilitySelect;
                                 UpdateSidePrompt(j);
@@ -345,7 +355,11 @@ public class MenuManager : MonoBehaviour
                             }
                         }
                     }
-                }
+                    if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].AbilityKey.ToString()))
+                    {
+                        Back(j);
+                    }
+                } 
             }
         }
 
@@ -369,13 +383,13 @@ public class MenuManager : MonoBehaviour
 
                 inputSourceIndex = int.Parse(inputSource.Substring(inputSource.IndexOf(" ")));
 
-                if (inputSource.Contains("Keybinds"))
+                if (inputSource.Contains("Keybinds") == true)
                 {
                     if (keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].LeftKey.ToString()) && keysReleased.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].RightKey.ToString()))
                     {
                         for (int j = 0; j < activeKeybinds.Count; j++) //Check which player this activeKeybind belongs to and let that player be able to change colour.
                         {
-                            if(activeKeybinds[j].keybindIndex == inputSourceIndex)
+                            if (activeKeybinds[j].keybindIndex == inputSourceIndex)
                                 canChangePlayerColourArray[activeKeybinds[j].playerNum] = true;
                         }
                     }
@@ -397,10 +411,18 @@ public class MenuManager : MonoBehaviour
 
 	private void PlayerJoin(string inputSource)
 	{
-		//When someone presses a Join Button, get the input source and tie it to the current player number.
-		//Ex: if there's no current player 1, tie it to player 1.
-        if(currentJoinedPlayerIndex < MAX_NUM_OF_PLAYERS - 1)
+        //When someone presses a Join Button, get the input source and tie it to the current player number.
+        //Ex: if there's no current player 1, tie it to player 1.
+        if (currentJoinedPlayerIndex < MAX_NUM_OF_PLAYERS - 1)
+        {
             currentJoinedPlayerIndex++;
+
+            //Check all players, if the currentJoinedPlayerIndex is occupied, keep checking until there is an available spot.
+
+            while (playerStatuses[currentJoinedPlayerIndex] != PlayerJoinStatus.NotJoined)
+                currentJoinedPlayerIndex++; 
+        }
+            
 
         //Register their info to the GameInfoManager
         GameInfoManager.Instance.PlayerInputSources[currentJoinedPlayerIndex] = inputSource;
@@ -437,7 +459,7 @@ public class MenuManager : MonoBehaviour
         //Set the player status and update their prompt.
         playerStatuses[currentJoinedPlayerIndex] = PlayerJoinStatus.ColourSelect;
 
-        UpdateSidePrompt(currentJoinedPlayerIndex);
+        UpdateSidePrompt(currentJoinedPlayerIndex, true);
 
         ShowHideBackPrompt(currentJoinedPlayerIndex, true);
 	}
@@ -445,6 +467,24 @@ public class MenuManager : MonoBehaviour
     private void PlayerQuit(int playerNum)
     {   
         //Remove their information from the GameInfoManager, reset their colour, join status, ability, and the current Joined Player Index so the next player to join replaces them.
+
+        if (GameInfoManager.Instance.PlayerInputSources[playerNum].Contains("Controller") == true) //If the player was using a controller, make sure to remove it from the ActiveControllers pool
+        {
+            for (int i = 0; i < activeControllers.Count; i++)
+            {
+                if (activeControllers[i].playerNum == playerNum)
+                    activeControllers.Remove(activeControllers[i]);
+            }
+        }
+        else if (GameInfoManager.Instance.PlayerInputSources[playerNum].Contains("Keybinds") == true)
+        {
+            for (int j = 0; j < activeKeybinds.Count; j++)
+            {
+                if (activeKeybinds[j].playerNum == playerNum)
+                    activeKeybinds.Remove(activeKeybinds[j]);
+            }
+        }
+
         GameInfoManager.Instance.PlayerInputSources[playerNum] = "";
         GameInfoManager.Instance.JoinedPlayers[playerNum] = false;
 
@@ -453,7 +493,26 @@ public class MenuManager : MonoBehaviour
         playerAbilityIndexArray[playerNum] = 1;
         canChangePlayerColourArray[playerNum] = true;
 
-        currentJoinedPlayerIndex = playerNum - 1;
+        //Find the lowest index of players that haven't joined.
+        int lowestIndexNotJoined = 4;
+
+        for (int i = 0; i < playerStatuses.Length; i++)
+        {
+            if (playerStatuses[i] == PlayerJoinStatus.NotJoined)
+            {
+                if (i < lowestIndexNotJoined)
+                {
+                    lowestIndexNotJoined = i;
+
+                    Debug.Log(i);
+                }
+                    
+            }
+        }
+
+        Debug.Log("Lowest index: " + lowestIndexNotJoined);
+
+        currentJoinedPlayerIndex = lowestIndexNotJoined - 1;
     }
 
     private void ButtonMenuInput(int playerNum, List<string> buttonsHeld)
@@ -485,17 +544,15 @@ public class MenuManager : MonoBehaviour
                 LoadGame();
             }
         }
-        else if (buttonsHeld.Contains(inputManager.ControllerArray[playerNum].buttonB))
-        {
-            Back(playerNum);
-        }
 
         //Check registered controllers
         for (int i = 0; i < activeControllers.Count; i++)
         {
-            if (activeControllers[i].playerController.GetButtonHeld(activeControllers[i].playerController.buttonA) )
+            int controllerPlayerNum = activeControllers[i].playerNum;
+
+            if (buttonsHeld.Contains(activeControllers[i].playerController.buttonA) )
             {
-                int controllerPlayerNum = activeControllers[i].playerNum;
+                Debug.Log("Controller player num: " + controllerPlayerNum);
 
                 if (playerStatuses[controllerPlayerNum] == PlayerJoinStatus.ColourSelect) //If the player is still selecting a colour, apply the colour and move on to Ability selection.
                 {
@@ -510,6 +567,10 @@ public class MenuManager : MonoBehaviour
                         ShowHideColourSelection(controllerPlayerNum, false);
                     }
                 }
+            }
+            else if (buttonsHeld.Contains(activeControllers[i].playerController.buttonB) )
+            {
+                Back(controllerPlayerNum);
             }
         }
     }
@@ -595,7 +656,7 @@ public class MenuManager : MonoBehaviour
         }
     }
 
-    private void UpdateSidePrompt(int playerNum)
+    private void UpdateSidePrompt(int playerNum, bool updatePromptButton = false)
     {
         Vector3 newPromptPos = Vector3.zero;
 
@@ -617,46 +678,60 @@ public class MenuManager : MonoBehaviour
                 break;
         }
 
-        if (GameInfoManager.Instance.PlayerInputSources[playerNum].Contains("Keybinds 0") ) //Uses the F key, hide other prompts and center the F prompt
+        if (updatePromptButton == true)
         {
-            joinPrompts[playerNum].transform.FindChild("KEYBOARD_SEMICOLON").GetComponent<SpriteRenderer>().enabled = false;
-            joinPrompts[playerNum].transform.FindChild("XBONE_A").GetComponent<SpriteRenderer>().enabled = false;
+            if (GameInfoManager.Instance.PlayerInputSources[playerNum].Contains("Keybinds 0")) //Uses the F key, hide other prompts and center the F prompt
+            {
+                joinPrompts[playerNum].transform.FindChild("KEYBOARD_SEMICOLON").GetComponent<SpriteRenderer>().enabled = false;
+                joinPrompts[playerNum].transform.FindChild("XBONE_A").GetComponent<SpriteRenderer>().enabled = false;
 
-            newPromptPos = joinPrompts[playerNum].transform.FindChild("KEYBOARD_F").position;
-            newPromptPos.x = joinPrompts[playerNum].transform.FindChild("Join_Text").position.x;
+                newPromptPos = joinPrompts[playerNum].transform.FindChild("KEYBOARD_F").position;
+                newPromptPos.x = joinPrompts[playerNum].transform.FindChild("Join_Text").position.x;
 
-            joinPrompts[playerNum].transform.FindChild("KEYBOARD_F").position = newPromptPos;
+                joinPrompts[playerNum].transform.FindChild("KEYBOARD_F").position = newPromptPos;
 
-            RemovePromptFromOthers(playerNum, "KEYBOARD_F"); //Hide the F Key from all other prompts, since there's only one.
+                RemovePromptFromOthers(playerNum, "KEYBOARD_F"); //Hide the F Key from all other prompts, since there's only one.
 
-            SetBackPrompt(playerNum, true); //Set the back prompt to use R
+                SetBackPrompt(playerNum, true); //Set the back prompt to use R
+            }
+            else if (GameInfoManager.Instance.PlayerInputSources[playerNum].Contains("Keybinds 1")) //Uses the ; key, hide other prompts and center the ; prompt
+            {
+                joinPrompts[playerNum].transform.FindChild("KEYBOARD_F").GetComponent<SpriteRenderer>().enabled = false;
+                joinPrompts[playerNum].transform.FindChild("XBONE_A").GetComponent<SpriteRenderer>().enabled = false;
+
+                newPromptPos = joinPrompts[playerNum].transform.FindChild("KEYBOARD_SEMICOLON").position;
+                newPromptPos.x = joinPrompts[playerNum].transform.FindChild("Join_Text").position.x;
+
+                joinPrompts[playerNum].transform.FindChild("KEYBOARD_SEMICOLON").position = newPromptPos;
+
+                RemovePromptFromOthers(playerNum, "KEYBOARD_SEMICOLON"); //Hide the Semicolon Key from all other prompts, since there's only one.
+
+                SetBackPrompt(playerNum, true); //Set the back prompt to use P
+            }
+            else if (GameInfoManager.Instance.PlayerInputSources[playerNum].Contains("Controller")) //Uses an Xbox controller, hide other prompts and center the A button prompt
+            {
+                joinPrompts[playerNum].transform.FindChild("KEYBOARD_F").GetComponent<SpriteRenderer>().enabled = false;
+                joinPrompts[playerNum].transform.FindChild("KEYBOARD_SEMICOLON").GetComponent<SpriteRenderer>().enabled = false;
+
+                newPromptPos = joinPrompts[playerNum].transform.FindChild("XBONE_A").position;
+                newPromptPos.x = joinPrompts[playerNum].transform.FindChild("Join_Text").position.x;
+
+                joinPrompts[playerNum].transform.FindChild("XBONE_A").position = newPromptPos;
+
+                SetBackPrompt(playerNum, false); //Set the back prompt to use the Xbox B button
+            }
+            else //Otherwise, show all prompts and set them to their original local positions.
+            {
+                joinPrompts[playerNum].transform.FindChild("KEYBOARD_F").GetComponent<SpriteRenderer>().enabled = true;
+                joinPrompts[playerNum].transform.FindChild("KEYBOARD_SEMICOLON").GetComponent<SpriteRenderer>().enabled = true;
+                joinPrompts[playerNum].transform.FindChild("XBONE_A").GetComponent<SpriteRenderer>().enabled = true;
+
+                joinPrompts[playerNum].transform.FindChild("KEYBOARD_F").localPosition = prompt_F_OriginalPos;
+                joinPrompts[playerNum].transform.FindChild("KEYBOARD_SEMICOLON").localPosition = prompt_Semicolon_OriginalPos;
+                joinPrompts[playerNum].transform.FindChild("XBONE_A").localPosition = prompt_XboxA_OriginalPos;
+            }
         }
-        else if (GameInfoManager.Instance.PlayerInputSources[playerNum].Contains("Keybinds 1")) //Uses the ; key, hide other prompts and center the ; prompt
-        {
-            joinPrompts[playerNum].transform.FindChild("KEYBOARD_F").GetComponent<SpriteRenderer>().enabled = false;
-            joinPrompts[playerNum].transform.FindChild("XBONE_A").GetComponent<SpriteRenderer>().enabled = false;
-
-            newPromptPos = joinPrompts[playerNum].transform.FindChild("KEYBOARD_SEMICOLON").position;
-            newPromptPos.x = joinPrompts[playerNum].transform.FindChild("Join_Text").position.x;
-
-            joinPrompts[playerNum].transform.FindChild("KEYBOARD_SEMICOLON").position = newPromptPos;
-
-            RemovePromptFromOthers(playerNum, "KEYBOARD_SEMICOLON"); //Hide the Semicolon Key from all other prompts, since there's only one.
-
-            SetBackPrompt(playerNum, true); //Set the back prompt to use P
-        }
-        else if (GameInfoManager.Instance.PlayerInputSources[playerNum].Contains("Controller")) //Uses an Xbox controller, hide other prompts and center the A button prompt
-        {
-            joinPrompts[playerNum].transform.FindChild("KEYBOARD_F").GetComponent<SpriteRenderer>().enabled = false;
-            joinPrompts[playerNum].transform.FindChild("KEYBOARD_SEMICOLON").GetComponent<SpriteRenderer>().enabled = false;
-
-            newPromptPos = joinPrompts[playerNum].transform.FindChild("XBONE_A").position;
-            newPromptPos.x = joinPrompts[playerNum].transform.FindChild("Join_Text").position.x;
-
-            joinPrompts[playerNum].transform.FindChild("XBONE_A").position = newPromptPos;
-
-            SetBackPrompt(playerNum, false); //Set the back prompt to use the Xbox B button
-        }
+        
 
         joinPrompts[playerNum].transform.FindChild("Join_Text").GetComponent<SpriteRenderer>().sprite = textSprite;
     }
@@ -721,10 +796,19 @@ public class MenuManager : MonoBehaviour
             case PlayerJoinStatus.ColourSelect: //Go back to not joined.
                 PlayerQuit(playerNum);
                 MovePanelBack(playerNum);
+                UpdateSidePrompt(playerNum, true);
                 break;
-            case PlayerJoinStatus.AbilitySelect: //Go back to Colour selection.
+            case PlayerJoinStatus.AbilitySelect: //Go back to Colour selection. Update the side prompt, hide ability selection, show colour selection.
+                playerStatuses[playerNum] = PlayerJoinStatus.ColourSelect;
+                UpdateSidePrompt(playerNum);
+                ShowHideAbilitySelection(playerNum, false);
+                ShowHideColourSelection(playerNum, true);
                 break;
-            case PlayerJoinStatus.Done: //Go back to Ability selection.
+            case PlayerJoinStatus.Done: //Go back to Ability selection. Update the side prompt, show ability selection, hide colour selection.
+                playerStatuses[playerNum] = PlayerJoinStatus.AbilitySelect;
+                UpdateSidePrompt(playerNum);
+                ShowHideAbilitySelection(playerNum, true);
+                ShowHideColourSelection(playerNum, false);
                 break;
             default:
                 break;
