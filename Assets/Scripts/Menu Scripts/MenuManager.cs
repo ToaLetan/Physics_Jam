@@ -365,7 +365,7 @@ public class MenuManager : MonoBehaviour
 
         if (keysHeld.Contains(inputManager.PlayerKeybindArray[0].SelectKey.ToString())) //Start game once enter has been pressed. Make sure to unsub first.
         {
-            if (currentJoinedPlayerIndex >= 1) //Prevent a game from starting until there's at least two players.
+            if (DetermineGameStart() == true) //Prevent a game from starting until there's at least two players.
             {
                 LoadGame();
             }
@@ -503,8 +503,6 @@ public class MenuManager : MonoBehaviour
                 if (i < lowestIndexNotJoined)
                 {
                     lowestIndexNotJoined = i;
-
-                    Debug.Log(i);
                 }
                     
             }
@@ -539,7 +537,7 @@ public class MenuManager : MonoBehaviour
 		}
         else if (buttonsHeld.Contains(inputManager.ControllerArray[playerNum].startButton))
         {
-            if (currentJoinedPlayerIndex >= 1) //Prevent a game from starting until there's at least two players.
+            if (DetermineGameStart() == true) //Prevent a game from starting until there's at least two players.
             {
                 LoadGame();
             }
@@ -726,9 +724,7 @@ public class MenuManager : MonoBehaviour
                 joinPrompts[playerNum].transform.FindChild("KEYBOARD_SEMICOLON").GetComponent<SpriteRenderer>().enabled = true;
                 joinPrompts[playerNum].transform.FindChild("XBONE_A").GetComponent<SpriteRenderer>().enabled = true;
 
-                joinPrompts[playerNum].transform.FindChild("KEYBOARD_F").localPosition = prompt_F_OriginalPos;
-                joinPrompts[playerNum].transform.FindChild("KEYBOARD_SEMICOLON").localPosition = prompt_Semicolon_OriginalPos;
-                joinPrompts[playerNum].transform.FindChild("XBONE_A").localPosition = prompt_XboxA_OriginalPos;
+                AdjustPromptPositions(playerNum, 3);
             }
         }
         
@@ -757,33 +753,69 @@ public class MenuManager : MonoBehaviour
                     }
                 }
 
-                if (numPromptsVisible == 2) //Center both prompts.
-                {
-                    for (int k = 0; k < joinPrompts[i].transform.childCount; k++)
-                    {
-                        if (joinPrompts[i].transform.GetChild(k).name != "Join_Text")
-                        {
-                            Vector3 newPos = joinPrompts[i].transform.GetChild(k).position;
-                            newPos.x -= joinPrompts[i].transform.GetChild(k).GetComponent<SpriteRenderer>().bounds.extents.x * 1.5f;
-
-                            joinPrompts[i].transform.GetChild(k).position = newPos;
-                        }
-                    }
-                }
-                else if (numPromptsVisible == 1) //Center the only prompt.
-                {
-                    for (int l = 0; l < joinPrompts[i].transform.childCount; l++)
-                    {
-                        if (joinPrompts[i].transform.GetChild(l).name != "Join_Text")
-                        {
-                            Vector3 newPos = joinPrompts[i].transform.GetChild(l).position;
-                            newPos.x = joinPrompts[i].transform.FindChild("Join_Text").position.x;
-
-                            joinPrompts[i].transform.GetChild(l).position = newPos;
-                        }
-                    }
-                }
+                AdjustPromptPositions(i, numPromptsVisible);
             }
+        }
+    }
+
+    private void CheckPromptsToRemove()
+    {
+        for (int i = 0; i < GameInfoManager.Instance.PlayerInputSources.Count; i++)
+        {
+            if (GameInfoManager.Instance.PlayerInputSources[i].Contains("Keybinds 0"))
+                RemovePromptFromOthers(i, "KEYBOARD_F");
+            else if (GameInfoManager.Instance.PlayerInputSources[i].Contains("Keybinds 1"))
+                RemovePromptFromOthers(i, "KEYBOARD_SEMICOLON");
+        }
+    }
+
+    private void AdjustPromptPositions(int promptIndex, int numPromptsVisible)
+    {
+        switch(numPromptsVisible)
+        {
+            case 3:
+                joinPrompts[promptIndex].transform.FindChild("KEYBOARD_F").localPosition = prompt_F_OriginalPos;
+                joinPrompts[promptIndex].transform.FindChild("KEYBOARD_SEMICOLON").localPosition = prompt_Semicolon_OriginalPos;
+                joinPrompts[promptIndex].transform.FindChild("XBONE_A").localPosition = prompt_XboxA_OriginalPos;
+                break;
+            case 2:
+                for (int j = 0; j < joinPrompts[promptIndex].transform.childCount; j++)
+                {
+                    if (joinPrompts[promptIndex].transform.GetChild(j).name != "Join_Text")
+                    {
+                        //Use original positions to determine new positions, used to deal with prompts that were previously centered.
+                        Vector3 newPos = Vector3.zero;
+
+                        if (joinPrompts[promptIndex].transform.GetChild(j).name == "KEYBOARD_F")
+                            newPos = prompt_F_OriginalPos;
+                        if (joinPrompts[promptIndex].transform.GetChild(j).name == "KEYBOARD_SEMICOLON")
+                            newPos = prompt_Semicolon_OriginalPos;
+                        if (joinPrompts[promptIndex].transform.GetChild(j).name == "XBONE_A")
+                            newPos = prompt_XboxA_OriginalPos;
+
+                        if (joinPrompts[promptIndex].transform.GetChild(j).name == "KEYBOARD_F")
+                            newPos.x -= (joinPrompts[promptIndex].transform.GetChild(j).GetComponent<SpriteRenderer>().bounds.extents.x * -0.8f);
+                        else
+                            newPos.x -= (joinPrompts[promptIndex].transform.GetChild(j).GetComponent<SpriteRenderer>().bounds.extents.x * 1.5f);
+
+                        joinPrompts[promptIndex].transform.GetChild(j).localPosition = newPos;
+                    }
+                }
+                break;
+            case 1:
+                for (int k = 0; k < joinPrompts[promptIndex].transform.childCount; k++)
+                {
+                    if (joinPrompts[promptIndex].transform.GetChild(k).name != "Join_Text")
+                    {
+                        Vector3 newPos = joinPrompts[promptIndex].transform.GetChild(k).position;
+                        newPos.x = joinPrompts[promptIndex].transform.FindChild("Join_Text").position.x;
+
+                        joinPrompts[promptIndex].transform.GetChild(k).position = newPos;
+                    }
+                }
+                break;
+            default:
+                break;
         }
     }
 
@@ -793,10 +825,15 @@ public class MenuManager : MonoBehaviour
 
         switch(playerStatus)
         {
-            case PlayerJoinStatus.ColourSelect: //Go back to not joined.
+            case PlayerJoinStatus.ColourSelect: //Go back to not joined and move the player's panel back.
                 PlayerQuit(playerNum);
                 MovePanelBack(playerNum);
-                UpdateSidePrompt(playerNum, true);
+
+                //Update all side prompts
+                for (int i = 0; i < MAX_NUM_OF_PLAYERS; i++)
+                    UpdateSidePrompt(i, true);
+
+                CheckPromptsToRemove(); //If any prompts are still claimed, prevent them from appearing.
                 break;
             case PlayerJoinStatus.AbilitySelect: //Go back to Colour selection. Update the side prompt, hide ability selection, show colour selection.
                 playerStatuses[playerNum] = PlayerJoinStatus.ColourSelect;
@@ -813,5 +850,27 @@ public class MenuManager : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    private bool DetermineGameStart()
+    {
+        //Check all player statuses. If all joined players are ready, allow the game to start.
+        bool canGameStart = false;
+        int numJoinedPlayers = 0;
+        int numReadyPlayers = 0;
+
+        for (int i = 0; i < GameInfoManager.Instance.JoinedPlayers.Count; i++)
+        {
+            if (GameInfoManager.Instance.JoinedPlayers[i] == true)
+                numJoinedPlayers++;
+
+            if (playerStatuses[i] == PlayerJoinStatus.AbilitySelect) //TODO: SET TO DONE, USING ABILITY SELECT FOR TESTING
+                numReadyPlayers++;
+        }
+
+        if (numJoinedPlayers >= 2 && numReadyPlayers == numJoinedPlayers) //Game requires at least two people to play.
+            canGameStart = true;
+
+            return canGameStart;
     }
 }
