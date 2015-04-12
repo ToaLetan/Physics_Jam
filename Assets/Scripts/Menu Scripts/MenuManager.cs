@@ -357,10 +357,7 @@ public class MenuManager : MonoBehaviour
                                 }
                                 break;
                             case PlayerJoinStatus.AbilitySelect: //If the player is selecting an ability and presses F or :, progress to the Done state.
-                                playerStatuses[j] = PlayerJoinStatus.Done;
-                                ShowHideAbilitySelection(j, false);
-                                ShowHideAllSidePrompt(j, false);
-                                ShowHideReady(j, true);
+                                PlayerReady(j);
                                 break;
                             default:
                                 break;
@@ -578,10 +575,7 @@ public class MenuManager : MonoBehaviour
                         }
                         break;
                     case PlayerJoinStatus.AbilitySelect: //If the player is selecting an ability and presses F or :, progress to the Done state.
-                        playerStatuses[controllerPlayerNum] = PlayerJoinStatus.Done;
-                        ShowHideAbilitySelection(controllerPlayerNum, false);
-                        ShowHideAllSidePrompt(controllerPlayerNum, false);
-                        ShowHideReady(controllerPlayerNum, true);
+                        PlayerReady(controllerPlayerNum);
                         break;
                     default:
                         break;
@@ -670,6 +664,29 @@ public class MenuManager : MonoBehaviour
             if (joinPrompts[playerNum].transform.GetChild(i).name != "Text_Ready" && joinPrompts[playerNum].transform.GetChild(i).GetComponent<SpriteRenderer>() != null)
             {
                 joinPrompts[playerNum].transform.GetChild(i).GetComponent<SpriteRenderer>().enabled = showPrompt;
+            }
+        }
+    }
+
+    private void ShowFinalInfo(int playerNum) //Shows combined info of Player colour, number, and ability icon.
+    {
+        for (int i = 0; i < previewPlayers[playerNum].transform.childCount; i++)
+        {
+            if (previewPlayers[playerNum].transform.GetChild(i).name == "Arrow" || previewPlayers[playerNum].transform.GetChild(i).name == "ColourPreview")
+                previewPlayers[playerNum].transform.GetChild(i).GetComponent<SpriteRenderer>().enabled = false;
+            else
+            {
+                if (previewPlayers[playerNum].transform.GetChild(i).GetComponent<SpriteRenderer>().enabled == false)
+                previewPlayers[playerNum].transform.GetChild(i).GetComponent<SpriteRenderer>().enabled = true;
+            }
+        }
+
+        for (int j = 0; j < abilitySelections[playerNum].transform.childCount; j++)
+        {
+            if (abilitySelections[playerNum].transform.GetChild(j).name == "Arrow" || abilitySelections[playerNum].transform.GetChild(j).name == "AbilityName"
+                || abilitySelections[playerNum].transform.GetChild(j).name == "AbilityDescription")
+            {
+                abilitySelections[playerNum].transform.GetChild(j).GetComponent<SpriteRenderer>().enabled = false;
             }
         }
     }
@@ -856,6 +873,15 @@ public class MenuManager : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    private void PlayerReady(int playerNum)
+    {
+        playerStatuses[playerNum] = PlayerJoinStatus.Done;
+        //ShowHideAbilitySelection(playerNum, false);
+        ShowFinalInfo(playerNum);
+        ShowHideAllSidePrompt(playerNum, false);
+        ShowHideReady(playerNum, true);
     }
 
     private void Back(int playerNum)
