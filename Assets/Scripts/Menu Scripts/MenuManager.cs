@@ -80,9 +80,10 @@ public class MenuManager : MonoBehaviour
             GameObject currentPanel = previewPlayers[i].transform.parent.gameObject;
             originalPanelPositionsArray[i] = currentPanel.transform.position;
 
-            //Hide all Ability selections and back prompts
+            //Hide all Ability selections, back prompts, and ready indicators
             ShowHideAbilitySelection(i, false);
             ShowHideBackPrompt(i, false);
+            ShowHideReady(i, false);
         }
 
         //Store the original prompt local positions.
@@ -340,19 +341,29 @@ public class MenuManager : MonoBehaviour
                     }
                     if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].GraborThrowKey.ToString()))
                     {
-                        if (playerStatuses[j] == PlayerJoinStatus.ColourSelect) //If the player is still selecting a colour, apply the colour and move on to Ability selection.
+                        switch(playerStatuses[j])
                         {
-                            //Used to prevent the player status from immediately changing.
-                            if (previewPlayers[j].transform.parent.gameObject.transform.position.x >= panelDestinationX - 0.05f
-                                && previewPlayers[j].transform.parent.gameObject.transform.position.x <= panelDestinationX + 0.05f)
-                            {
-                                playerStatuses[j] = PlayerJoinStatus.AbilitySelect;
-                                UpdateSidePrompt(j);
+                            case PlayerJoinStatus.ColourSelect: //If the player is still selecting a colour, apply the colour and move on to Ability selection.
+                                //Used to prevent the player status from immediately changing.
+                                if (previewPlayers[j].transform.parent.gameObject.transform.position.x >= panelDestinationX - 0.05f
+                                    && previewPlayers[j].transform.parent.gameObject.transform.position.x <= panelDestinationX + 0.05f)
+                                {
+                                    playerStatuses[j] = PlayerJoinStatus.AbilitySelect;
+                                    UpdateSidePrompt(j);
 
-                                //Hide the colour selection and show ability selection
-                                ShowHideColourSelection(j, false);
-                                ShowHideAbilitySelection(j, true);
-                            }
+                                    //Hide the colour selection and show ability selection
+                                    ShowHideColourSelection(j, false);
+                                    ShowHideAbilitySelection(j, true);
+                                }
+                                break;
+                            case PlayerJoinStatus.AbilitySelect: //If the player is selecting an ability and presses F or :, progress to the Done state.
+                                playerStatuses[j] = PlayerJoinStatus.Done;
+                                ShowHideAbilitySelection(j, false);
+                                ShowHideAllSidePrompt(j, false);
+                                ShowHideReady(j, true);
+                                break;
+                            default:
+                                break;
                         }
                     }
                     if (keysHeld.Contains(inputManager.PlayerKeybindArray[inputSourceIndex].AbilityKey.ToString()))
@@ -552,18 +563,28 @@ public class MenuManager : MonoBehaviour
             {
                 Debug.Log("Controller player num: " + controllerPlayerNum);
 
-                if (playerStatuses[controllerPlayerNum] == PlayerJoinStatus.ColourSelect) //If the player is still selecting a colour, apply the colour and move on to Ability selection.
+                switch(playerStatuses[controllerPlayerNum])
                 {
-                    //Used to prevent colour selection from immediately being skipped.
-                    if (previewPlayers[controllerPlayerNum].transform.parent.gameObject.transform.position.x >= panelDestinationX - 0.05f
-                                && previewPlayers[controllerPlayerNum].transform.parent.gameObject.transform.position.x <= panelDestinationX + 0.05f)
-                    {
-                        playerStatuses[controllerPlayerNum] = PlayerJoinStatus.AbilitySelect;
-                        UpdateSidePrompt(controllerPlayerNum);
+                    case PlayerJoinStatus.ColourSelect://If the player is still selecting a colour, apply the colour and move on to Ability selection.
+                        //Used to prevent colour selection from immediately being skipped.
+                        if (previewPlayers[controllerPlayerNum].transform.parent.gameObject.transform.position.x >= panelDestinationX - 0.05f
+                                    && previewPlayers[controllerPlayerNum].transform.parent.gameObject.transform.position.x <= panelDestinationX + 0.05f)
+                        {
+                            playerStatuses[controllerPlayerNum] = PlayerJoinStatus.AbilitySelect;
+                            UpdateSidePrompt(controllerPlayerNum);
 
-                        ShowHideAbilitySelection(controllerPlayerNum, true);
-                        ShowHideColourSelection(controllerPlayerNum, false);
-                    }
+                            ShowHideAbilitySelection(controllerPlayerNum, true);
+                            ShowHideColourSelection(controllerPlayerNum, false);
+                        }
+                        break;
+                    case PlayerJoinStatus.AbilitySelect: //If the player is selecting an ability and presses F or :, progress to the Done state.
+                        playerStatuses[controllerPlayerNum] = PlayerJoinStatus.Done;
+                        ShowHideAbilitySelection(controllerPlayerNum, false);
+                        ShowHideAllSidePrompt(controllerPlayerNum, false);
+                        ShowHideReady(controllerPlayerNum, true);
+                        break;
+                    default:
+                        break;
                 }
             }
             else if (buttonsHeld.Contains(activeControllers[i].playerController.buttonB) )
@@ -634,6 +655,25 @@ public class MenuManager : MonoBehaviour
         }
     }
 
+    private void ShowHideReady(int playerNum, bool showPrompt = false)
+    {
+        if (joinPrompts[playerNum].transform.FindChild("Text_Ready").GetComponent<SpriteRenderer>() != null)
+        {
+            joinPrompts[playerNum].transform.FindChild("Text_Ready").GetComponent<SpriteRenderer>().enabled = showPrompt;
+        }
+    }
+
+    private void ShowHideAllSidePrompt(int playerNum, bool showPrompt = false)
+    {
+        for (int i = 0; i < joinPrompts[playerNum].transform.childCount; i++) //Exclude "Ready" since it's covered by ShowHideReady()
+        {
+            if (joinPrompts[playerNum].transform.GetChild(i).name != "Text_Ready" && joinPrompts[playerNum].transform.GetChild(i).GetComponent<SpriteRenderer>() != null)
+            {
+                joinPrompts[playerNum].transform.GetChild(i).GetComponent<SpriteRenderer>().enabled = showPrompt;
+            }
+        }
+    }
+
     private void SetBackPrompt(int previewIndex, bool useKeyboardPrompt = false)
     {
         GameObject prompt = previewPlayers[previewIndex].transform.parent.FindChild("BackPrompt").GetChild(0).gameObject;
@@ -671,8 +711,7 @@ public class MenuManager : MonoBehaviour
             case PlayerJoinStatus.AbilitySelect:
                 textSprite = Resources.Load<Sprite>("Sprites/UI/Menus/Text_SelectAbility");
                 break;
-            case PlayerJoinStatus.Done:
-                textSprite = Resources.Load<Sprite>("Sprites/UI/Menus/Text_Ready");
+            default:
                 break;
         }
 
@@ -746,7 +785,7 @@ public class MenuManager : MonoBehaviour
                 //First, count up all of the visible prompts.
                 for (int j = 0; j < joinPrompts[i].transform.childCount; j++)
                 {
-                    if (joinPrompts[i].transform.GetChild(j).name != "Join_Text")
+                    if (joinPrompts[i].transform.GetChild(j).name != "Join_Text" && joinPrompts[i].transform.GetChild(j).name != "Text_Ready")
                     {
                         if (joinPrompts[i].transform.GetChild(j).GetComponent<SpriteRenderer>() != null && joinPrompts[i].transform.GetChild(j).GetComponent<SpriteRenderer>().enabled == true)
                             numPromptsVisible++;
@@ -781,7 +820,7 @@ public class MenuManager : MonoBehaviour
             case 2:
                 for (int j = 0; j < joinPrompts[promptIndex].transform.childCount; j++)
                 {
-                    if (joinPrompts[promptIndex].transform.GetChild(j).name != "Join_Text")
+                    if (joinPrompts[promptIndex].transform.GetChild(j).name != "Join_Text" && joinPrompts[promptIndex].transform.GetChild(j).name != "Text_Ready")
                     {
                         //Use original positions to determine new positions, used to deal with prompts that were previously centered.
                         Vector3 newPos = Vector3.zero;
@@ -805,7 +844,7 @@ public class MenuManager : MonoBehaviour
             case 1:
                 for (int k = 0; k < joinPrompts[promptIndex].transform.childCount; k++)
                 {
-                    if (joinPrompts[promptIndex].transform.GetChild(k).name != "Join_Text")
+                    if (joinPrompts[promptIndex].transform.GetChild(k).name != "Join_Text" && joinPrompts[promptIndex].transform.GetChild(k).name != "Text_Ready")
                     {
                         Vector3 newPos = joinPrompts[promptIndex].transform.GetChild(k).position;
                         newPos.x = joinPrompts[promptIndex].transform.FindChild("Join_Text").position.x;
@@ -843,7 +882,9 @@ public class MenuManager : MonoBehaviour
                 break;
             case PlayerJoinStatus.Done: //Go back to Ability selection. Update the side prompt, show ability selection, hide colour selection.
                 playerStatuses[playerNum] = PlayerJoinStatus.AbilitySelect;
-                UpdateSidePrompt(playerNum);
+                ShowHideReady(playerNum, false);
+                ShowHideAllSidePrompt(playerNum, true);
+                UpdateSidePrompt(playerNum, true);
                 ShowHideAbilitySelection(playerNum, true);
                 ShowHideColourSelection(playerNum, false);
                 break;
@@ -864,7 +905,7 @@ public class MenuManager : MonoBehaviour
             if (GameInfoManager.Instance.JoinedPlayers[i] == true)
                 numJoinedPlayers++;
 
-            if (playerStatuses[i] == PlayerJoinStatus.AbilitySelect) //TODO: SET TO DONE, USING ABILITY SELECT FOR TESTING
+            if (playerStatuses[i] == PlayerJoinStatus.Done)
                 numReadyPlayers++;
         }
 
