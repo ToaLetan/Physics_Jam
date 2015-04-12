@@ -39,7 +39,7 @@ public class CameraEffectsScript : MonoBehaviour
         if (theCamera.orthographicSize != zoomScale)
         {
             theCamera.orthographicSize += (zoomScale - theCamera.orthographicSize) * zoomSpeed * Time.deltaTime;
-            theCamera.orthographicSize = Mathf.Round(theCamera.orthographicSize * 100.0f)/100.0f;
+            //theCamera.orthographicSize = Mathf.Round(theCamera.orthographicSize * 100.0f)/100.0f; //Caused jitter, probably leaving this out.
         }
 	}
 

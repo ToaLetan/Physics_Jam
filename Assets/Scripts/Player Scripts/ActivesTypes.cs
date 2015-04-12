@@ -198,6 +198,7 @@ public class Active //The base Active class, features cooldown timer and duratio
         GameObject newProjectile = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Glob_Projectile"), owner.PlayerBeam.transform.position, owner.PlayerBeam.transform.rotation) as GameObject;
 
         newProjectile.GetComponent<ActiveProjectileScript>().Destination = objectPos;
+        newProjectile.GetComponent<ActiveProjectileScript>().OwnerPlayer = owner;
     }
 
     private void ShootSlowProjectile()
@@ -214,6 +215,7 @@ public class Active //The base Active class, features cooldown timer and duratio
         GameObject newProjectile = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Glob_Slow_Projectile"), owner.PlayerBeam.transform.position, owner.PlayerBeam.transform.rotation) as GameObject;
 
         newProjectile.GetComponent<ActiveProjectileScript>().Destination = objectPos;
+        newProjectile.GetComponent<ActiveProjectileScript>().OwnerPlayer = owner;
     }
 
     private void ShootSoakProjectile()

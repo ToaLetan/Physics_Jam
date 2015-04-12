@@ -7,6 +7,14 @@ public class SpeedZoneScript : MonoBehaviour
 
     private GameManager gameManager = null;
 
+    private Active abilityInfo = null;
+
+    public Active AbilityInfo
+    {
+        get { return abilityInfo; }
+        set { abilityInfo = value; }
+    }
+
 	// Use this for initialization
 	void Start () 
     {
@@ -16,9 +24,20 @@ public class SpeedZoneScript : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
     {
-        if (gameManager.IsGamePaused == false)
+        /*if (gameManager.IsGamePaused == false)
         {
 
-        }
+        }*/
 	}
+
+    public void TieAbilityInfo(Active ability)
+    {
+        abilityInfo = ability;
+        abilityInfo.Duration.OnTimerComplete += Despawn;
+    }
+
+    private void Despawn()
+    {
+        Destroy(gameObject);
+    }
 }

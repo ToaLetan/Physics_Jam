@@ -77,4 +77,10 @@ public class GravFieldScript : MonoBehaviour
 
         GameObject.Destroy(gameObject.transform.parent.gameObject);
     }
+
+    public void TieAbilityInfo(Active ability)
+    {
+        gravFieldActive = ability;
+        ability.Duration.OnTimerComplete += Despawn;
+    }
 }

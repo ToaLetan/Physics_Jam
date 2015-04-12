@@ -8,7 +8,16 @@ public class GlobPuddleScript : MonoBehaviour
     public PuddleType PuddleClassification;
 
     private AnimationObject animScript = null;
+
+    private Active abilityInfo = null;
+
     private bool hasSpawnedObj = false;
+
+    public Active AbilityInfo
+    {
+        get { return abilityInfo; }
+        set { abilityInfo = value; }
+    }
 
 	// Use this for initialization
 	void Start () 
@@ -32,15 +41,18 @@ public class GlobPuddleScript : MonoBehaviour
             switch (PuddleClassification)
             {
                 case PuddleType.SpeedUp:
-                    GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/OilSlick"), gameObject.transform.position, gameObject.transform.rotation);
+                    GameObject slipGel = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/OilSlick"), gameObject.transform.position, gameObject.transform.rotation) as GameObject;
+                    slipGel.GetComponent<SpeedZoneScript>().TieAbilityInfo(abilityInfo);
                     break;
                 case PuddleType.SpeedDown:
-                    GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/SlowPuddle"), gameObject.transform.position, gameObject.transform.rotation);
+                    GameObject slowGel = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/SlowPuddle"), gameObject.transform.position, gameObject.transform.rotation) as GameObject;
+                    slowGel.GetComponent<SpeedZoneScript>().TieAbilityInfo(abilityInfo);
                     break;
                 case PuddleType.Decoration:
                     break;
                 case PuddleType.GravField:
-                    GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/GravField"), gameObject.transform.position, gameObject.transform.rotation);
+                    GameObject gravField = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/GravField"), gameObject.transform.position, gameObject.transform.rotation) as GameObject;
+                    gravField.transform.FindChild("GravField_Anim").GetComponent<GravFieldScript>().TieAbilityInfo(abilityInfo);
                     break;
             }
             

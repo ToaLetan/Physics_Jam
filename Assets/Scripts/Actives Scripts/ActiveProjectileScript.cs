@@ -5,6 +5,7 @@ public class ActiveProjectileScript : MonoBehaviour
 {
     private const float DESTINATION_DEADZONE = 0.15f;
     private const float PUDDLE_OFFSET = -0.15f;
+    private const float BOUNDS_LIFE_TIMER = 2.5f;
 
     public enum ActiveProjectileType { SpeedUp, SpeedDown, Soak, GravField };
 
@@ -13,9 +14,13 @@ public class ActiveProjectileScript : MonoBehaviour
     public delegate void ProjectileEvent(GameObject collisionObject);
     public event ProjectileEvent OnProjectileCollision;
 
+    private GameManager gameManager = null;
+
     private PlayerScript ownerPlayer = null;
 
     private GameObject collidedPlayer = null;
+
+    private Timer lifeTimer = null;
 
     private Color soakColour = new Color(0.22f, 0.38f, 0.62f, 1.0f);
 
@@ -24,6 +29,7 @@ public class ActiveProjectileScript : MonoBehaviour
     private float velocity = 1.5f;
 
     private bool hasReachedDestination = false;
+    private bool ignoreDestination = false;
 
     public PlayerScript OwnerPlayer
     {
@@ -33,6 +39,12 @@ public class ActiveProjectileScript : MonoBehaviour
     public GameObject CollidedPlayer
     {
         get { return collidedPlayer; }
+    }
+
+    public Timer LifeTimer
+    {
+        get { return lifeTimer; }
+        set { lifeTimer = value; }
     }
 
     public Vector3 Destination
@@ -48,42 +60,59 @@ public class ActiveProjectileScript : MonoBehaviour
 	// Use this for initialization
 	void Start () 
     {
-	
+        lifeTimer = new Timer(BOUNDS_LIFE_TIMER);
+        lifeTimer.OnTimerComplete += Despawn;
+
+        gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
 	}
 	
 	// Update is called once per frame
 	void Update () 
     {
-        float distance = Vector3.Distance(gameObject.transform.position, destination);
+        if (gameManager.IsGamePaused == false)
+        {
+            if (lifeTimer != null)
+                lifeTimer.Update();
 
-        if (distance > DESTINATION_DEADZONE)
-        {
-            UpdateMovement();
-        }
-        else
-        {
-            if (hasReachedDestination == false)
+            if (ignoreDestination == false)
             {
-                hasReachedDestination = true;
+                float distance = Vector3.Distance(gameObject.transform.position, destination);
 
-                //Instantiate the next animation object, destroy this one.
-                switch(ProjectileType)
+                if (distance > DESTINATION_DEADZONE)
                 {
-                    case ActiveProjectileType.SpeedUp:
-                        GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Glob_Splash"), gameObject.transform.position, Quaternion.identity);
-                        break;
-                    case ActiveProjectileType.SpeedDown:
-                        GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Glob_SlowSplash"), gameObject.transform.position, Quaternion.identity);
-                        break;
-                    case ActiveProjectileType.Soak:
-                        break;
-                    case ActiveProjectileType.GravField:
-                        //GameObject gravField = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/GravField"), gameObject.transform.position, Quaternion.identity) as GameObject;
-                        GameObject gravField = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Grav_Impact"), gameObject.transform.position, Quaternion.identity) as GameObject;
-                        break;
+                    UpdateMovement();
                 }
-                GameObject.Destroy(gameObject);
+                else
+                {
+                    if (hasReachedDestination == false)
+                    {
+                        hasReachedDestination = true;
+
+                        //Instantiate the next animation object, destroy this one.
+                        switch (ProjectileType)
+                        {
+                            case ActiveProjectileType.SpeedUp:
+                                GameObject slipSplash = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Glob_Splash"), gameObject.transform.position, Quaternion.identity) as GameObject;
+                                slipSplash.GetComponent<GlobPuddleScript>().AbilityInfo = ownerPlayer.PlayerActive;
+                                break;
+                            case ActiveProjectileType.SpeedDown:
+                                GameObject slowSplash = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Glob_SlowSplash"), gameObject.transform.position, Quaternion.identity) as GameObject;
+                                slowSplash.GetComponent<GlobPuddleScript>().AbilityInfo = ownerPlayer.PlayerActive;
+                                break;
+                            case ActiveProjectileType.Soak:
+                                break;
+                            case ActiveProjectileType.GravField:
+                                //GameObject gravField = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/GravField"), gameObject.transform.position, Quaternion.identity) as GameObject;
+                                GameObject gravField = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Grav_Impact"), gameObject.transform.position, Quaternion.identity) as GameObject;
+                                gravField.GetComponent<GlobPuddleScript>().AbilityInfo = ownerPlayer.PlayerActive;
+                                break;
+                        }
+                        GameObject.Destroy(gameObject);
+                    }
+                }
             }
+            else //If ignoring the destination, just keep moving forward.
+                UpdateMovement();
         }
 	}
 
@@ -94,6 +123,14 @@ public class ActiveProjectileScript : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D coll)
     {
+        if (coll.gameObject.tag == "KillBox")
+        {
+            //Start the timer to despawn out of bounds.
+            ignoreDestination = true;
+
+            lifeTimer.StartTimer();
+        }
+
         if (ProjectileType == ActiveProjectileType.Soak)
         {
             if (coll.gameObject.GetComponent<PlayerScript>() != null && coll.gameObject.GetComponent<PlayerScript>().PlayerNumber != ownerPlayer.PlayerNumber)
@@ -131,5 +168,10 @@ public class ActiveProjectileScript : MonoBehaviour
                 GameObject.Destroy(gameObject);
             }
         }
+    }
+
+    private void Despawn()
+    {
+        Destroy(gameObject);
     }
 }
