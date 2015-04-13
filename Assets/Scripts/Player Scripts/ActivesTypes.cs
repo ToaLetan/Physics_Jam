@@ -254,7 +254,9 @@ public class Active //The base Active class, features cooldown timer and duratio
 
         nextTweenColour = colourOverclockRed;
 
-        owner.gameObject.AddComponent<TweenComponent>();
+        if (owner.gameObject.GetComponent<TweenComponent>() == null)
+            owner.gameObject.AddComponent<TweenComponent>();
+
         TweenComponent playerTween = owner.gameObject.GetComponent<TweenComponent>();
 
         owner.gameObject.transform.FindChild("PlayerArm").gameObject.AddComponent<TweenComponent>();

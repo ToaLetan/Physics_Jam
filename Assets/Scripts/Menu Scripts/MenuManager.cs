@@ -49,9 +49,12 @@ public class MenuManager : MonoBehaviour
 
 	private InputManager inputManager;
 
-    private Vector3 startGamePrompt_Location = new Vector3(1.38f, -1.18f, 0); //Where the prompt to start the game will move to.
+    private Vector3 startGamePrompt_Location = new Vector3(-0.52f, 0.75f, 0); //Where the prompt to start the game will move to.
+    private Vector3 startGamePrompt_OriginalLocation = Vector3.zero;
 
     public int currentJoinedPlayerIndex = -1; //Player number of whoever joined recently, set to -1 because arrays start at 0.
+
+    private bool hasMovedStartPrompt = false;
 
 	// Use this for initialization
 	void Start () 
@@ -91,6 +94,8 @@ public class MenuManager : MonoBehaviour
         prompt_Semicolon_OriginalPos = joinPrompts[0].transform.FindChild("KEYBOARD_SEMICOLON").localPosition;
         prompt_XboxA_OriginalPos = joinPrompts[0].transform.FindChild("XBONE_A").localPosition;
 
+        startGamePrompt_OriginalLocation = GameObject.FindGameObjectWithTag("StartGamePrompt").transform.position;
+
 		AnimatePlayers();
 	}
 	
@@ -103,6 +108,17 @@ public class MenuManager : MonoBehaviour
 
             if (activeControllers.Count > 0)
                 UpdateControllerInput();
+
+            if (hasMovedStartPrompt == false)
+            {
+                if (DetermineGameStart() == true)
+                {
+                    hasMovedStartPrompt = true;
+
+                    MoveStartPrompt();
+                }
+                
+            }
         }
 	}
 
@@ -453,6 +469,7 @@ public class MenuManager : MonoBehaviour
         }*/
 
         //Show the start game prompt if there's at least two people
+        /*
         if (currentJoinedPlayerIndex == 1)
         {
             GameObject startGamePrompt = GameObject.FindGameObjectWithTag("StartGamePrompt");
@@ -462,7 +479,7 @@ public class MenuManager : MonoBehaviour
                 startGamePrompt.AddComponent<TweenComponent>();
                 startGamePrompt.GetComponent<TweenComponent>().TweenPositionTo(startGamePrompt_Location, PANEL_MOVESPEED);
             }
-        }
+        }*/
 
         //Set the player status and update their prompt.
         playerStatuses[currentJoinedPlayerIndex] = PlayerJoinStatus.ColourSelect;
@@ -499,6 +516,8 @@ public class MenuManager : MonoBehaviour
         playerStatuses[playerNum] = PlayerJoinStatus.NotJoined;
         playerColourIndexArray[playerNum] = -1;
         playerAbilityIndexArray[playerNum] = 1;
+        SelectAbility(0, playerNum);
+        
         canChangePlayerColourArray[playerNum] = true;
 
         //Find the lowest index of players that haven't joined.
@@ -593,7 +612,10 @@ public class MenuManager : MonoBehaviour
         if (queuedPlayersJoining.Count > 0)
         {
             GameObject panel = previewPlayers[queuedPlayersJoining[0]].transform.parent.gameObject;
-            panel.AddComponent<TweenComponent>();
+
+            if(panel.GetComponent<TweenComponent>() == null)
+                panel.AddComponent<TweenComponent>();
+            
             panel.GetComponent<TweenComponent>().TweenPositionTo(panelPositionsArray[queuedPlayersJoining[0]], PANEL_MOVESPEED);
 
             queuedPlayersJoining.RemoveAt(0);
@@ -604,7 +626,9 @@ public class MenuManager : MonoBehaviour
     {
         GameObject panel = previewPlayers[panelNum].transform.parent.gameObject;
 
-        panel.AddComponent<TweenComponent>();
+        if (panel.GetComponent<TweenComponent>() == null)
+            panel.AddComponent<TweenComponent>();
+
         panel.GetComponent<TweenComponent>().TweenPositionTo(originalPanelPositionsArray[panelNum], PANEL_MOVESPEED);
     }
 
@@ -689,6 +713,23 @@ public class MenuManager : MonoBehaviour
                 abilitySelections[playerNum].transform.GetChild(j).GetComponent<SpriteRenderer>().enabled = false;
             }
         }
+    }
+
+    private void MoveStartPrompt(bool moveToOriginalPos = false)
+    {
+        GameObject startGamePrompt = GameObject.FindGameObjectWithTag("StartGamePrompt");
+
+        Vector3 destination = Vector3.zero;
+
+        if (moveToOriginalPos == true)
+            destination = startGamePrompt_OriginalLocation;
+        else
+            destination = startGamePrompt_Location;
+
+        if (startGamePrompt.GetComponent<TweenComponent>() == null)
+            startGamePrompt.AddComponent<TweenComponent>();
+
+        startGamePrompt.GetComponent<TweenComponent>().TweenPositionTo(destination, PANEL_MOVESPEED);
     }
 
     private void SetBackPrompt(int previewIndex, bool useKeyboardPrompt = false)
@@ -913,6 +954,13 @@ public class MenuManager : MonoBehaviour
                 UpdateSidePrompt(playerNum, true);
                 ShowHideAbilitySelection(playerNum, true);
                 ShowHideColourSelection(playerNum, false);
+
+                //If the Start prompt is showing, move it back
+                if (hasMovedStartPrompt == true)
+                {
+                    hasMovedStartPrompt = false;
+                    MoveStartPrompt(true);
+                }
                 break;
             default:
                 break;

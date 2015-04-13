@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class TweenComponent : MonoBehaviour 
 {
@@ -125,6 +126,13 @@ public class TweenComponent : MonoBehaviour
     {
         affectedByPause = true;
         gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
+    }
+
+    public void CancelTween()
+    {
+        isTweening = false;
+
+        Destroy(this);
     }
 
     private void ResolveTween(bool destroyComponent)
