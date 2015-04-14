@@ -135,37 +135,40 @@ public class ActiveProjectileScript : MonoBehaviour
         {
             if (coll.gameObject.GetComponent<PlayerScript>() != null && coll.gameObject.GetComponent<PlayerScript>().PlayerNumber != ownerPlayer.PlayerNumber)
             {
-                collidedPlayer = coll.gameObject;
-
-                //Fire the event.
-                if (OnProjectileCollision != null)
-                    OnProjectileCollision(collidedPlayer);
-
-                //Play the splash animation
-                GameObject splashAnim = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Soak_Splash"), gameObject.transform.position, Quaternion.identity) as GameObject;
-
-                //Play the puddle animation
-                Vector3 puddlePos = coll.gameObject.transform.position;
-                puddlePos.y += PUDDLE_OFFSET;
-
-                GameObject puddleAnim = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Soak_Puddle"), puddlePos, Quaternion.identity) as GameObject;
-
-                //Flag the player as being soaked, reduce their speed and instantiate and animated prefab attached to them. Finally, destroy the projectile.
-                GameObject dripAnim = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Soak_Drip"), coll.gameObject.transform.position, Quaternion.identity) as GameObject;
-                dripAnim.transform.parent = coll.gameObject.transform;
-
-                //Slow down the player.
-                coll.gameObject.GetComponent<PlayerScript>().MaxVelocity = 0.25f;
-                coll.gameObject.GetComponent<PlayerScript>().Acceleration = 1.0f;
-
-                //Colour the player.
-                if(coll.gameObject.GetComponent<SpriteRenderer>() != null)
+                if (coll.gameObject.GetComponent<PlayerScript>().CanMove == true) //Prevents cheap shots being taken on falling players.
                 {
-                    coll.gameObject.GetComponent<SpriteRenderer>().color = soakColour;
-                    coll.gameObject.transform.FindChild("PlayerArm").GetComponent<SpriteRenderer>().color = soakColour;
-                }
+                    collidedPlayer = coll.gameObject;
 
-                GameObject.Destroy(gameObject);
+                    //Fire the event.
+                    if (OnProjectileCollision != null)
+                        OnProjectileCollision(collidedPlayer);
+
+                    //Play the splash animation
+                    GameObject splashAnim = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Soak_Splash"), gameObject.transform.position, Quaternion.identity) as GameObject;
+
+                    //Play the puddle animation
+                    Vector3 puddlePos = coll.gameObject.transform.position;
+                    puddlePos.y += PUDDLE_OFFSET;
+
+                    GameObject puddleAnim = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Soak_Puddle"), puddlePos, Quaternion.identity) as GameObject;
+
+                    //Flag the player as being soaked, reduce their speed and instantiate and animated prefab attached to them. Finally, destroy the projectile.
+                    GameObject dripAnim = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Actives/Soak_Drip"), coll.gameObject.transform.position, Quaternion.identity) as GameObject;
+                    dripAnim.transform.parent = coll.gameObject.transform;
+
+                    //Slow down the player.
+                    coll.gameObject.GetComponent<PlayerScript>().MaxVelocity = 0.25f;
+                    coll.gameObject.GetComponent<PlayerScript>().Acceleration = 1.0f;
+
+                    //Colour the player.
+                    if (coll.gameObject.GetComponent<SpriteRenderer>() != null)
+                    {
+                        coll.gameObject.GetComponent<SpriteRenderer>().color = soakColour;
+                        coll.gameObject.transform.FindChild("PlayerArm").GetComponent<SpriteRenderer>().color = soakColour;
+                    }
+
+                    GameObject.Destroy(gameObject);
+                }
             }
         }
     }
