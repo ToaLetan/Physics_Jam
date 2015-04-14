@@ -192,7 +192,7 @@ public class PlayerScript : MonoBehaviour
 
 	public void PlayerInput(int playerNum, List<string> keysHeld)
 	{
-        if (gameManager.IsGamePaused == false)
+        if (gameManager.IsGamePaused == false && gameManager.IsGameOver == false)
         {
             Vector3 newPosition = gameObject.transform.position;
 
@@ -273,7 +273,7 @@ public class PlayerScript : MonoBehaviour
     {
         if (playerNum == inputSourceIndex)
         {
-            if (gameManager.IsGamePaused == false)
+            if (gameManager.IsGamePaused == false && gameManager.IsGameOver == false)
             {
                 Vector3 newPosition = gameObject.transform.position;
 
@@ -343,7 +343,7 @@ public class PlayerScript : MonoBehaviour
     {
         if (playerNum == inputSourceIndex)
         {
-            if (gameManager.IsGamePaused == false)
+            if (gameManager.IsGamePaused == false && gameManager.IsGameOver == false)
             {
                 if (triggerValue >= THUMBSTICK_TRIGGER_DEADZONE)
                 {
@@ -357,7 +357,7 @@ public class PlayerScript : MonoBehaviour
     {
         if (playerNum == inputSourceIndex)
         {
-            if (gameManager.IsGamePaused == false)
+            if (gameManager.IsGamePaused == false && gameManager.IsGameOver == false)
             {
                 if (triggerValue <= -THUMBSTICK_TRIGGER_DEADZONE)
                 {
@@ -375,7 +375,7 @@ public class PlayerScript : MonoBehaviour
 
     public void ApplyDeceleration(int playerNum, List<string> keysReleased)
     {
-        if (gameManager.IsGamePaused == false)
+        if (gameManager.IsGamePaused == false && gameManager.IsGameOver == false)
         {
             Vector3 newPosition = gameObject.transform.position;
 
@@ -435,7 +435,7 @@ public class PlayerScript : MonoBehaviour
     {
         if (playerNum == inputSourceIndex)
         {
-            if (gameManager.IsGamePaused == false)
+            if (gameManager.IsGamePaused == false && gameManager.IsGameOver == false)
             {
                 Vector3 newPosition = gameObject.transform.position;
 
@@ -571,7 +571,7 @@ public class PlayerScript : MonoBehaviour
 
 	private void RotateBeamKeyboard(int direction)
 	{
-        if (gameManager.IsGamePaused == false)
+        if (gameManager.IsGamePaused == false && gameManager.IsGameOver == false)
         {
             float newAngle;
             newAngle = selectorBeam.transform.rotation.eulerAngles.z + turnSpeed * direction * Time.deltaTime;
@@ -587,7 +587,7 @@ public class PlayerScript : MonoBehaviour
 
     private void RotateBeamController(int playerNum, Vector2 thumbstickAxis)
     {
-        if (gameManager.IsGamePaused == false)
+        if (gameManager.IsGamePaused == false && gameManager.IsGameOver == false)
         {
             if (playerNum == inputSourceIndex)
             {

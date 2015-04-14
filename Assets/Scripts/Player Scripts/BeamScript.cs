@@ -58,11 +58,18 @@ public class BeamScript : MonoBehaviour
 
     public void GrabObject()
     {
-        isHoldingObject = true;
-        currentObjectHeld = currentObjectSelected;
+        if (currentObjectSelected != null)
+        {
+            currentObjectSelected.GetComponent<PhysicsObjectScript>().IsFalling = false;
 
-        if (currentObjectHeld.GetComponent<ProjectileAttributeScript>() != null)
-            Destroy(currentObjectHeld.GetComponent<ProjectileAttributeScript>() );
+            isHoldingObject = true;
+            currentObjectHeld = currentObjectSelected;
+
+            currentObjectSelected.transform.localScale = Vector3.one;
+
+            if (currentObjectHeld.GetComponent<ProjectileAttributeScript>() != null)
+                Destroy(currentObjectHeld.GetComponent<ProjectileAttributeScript>());
+        }
     }
 
     public void ReleaseObject(float scaleModifier = 1.0f)

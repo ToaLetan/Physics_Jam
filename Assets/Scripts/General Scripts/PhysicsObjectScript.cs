@@ -19,6 +19,12 @@ public class PhysicsObjectScript : MonoBehaviour
     private bool capVelocity = true;
     private bool hasSpedUp = false;
 
+    public bool IsFalling
+    {
+        get { return isFalling; }
+        set { isFalling = value; }
+    }
+
 	// Use this for initialization
 	void Start () 
     {

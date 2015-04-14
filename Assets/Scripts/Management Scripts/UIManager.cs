@@ -212,7 +212,7 @@ public class UIManager
 
         //Position the text.
         winnerText.transform.parent = playerNamesArray [winnerNum].transform;
-        winnerText.transform.localPosition = new Vector3(0.4f, 0, 0);
+        winnerText.transform.localPosition = new Vector3(0.44f, 0, 0);
        
         endPromptText.transform.localPosition = new Vector3(0, 0, 1);
     }

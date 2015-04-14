@@ -26,6 +26,12 @@ public class GameManager : MonoBehaviour
         set { isGamePaused = value; }
     }
 
+    public bool IsGameOver
+    {
+        get { return isGameOver; }
+        set { isGameOver = value; }
+    }
+
 	// Use this for initialization
 	void Start () 
 	{

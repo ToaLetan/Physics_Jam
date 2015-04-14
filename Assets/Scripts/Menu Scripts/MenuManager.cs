@@ -487,6 +487,13 @@ public class MenuManager : MonoBehaviour
         UpdateSidePrompt(currentJoinedPlayerIndex, true);
 
         ShowHideBackPrompt(currentJoinedPlayerIndex, true);
+
+        //If the Start prompt is showing, move it back
+        if (hasMovedStartPrompt == true)
+        {
+            hasMovedStartPrompt = false;
+            MoveStartPrompt(true);
+        }
 	}
 
     private void PlayerQuit(int playerNum)
