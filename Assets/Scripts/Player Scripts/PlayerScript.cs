@@ -482,7 +482,7 @@ public class PlayerScript : MonoBehaviour
             || keysButtonsPressed.Contains(InputManager.Instance.ControllerArray[inputSourceIndex].startButton)) //Index is always 0 for keyboard since there's only one pause and exit key
         {
             if (gameManager.IsGamePaused == false)
-                gameManager.ShowPauseMenu(inputSource, inputSourceIndex);
+                gameManager.ShowPauseMenu(inputSource, 0); //Set to 0 since both keyboard players share the pause menu
         }
     }
 
