@@ -462,25 +462,6 @@ public class MenuManager : MonoBehaviour
         GameObject joinAnim = GameObject.Instantiate(Resources.Load("Prefabs/AnimatedPrefabs/JoinAnimation"), panelPositionsArray[currentJoinedPlayerIndex], previewPlayers[currentJoinedPlayerIndex].transform.rotation) as GameObject;
         joinAnim.GetComponent<AnimationObject>().Animation_Complete += MovePanel;
 
-        //Hide the prompt
-        /*for (int i = 0; i < joinPrompts[currentJoinedPlayerIndex].transform.childCount; i++)
-        {
-            joinPrompts[currentJoinedPlayerIndex].transform.GetChild(i).GetComponent<SpriteRenderer>().color = new Color(0, 0, 0, 0);
-        }*/
-
-        //Show the start game prompt if there's at least two people
-        /*
-        if (currentJoinedPlayerIndex == 1)
-        {
-            GameObject startGamePrompt = GameObject.FindGameObjectWithTag("StartGamePrompt");
-            for (int j = 0; j < startGamePrompt.transform.childCount; j++)
-            {
-                //startGamePrompt.transform.GetChild(j).GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
-                startGamePrompt.AddComponent<TweenComponent>();
-                startGamePrompt.GetComponent<TweenComponent>().TweenPositionTo(startGamePrompt_Location, PANEL_MOVESPEED);
-            }
-        }*/
-
         //Set the player status and update their prompt.
         playerStatuses[currentJoinedPlayerIndex] = PlayerJoinStatus.ColourSelect;
 
@@ -542,8 +523,6 @@ public class MenuManager : MonoBehaviour
             }
         }
 
-        Debug.Log("Lowest index: " + lowestIndexNotJoined);
-
         currentJoinedPlayerIndex = lowestIndexNotJoined - 1;
     }
 
@@ -582,10 +561,9 @@ public class MenuManager : MonoBehaviour
         {
             int controllerPlayerNum = activeControllers[i].playerNum;
 
-            if (buttonsHeld.Contains(activeControllers[i].playerController.buttonA) )
+            //if (buttonsHeld.Contains(activeControllers[i].playerController.buttonA) )
+            if (activeControllers[i].playerController.GetButtonDown(activeControllers[i].playerController.buttonA))
             {
-                Debug.Log("Controller player num: " + controllerPlayerNum);
-
                 switch(playerStatuses[controllerPlayerNum])
                 {
                     case PlayerJoinStatus.ColourSelect://If the player is still selecting a colour, apply the colour and move on to Ability selection.
@@ -607,7 +585,8 @@ public class MenuManager : MonoBehaviour
                         break;
                 }
             }
-            else if (buttonsHeld.Contains(activeControllers[i].playerController.buttonB) )
+            //else if (buttonsHeld.Contains(activeControllers[i].playerController.buttonB) )
+            else if (activeControllers[i].playerController.GetButtonDown(activeControllers[i].playerController.buttonB))
             {
                 Back(controllerPlayerNum);
             }

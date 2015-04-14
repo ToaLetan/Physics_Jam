@@ -42,7 +42,7 @@ public class PauseMenu : MonoBehaviour
         inputManager.Key_Pressed += ProcessInput;
 
         //Subscribe to controller input events
-        inputManager.Button_Pressed += ProcessInput;
+        inputManager.Button_Pressed += ProcessControllerInput;
         inputManager.Left_Thumbstick_Axis += ProcessThumbsticks;
 
         menuSelections [0] = gameObject.transform.FindChild("Text_Resume").gameObject;
@@ -66,39 +66,58 @@ public class PauseMenu : MonoBehaviour
         }*/
 	}
 
-    private void ProcessInput(int playerNum, List<string> keysButtonsPressed)
+    private void ProcessInput(int playerNum, List<string> keysPressed)
     {
-            if (keysButtonsPressed.Contains(inputManager.PlayerKeybindArray[ownerInputIndex].UpKey.ToString()) || keysButtonsPressed.Contains(inputManager.PlayerKeybindArray[ownerInputIndex].UpKey.ToString()))
+        if (keysPressed.Contains(inputManager.PlayerKeybindArray[ownerInputIndex].UpKey.ToString()))
             {
                 IncrementSelection(-1);
                 HighlightSelection();
             }
 
-            if (keysButtonsPressed.Contains(inputManager.PlayerKeybindArray[ownerInputIndex].DownKey.ToString()) || keysButtonsPressed.Contains(inputManager.PlayerKeybindArray[ownerInputIndex].DownKey.ToString()))
+        if (keysPressed.Contains(inputManager.PlayerKeybindArray[ownerInputIndex].DownKey.ToString()))
             {
                 IncrementSelection(1);
                 HighlightSelection();
             }
 
-            if (keysButtonsPressed.Contains(inputManager.PlayerKeybindArray[0].SelectKey.ToString() )  || keysButtonsPressed.Contains(inputManager.ControllerArray[playerNum].buttonA) )
+            //if (keysButtonsPressed.Contains(inputManager.PlayerKeybindArray[0].SelectKey.ToString() )  || keysButtonsPressed.Contains(inputManager.ControllerArray[playerNum].buttonA) )
+        if (keysPressed.Contains(inputManager.PlayerKeybindArray[0].SelectKey.ToString()) )
                 ProcessSelection();
 
-            if(keysButtonsPressed.Contains(inputManager.ControllerArray[playerNum].buttonB) ) //Close the menu
+        if (keysPressed.Contains(inputManager.PlayerKeybindArray[0].AbilityKey.ToString()) ) //Close the menu
             {
                 inputManager.Key_Pressed -= ProcessInput;
-                inputManager.Button_Pressed -= ProcessInput;
+                inputManager.Button_Pressed -= ProcessControllerInput;
                 inputManager.Left_Thumbstick_Axis -= ProcessThumbsticks;
 
                 gameManager.HidePauseMenu();
-            }
-                
+            }  
+    }
+
+    private void ProcessControllerInput(int playerNum, List<string> buttonsPressed)
+    {
+        //if (keysButtonsPressed.Contains(inputManager.PlayerKeybindArray[0].SelectKey.ToString() )  || keysButtonsPressed.Contains(inputManager.ControllerArray[playerNum].buttonA) )
+        if (inputManager.ControllerArray[ownerInputIndex].GetButtonDown(inputManager.ControllerArray[ownerInputIndex].buttonA) )
+            ProcessSelection();
+
+        if (inputManager.ControllerArray[ownerInputIndex].GetButtonDown(inputManager.ControllerArray[ownerInputIndex].buttonB) ) //Close the menu
+        {
+            inputManager.Key_Pressed -= ProcessInput;
+            inputManager.Button_Pressed -= ProcessControllerInput;
+            inputManager.Left_Thumbstick_Axis -= ProcessThumbsticks;
+
+            gameManager.HidePauseMenu();
+        }  
     }
 
     private void ProcessThumbsticks(int playerNum, Vector2 leftThumbstick)
     {
-        if (playerNum == OwnerInputIndex)
-        {
-            if (leftThumbstick.y > MIN_THUMBSTICK_POS)
+        //if (playerNum == OwnerInputIndex)
+        //{
+
+       // Debug.Log("OWNER: " + ownerInputIndex);
+            //if (leftThumbstick.y > MIN_THUMBSTICK_POS)
+            if (inputManager.ControllerArray[ownerInputIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[ownerInputIndex].leftThumbstickVertical) > MIN_THUMBSTICK_POS)
             {
                 if (canChangeSelection == true)
                 {
@@ -107,7 +126,8 @@ public class PauseMenu : MonoBehaviour
                     canChangeSelection = false;
                 }
             }
-            if (leftThumbstick.y < -MIN_THUMBSTICK_POS)
+            //if (leftThumbstick.y < -MIN_THUMBSTICK_POS)
+            if (inputManager.ControllerArray[ownerInputIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[ownerInputIndex].leftThumbstickVertical) < -MIN_THUMBSTICK_POS)
             {
                 if (canChangeSelection == true)
                 {
@@ -118,11 +138,13 @@ public class PauseMenu : MonoBehaviour
             }
 
             //Allows menu to be used by flicking thumbsticks, prevents flickering.
-            if (leftThumbstick.y < THUMBSTICK_DEADZONE && leftThumbstick.y > -THUMBSTICK_DEADZONE)
+           // if (leftThumbstick.y < THUMBSTICK_DEADZONE && leftThumbstick.y > -THUMBSTICK_DEADZONE)
+            if (inputManager.ControllerArray[ownerInputIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[ownerInputIndex].leftThumbstickVertical) < THUMBSTICK_DEADZONE
+                && inputManager.ControllerArray[ownerInputIndex].GetThumbstickTriggerAxis(inputManager.ControllerArray[ownerInputIndex].leftThumbstickVertical) > -THUMBSTICK_DEADZONE)
             {
                 canChangeSelection = true;
             }
-        }
+        //}
     }
 
     private void IncrementSelection(int index)
@@ -160,14 +182,14 @@ public class PauseMenu : MonoBehaviour
                 if (gameManager.IsGamePaused == true)
                 {
                     inputManager.Key_Pressed -= ProcessInput;
-                    inputManager.Button_Pressed -= ProcessInput;
+                    inputManager.Button_Pressed -= ProcessControllerInput;
                     inputManager.Left_Thumbstick_Axis -= ProcessThumbsticks;
                     gameManager.HidePauseMenu();
                 }
                 break;
             case "Text_Restart":
                 inputManager.Key_Pressed -= ProcessInput;
-                inputManager.Button_Pressed -= ProcessInput;
+                inputManager.Button_Pressed -= ProcessControllerInput;
                 inputManager.Left_Thumbstick_Axis -= ProcessThumbsticks;
                 gameManager.RestartGame();
                 break;
@@ -176,7 +198,7 @@ public class PauseMenu : MonoBehaviour
                 if (isOnControlsScreen == false)
                 {
                     inputManager.Key_Pressed -= ProcessInput;
-                    inputManager.Button_Pressed -= ProcessInput;
+                    inputManager.Button_Pressed -= ProcessControllerInput;
                     inputManager.Left_Thumbstick_Axis -= ProcessThumbsticks;
                     ToggleControlsScreen(true);
                 }
@@ -188,7 +210,7 @@ public class PauseMenu : MonoBehaviour
                 if (gameManager.IsGamePaused == true)
                 {
                     inputManager.Key_Pressed -= ProcessInput;
-                    inputManager.Button_Pressed -= ProcessInput;
+                    inputManager.Button_Pressed -= ProcessControllerInput;
                     inputManager.Left_Thumbstick_Axis -= ProcessThumbsticks;
                     gameManager.HidePauseMenu();
                 }
@@ -238,7 +260,7 @@ public class PauseMenu : MonoBehaviour
 
             //Resub to events
             inputManager.Key_Pressed += ProcessInput;
-            inputManager.Button_Pressed += ProcessInput;
+            inputManager.Button_Pressed += ProcessControllerInput;
             inputManager.Left_Thumbstick_Axis += ProcessThumbsticks;
         }
     }

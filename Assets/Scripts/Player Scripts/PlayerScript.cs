@@ -126,7 +126,7 @@ public class PlayerScript : MonoBehaviour
         inputSource = GameInfoManager.Instance.PlayerInputSources[PlayerNumber];
         inputSourceIndex = int.Parse(inputSource.Substring(inputSource.IndexOf(" ") ) ); //Grabs the index number after the input source
 
-        Debug.Log("PLAYER " + PlayerNumber + " TIED TO INPUT SOURCE: " + inputSource);
+        //Debug.Log("PLAYER " + PlayerNumber + " TIED TO INPUT SOURCE: " + inputSource);
 
         if (inputSource.Contains("Keybinds"))
         {
@@ -482,7 +482,12 @@ public class PlayerScript : MonoBehaviour
             || keysButtonsPressed.Contains(InputManager.Instance.ControllerArray[inputSourceIndex].startButton)) //Index is always 0 for keyboard since there's only one pause and exit key
         {
             if (gameManager.IsGamePaused == false)
-                gameManager.ShowPauseMenu(inputSource, 0); //Set to 0 since both keyboard players share the pause menu
+            {
+                if (inputSource.Contains("Keybinds"))
+                    gameManager.ShowPauseMenu(inputSource, 0); //Set to 0 since both keyboard players share the pause menu
+                else
+                    gameManager.ShowPauseMenu(inputSource, playerNum);
+            }
         }
     }
 
