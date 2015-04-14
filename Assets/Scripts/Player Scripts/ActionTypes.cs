@@ -47,11 +47,13 @@ public static class ActionTypes //All actions players can perform. Everyone star
 
                 //Launch the object
                 clonedObjs[i].GetComponent<Rigidbody2D>().AddForce(clonedObjs[i].transform.right * THROWVELOCITY);
+
                 clonedObjs[i].GetComponent<BoxCollider2D>().enabled = true;
             }
 
             //Launch the initial object
             playerBeam.CurrentObjectHeld.GetComponent<Rigidbody2D>().AddForce(playerBeam.CurrentObjectHeld.transform.right * THROWVELOCITY);
+
             playerBeam.CurrentObjectHeld.GetComponent<BoxCollider2D>().enabled = true;
             
             playerBeam.CurrentObjectHeld.transform.parent = null;
@@ -64,7 +66,7 @@ public static class ActionTypes //All actions players can perform. Everyone star
     {
         if (playerBeam.CurrentObjectHeld != null)
         {
-            playerBeam.CurrentObjectHeld.GetComponent<Rigidbody2D>().AddForce(playerBeam.CurrentObjectHeld.transform.right * THROWVELOCITY/2);
+            playerBeam.CurrentObjectHeld.GetComponent<Rigidbody2D>().AddForce(playerBeam.CurrentObjectHeld.transform.right * THROWVELOCITY / 2);
 
             //Create the boomerang effect by rotating around a point.
             playerBeam.CurrentObjectHeld.AddComponent<ProjectileAttributeScript>();
@@ -83,7 +85,7 @@ public static class ActionTypes //All actions players can perform. Everyone star
         if (playerBeam.CurrentObjectHeld != null)
         {
             //Increase the object's mass and size.
-            playerBeam.CurrentObjectHeld.transform.localScale *= 2;
+            //playerBeam.CurrentObjectHeld.transform.localScale *= 2;
             playerBeam.CurrentObjectHeld.GetComponent<Rigidbody2D>().mass *= 2;
 
             playerBeam.CurrentObjectHeld.GetComponent<Rigidbody2D>().AddForce(playerBeam.CurrentObjectHeld.transform.right * THROWVELOCITY);
@@ -91,7 +93,7 @@ public static class ActionTypes //All actions players can perform. Everyone star
             playerBeam.CurrentObjectHeld.GetComponent<BoxCollider2D>().enabled = true;
             
             playerBeam.CurrentObjectHeld.transform.parent = null;
-            playerBeam.ReleaseObject();
+            playerBeam.ReleaseObject(2);
         }
     }
 
@@ -99,7 +101,7 @@ public static class ActionTypes //All actions players can perform. Everyone star
     {
         if (playerBeam.CurrentObjectHeld != null)
         {
-            playerBeam.CurrentObjectHeld.GetComponent<Rigidbody2D>().AddForce(playerBeam.CurrentObjectHeld.transform.right * THROWVELOCITY/2);
+            playerBeam.CurrentObjectHeld.GetComponent<Rigidbody2D>().AddForce(playerBeam.CurrentObjectHeld.transform.right * THROWVELOCITY / 2);
             
             //Get the opponent's location and home in on them with an offset.
             GameObject[] playerArray = GameObject.FindGameObjectsWithTag("Player");

@@ -68,7 +68,7 @@ public class PhysicsObjectScript : MonoBehaviour
                 }
             }
             //Reflect along the initial trajectory if the player's Reflect Active is in use.
-            if (collisionObj.gameObject.GetComponent<PlayerScript>().PlayerActive != null 
+            if (collisionObj.gameObject.GetComponent<PlayerScript>().PlayerActive != null
                 && collisionObj.gameObject.GetComponent<PlayerScript>().currentActiveType == Active.ActiveType.Reflect 
                 && collisionObj.gameObject.GetComponent<PlayerScript>().PlayerActive.IsReflective == true)
             {

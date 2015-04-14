@@ -65,9 +65,10 @@ public class BeamScript : MonoBehaviour
             Destroy(currentObjectHeld.GetComponent<ProjectileAttributeScript>() );
     }
 
-    public void ReleaseObject()
+    public void ReleaseObject(float scaleModifier = 1.0f)
     {
         isHoldingObject = false;
+        currentObjectHeld.transform.localScale = Vector3.one * scaleModifier;
         currentObjectHeld = null;
     }
 }

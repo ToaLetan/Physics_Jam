@@ -25,7 +25,7 @@ public class PlayerScript : MonoBehaviour
     private PlayerAction currentAction = PlayerAction.Throw_Basic;
 
     //Active
-    public Active.ActiveType currentActiveType = Active.ActiveType.Overclock; //SET TO PUBLIC FOR TESTING
+    public Active.ActiveType currentActiveType = Active.ActiveType.Overclock;
     private Active currentActive = null; //Instance of active that's in use.
 
     //Animations
@@ -573,7 +573,9 @@ public class PlayerScript : MonoBehaviour
 	{
         if (gameManager.IsGamePaused == false)
         {
-            float newAngle = selectorBeam.transform.rotation.eulerAngles.z + turnSpeed * direction * Time.deltaTime;
+            float newAngle;
+            newAngle = selectorBeam.transform.rotation.eulerAngles.z + turnSpeed * direction * Time.deltaTime;
+
             Quaternion newRotation = Quaternion.AngleAxis(newAngle, Vector3.forward);
 
             if (gameObject.transform.FindChild("PlayerArm") != null)
@@ -628,6 +630,11 @@ public class PlayerScript : MonoBehaviour
 	private void ThrowObject()
 	{
         BeamScript playerBeam = selectorBeam.GetComponent<BeamScript> ();
+
+        /*if (currentDirection == Direction.Left)
+            playerBeam.IsFacingLeft = true;
+        else
+            playerBeam.IsFacingLeft = false;*/
 
         if (playerBeam.CurrentObjectHeld != null)
         {
