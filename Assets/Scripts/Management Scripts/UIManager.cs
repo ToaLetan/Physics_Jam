@@ -7,7 +7,7 @@ public class UIManager
     private const float LEFT_PLAYERS_X = -1.16f;
     private const float RIGHT_PLAYERS_X = 0.8f;
     private const float TOP_PLAYERS_Y = 0.98f;
-    private const float BOTTOM_PLAYERS_Y = -0.86f;
+    private const float BOTTOM_PLAYERS_Y = -0.82f; //OLD: -0.86f
     private const float COOLDOWN_SPACING = 0.014f;
 
     private GameObject[] playerArray = new GameObject[4];
@@ -70,6 +70,22 @@ public class UIManager
                 //Create the cooldown icons and position them accordingly.
                 playerCooldownsArray[i] = GameObject.Instantiate(Resources.Load("Prefabs/GUI/Active_Cooldown")) as GameObject;
                 playerCooldownsArray[i].transform.parent = combinedUI.transform;
+
+                //Attach prompts to cooldown icons.
+                GameObject abilityPrompt = GameObject.Instantiate(Resources.Load("Prefabs/GUI/Prompt_LT")) as GameObject;
+
+                Sprite promptSprite = abilityPrompt.GetComponent<SpriteRenderer>().sprite;
+
+                //Set the sprite to match the player's input source, otherwise default to the gamepad prompt.
+                if (GameInfoManager.Instance.PlayerInputSources[i].Contains("Keybinds 0"))
+                    promptSprite = Resources.Load<Sprite>("Sprites/UI/Cooldowns/Prompt_R");
+                else if (GameInfoManager.Instance.PlayerInputSources[i].Contains("Keybinds 1"))
+                    promptSprite = Resources.Load<Sprite>("Sprites/UI/Cooldowns/Prompt_P");
+
+                abilityPrompt.GetComponent<SpriteRenderer>().sprite = promptSprite;
+
+                abilityPrompt.transform.parent = playerCooldownsArray[i].transform;
+                abilityPrompt.transform.localPosition = new Vector3(0.02f, -0.226f, 0);
 
                 Vector3 cooldownPos = playerNamesArray[i].transform.position;
                 cooldownPos.x -= (playerCooldownsArray[i].GetComponent<SpriteRenderer>().sprite.bounds.extents.x) + COOLDOWN_SPACING;
