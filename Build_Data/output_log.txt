@@ -13,28 +13,9 @@ Platform assembly: E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\Assembly
 Loading E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
 Platform assembly: E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\UnityEngine.UI.dll (this message is harmless)
 Loading E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
-- Completed reload, in  0.055 seconds
+- Completed reload, in  0.060 seconds
 desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.
 <RI> Initialized touch support.
 Platform assembly: E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\System.Core.dll (this message is harmless)
-Platform assembly: E:\[PORTFOLIO BUILDS]\Physics_Jam\Build_Data\Managed\System.dll (this message is harmless)
-Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
-UnloadTime: 1.772436 ms
-
-Unloading 134 unused Assets to reduce memory usage. Loaded Objects now: 754.
-Total: 1.019797 ms (FindLiveObjects: 0.147976 ms CreateObjectMapping: 0.135948 ms MarkObjects: 0.393631 ms  DeleteObjects: 0.340054 ms)
-
-Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
-UnloadTime: 1.687149 ms
-
-Unloading 276 unused Assets to reduce memory usage. Loaded Objects now: 553.
-Total: 0.887493 ms (FindLiveObjects: 0.063418 ms CreateObjectMapping: 0.110435 ms MarkObjects: 0.293036 ms  DeleteObjects: 0.414771 ms)
-
-Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
-UnloadTime: 1.514024 ms
-
-Unloading 133 unused Assets to reduce memory usage. Loaded Objects now: 754.
-Total: 1.059889 ms (FindLiveObjects: 0.134126 ms CreateObjectMapping: 0.121369 ms MarkObjects: 0.458508 ms  DeleteObjects: 0.344063 ms)
-

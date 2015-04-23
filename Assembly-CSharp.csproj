@@ -75,6 +75,7 @@
      <Compile Include="Assets\Scripts\Menu Scripts\ControlsScreen.cs" />
      <Compile Include="Assets\Scripts\Menu Scripts\MenuManager.cs" />
      <Compile Include="Assets\Scripts\Menu Scripts\PauseMenu.cs" />
+     <Compile Include="Assets\Scripts\Menu Scripts\SplashScreenManager.cs" />
      <Compile Include="Assets\Scripts\Player Scripts\ActionTypes.cs" />
      <Compile Include="Assets\Scripts\Player Scripts\ActivesTypes.cs" />
      <Compile Include="Assets\Scripts\Player Scripts\AnimatePreviewScript.cs" />

@@ -173,6 +173,6 @@ public class GameManager : MonoBehaviour
     public void RestartGame() //Go back to the Main Menu, make sure to unsubscribe to events, prevent all null errors, etc.
     {
         GameInfoManager.Instance.Reset();
-        Application.LoadLevel("Menu");
+        Application.LoadLevel("Splash");
     }
 }

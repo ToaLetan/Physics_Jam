@@ -102,7 +102,7 @@ public class MenuManager : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-        if (Application.loadedLevel == 0)
+        if (Application.loadedLevel == 1) //WAS 0, WHICH IS NOW SPLASH SCREEN.
         {
             inputManager.Update();
 
@@ -117,7 +117,6 @@ public class MenuManager : MonoBehaviour
 
                     MoveStartPrompt();
                 }
-                
             }
         }
 	}
